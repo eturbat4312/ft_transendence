@@ -4,21 +4,48 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
-    <script src="script.js" type="module"></script>
-    <title>Document</title>
+    <title>Ping Pong Game</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            margin: 50px;
+        }
+
+        header {
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 10px;
+        }
+
+        #play-link {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 18px;
+            text-decoration: none;
+            background-color: #4caf50;
+            color: #fff;
+            border-radius: 5px;
+        }
+
+        #play-link:hover {
+            background-color: #45a049;
+        }
+    </style>
 </head>
 
 <body>
-    <div class="score">
-        <div id="player-score">0</div>
-        <div id="computer-score">0</div>
-    </div>
-    <div class="ball" id="ball"></div>
-    <div class="paddle left" id="player-paddle"></div>
-    <div class="paddle right" id="computer-paddle"></div>
+    <header>
+        <h1>Welcome to the Ping Pong Game!</h1>
+    </header>
 
+    <section>
+        <p>
+            FT_TRANCENDENCE. Click the button below to start playing.
+        </p>
 
+        <a id="play-link" href="register.html">Click here to play</a>
+    </section>
 </body>
 
 </html>

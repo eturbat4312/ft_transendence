@@ -6,8 +6,25 @@ const playerPaddle = new Paddle(document.getElementById("player-paddle"))
 const computerPaddle = new Paddle(document.getElementById("computer-paddle"))
 const playerScoreElem = document.getElementById("player-score")
 const computerScoreElem = document.getElementById("computer-score")
+const player1NameElem = document.getElementById("player1Name")
+const player2NameElem = document.getElementById("player2Name")
+
+const player1Name = getParameterByName('player1Name') || 'Player 1';
+const player2Name = getParameterByName('player2Name') || 'Player 2';
+
+player1NameElem.innerText = player1Name;
+player2NameElem.innerText = player2Name;
+
+
+
 
 let lastTime
+
+function getParameterByName(name) {
+    const url = new URL(window.location.href);
+    return url.searchParams.get(name);
+}
+
 function update(time) {
 
     if (lastTime != null) {
@@ -45,3 +62,4 @@ document.addEventListener("mousemove", e => {
 })
 
 window.requestAnimationFrame(update)
+

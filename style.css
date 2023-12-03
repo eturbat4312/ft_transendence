@@ -79,3 +79,17 @@ body {
     border-right: .5vh solid var(--foreground-color);
 
 }
+
+.playerName {
+    display: flex;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 5vh;
+    color: var(--foreground-color);
+}
+
+#player1Name,
+#player2Name {
+    margin-right: 15px;
+    /* Adjust the value to your preference */
+}
