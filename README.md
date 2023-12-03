@@ -11,9 +11,15 @@ This is a group project about creating a single page web application platform to
 [Blaze Kalonda](https://github.com/blaisek)<br/>
 &emsp;42intra profile : [btchiman](https://profile.intra.42.fr/users/btchiman) <br/>
 <br/>
-
-
-
+[Jules Laurent](https://github.com/porgito)<br/>
+&emsp;42intra profile : [jlaurent](https://profile.intra.42.fr/users/jlaurent) <br/>
+<br/>
+[Gaëtan Renaud](https://github.com/garenaud)<br/>
+&emsp;42intra profile : [grenaud](https://profile.intra.42.fr/users/grenaud-)<br/>
+<br/>
+[Enkhbaatar Turbat](https://github.com/eturbat4312)<br/>
+&emsp;42intra profile : [eturbat](https://profile.intra.42.fr/users/eturbat)<br/>
+<br/>
 
 ## Modules
 
