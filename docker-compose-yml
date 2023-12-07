@@ -1,0 +1,42 @@
+version: '3.9'
+
+networks:
+    transcendence:
+        driver: bridge
+services:
+    front:
+        build:
+            context: ./src/app/front
+            dockerfile: Dockerfile
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./src/app/front:/app/front
+        depends_on:
+            - backend
+        networks:
+            - transcendence
+    backend:
+        build:
+            context: ./src/app/backend
+            dockerfile: Dockerfile
+        ports:
+            - "8080:8080"
+        volumes:
+            - ./src/app/backend:/app/backend
+        depends_on:
+            - db
+        networks:
+            - transcendence
+    db:
+        image: postgres:13.3-alpine
+        ports:
+            - "5432:5432"
+        volumes:
+            - ./src/app/db:/var/lib/postgresql/data
+        environment:
+            POSTGRES_USER: postgres
+            POSTGRES_PASSWORD: postgres
+            POSTGRES_DB: postgres
+        networks:
+            - transcendence

@@ -1,0 +1,13 @@
+{
+  "name": "transcendence",
+  "version": "1.0.0",
+  "description": "a single page web application platform to play Pong game",
+  "scripts": {
+    "start": "http-server -p 8080"
+  },
+  "devDependencies": {
+    "http-server": "^0.12.3",
+    "bootstrap": "^5.3.2"
+  }
+}
+

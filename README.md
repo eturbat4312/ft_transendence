@@ -3,7 +3,7 @@
 
 This is a group project about creating a single page web application platform to play the famous Pong game.
 
-<img src="src/assets/pong.png">
+<img src="src/assets/images/pong.png">
 <br/>
 
 # 🧠 Contributors
