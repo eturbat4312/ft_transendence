@@ -9,11 +9,11 @@ services:
             context: ./src/app/front
             dockerfile: Dockerfile
         ports:
-            - "3000:3000"
+            - "8080:8080"
         volumes:
             - ./src/app/front:/app/front
-        depends_on:
-            - backend
+       # depends_on:
+       #     - backend
         networks:
             - transcendence
     backend:
@@ -21,7 +21,7 @@ services:
             context: ./src/app/backend
             dockerfile: Dockerfile
         ports:
-            - "8080:8080"
+            - "8000:8000"
         volumes:
             - ./src/app/backend:/app/backend
         depends_on:
