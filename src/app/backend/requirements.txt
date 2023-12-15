@@ -1,0 +1,7 @@
+channels>=4.0
+daphne>=3.0
+Django==5.0
+gunicorn==20.1.0
+pillow>=8.2
+psycopg2-binary==2.9.9
+sqlparse==0.4.4

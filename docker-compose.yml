@@ -1,0 +1,24 @@
+version: '3.9'
+
+services:
+    web:
+        build:
+            context: src/app
+            dockerfile: Dockerfile
+        ports:
+            - "8000:8000"
+        volumes:
+            - ./src/app/backend:/app/web
+        depends_on:
+            - db
+
+    db:
+        image: postgres:15.1
+        environment:
+            - POSTGRES_USER=postgres
+            - POSTGRES_PASSWORD=test12345
+            - POSTGRES_DB=pong
+        ports:
+            - "5432:5432"
+        volumes:
+            - ./data/db:/var/lib/postgresql/data/
