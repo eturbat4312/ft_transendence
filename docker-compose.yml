@@ -4,26 +4,14 @@ networks:
     transcendence:
         driver: bridge
 services:
-    front:
+    django:
         build:
-            context: ./src/app/front
-            dockerfile: Dockerfile
-        ports:
-            - "8080:8080"
-        volumes:
-            - ./src/app/front:/app/front
-       # depends_on:
-       #     - backend
-        networks:
-            - transcendence
-    backend:
-        build:
-            context: ./src/app/backend
+            context: ./src/app/django
             dockerfile: Dockerfile
         ports:
             - "8000:8000"
         volumes:
-            - ./src/app/backend:/app/backend
+            - ./src/app/django:/app/django
         depends_on:
             - db
         networks:

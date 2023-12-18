@@ -8,21 +8,17 @@ CYAN		= \033[1;36m
 # VARIABLES
 DOCKERCOMPOSE = docker-compose.yml
 
-front:
-	@echo "${GREEN}Starting front container.."
-	@docker compose -f $(DOCKERCOMPOSE) up -d --build front
+all:
+	@echo "${GREEN}Starting containers.."
+	@docker compose -f $(DOCKERCOMPOSE) up -d --build
 
-back:
-	@echo "${GREEN}Starting back container.."
-	@docker compose -f $(DOCKERCOMPOSE) up -d --build backend
+django:
+	@echo "${GREEN}Starting django container.."
+	@docker compose -f $(DOCKERCOMPOSE) up -d --build django
 
 db:
 	@echo "${GREEN}Starting db container.."
 	@docker compose -f $(DOCKERCOMPOSE) up -d --build db
-
-all:
-	@echo "${GREEN}Starting containers.."
-	@docker compose -f $(DOCKERCOMPOSE) up -d --build
 
 down:
 	@echo "${RED}Stopping containers.."
@@ -35,4 +31,4 @@ clean:
 re: clean all
 	@echo "${CYAN}Containers restarted.."
 
-.phony: front back db all down clean re
+.phony: django db all down clean re
