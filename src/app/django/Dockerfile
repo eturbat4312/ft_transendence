@@ -1,4 +1,4 @@
-FROM python:3.11
+FROM python:3.12.1
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
@@ -14,4 +14,4 @@ COPY . /usr/src/app
 
 EXPOSE 8000
 
-CMD ["python", "manage.py", "runserver", "0.0.0.0:8000"]
+CMD ["python", "transcendence/manage.py", "runserver"]
