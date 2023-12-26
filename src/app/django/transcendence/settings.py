@@ -11,15 +11,20 @@ https://docs.djangoproject.com/en/4.2/ref/settings/
 """
 
 from pathlib import Path
+from decouple import Config
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
 
+env_path = Path(__file__).resolve().parents[3] / '.env'
+
+config = Config(env_path)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
+
 SECRET_KEY = 'django-insecure-zvid94xy)e7)9#0it9rh8z=1x!rcfz#_x)y8+=8yxm&xo5rqy&'
 
 # SECURITY WARNING: don't run with debug turned on in production!
@@ -78,10 +83,10 @@ WSGI_APPLICATION = 'transcendence.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'pong',
-        'USER': 'jules',
-        'PASSWORD': 'test12345',
-        'HOST': 'db',
+        'NAME': 'transcendence',
+        'USER': Config('DB_NAME'),
+        'PASSWORD': Config('POSTGRES_PASSWORD'),
+        'HOST': 'localhost',
         'PORT': '5432',
     }
 }
