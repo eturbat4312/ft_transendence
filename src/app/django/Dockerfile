@@ -1,7 +1,7 @@
 FROM python:3.9.18-slim-bullseye as base
 
 # set environment variables
-ENV PYTHONDONTWRITEBYTECODE 1s
+ENV PYTHONDONTWRITEBYTECODE 1
 ENV PYTHONUNBUFFERED 1
 
 WORKDIR /app/django
@@ -12,9 +12,12 @@ COPY ./requirements.txt /app/django/requirements.txt
 
 RUN pip install -r requirements.txt
 
-RUN pip install django-bootstrap-v5
-
 COPY . /app/django
 
+# Copy the entrypoint script into the image
+COPY ./entrypoint.sh /app/django/entrypoint.sh
+RUN chmod +x /app/django/entrypoint.sh
+
 EXPOSE 8000
-ENTRYPOINT  ["./entrypoint.sh"]
+
+CMD ["/app/django/entrypoint.sh"]

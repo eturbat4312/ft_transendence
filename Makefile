@@ -7,6 +7,7 @@ CYAN		= \033[1;36m
 
 # VARIABLES
 DOCKERCOMPOSE = docker-compose.yml
+ENVSCRIPT = ./script/env.sh
 
 all:
 	@echo "${GREEN}Starting containers.."
@@ -28,7 +29,11 @@ clean:
 	@echo "${ORANGE} Stoping and Removing containers images volumes networks.."
 	@docker compose -f $(DOCKERCOMPOSE) down --rmi all -v --remove-orphans
 
-re: clean all
+re: down all
 	@echo "${CYAN}Containers restarted.."
 
-.phony: django db all down clean re
+env: ## Create/Overwrite .env file
+	@chmod +x $(ENVSCRIPT)
+	@bash $(ENVSCRIPT)
+
+.phony: django db all down clean re env
