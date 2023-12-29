@@ -1,4 +1,4 @@
-FROM python:3.9.18-slim-bullseye as base
+FROM python:3.9 as base
 
 # set environment variables
 ENV PYTHONDONTWRITEBYTECODE 1
