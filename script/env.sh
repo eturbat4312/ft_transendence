@@ -8,15 +8,15 @@
   NC='\033[0m'
 
   # Variables
-  BASEDIR=./ft_transcendence/
-  ENV_PATH=$BASEDIR.env
+  ENV_PATH=.env
 
-  SECRET_KEY=django-insecure-rmg-2_m8-mq=!fw8osm^@&_z60)gj4rw3%qh&(#o*2kaq&a9mj
+  SECRET_KEY='django-insecure-rmg-2_m8-mq=!fw8osm^@&_z60)gj4rw3%qh&(#o*2kaq&a9mj'
   DB_HOST=db
   DB_PORT=5432
   POSTGRES_HOST=0.0.0.0
   DB_NAME=postgres
   DB_USER=postgres
+  DEBUG=True
 
   # Catch if ctrl+c is pressed
   trap ctrl_c INT
@@ -49,7 +49,7 @@
 
   # if .env not filled exit
   if [ -z "$SECRET_KEY" ] || [ -z "$DB_HOST" ] || [ -z "$DB_PORT" ] || [ -z "$POSTGRES_HOST" ] ||
-   [ -z "$DB_NAME" ] || [ -z "$DB_USER" ] || [ -z "$POSTGRES_PASSWORD" ] ; then
+   [ -z "$DB_NAME" ] || [ -z "$DB_USER" ] || [ -z "$POSTGRES_PASSWORD" ] || [ -z "$DEBUG" ] ; then
 
     echo -e "\n${RED}Error: .env file not filled${NC}"
     exit 1
@@ -61,6 +61,7 @@
     echo -e "POSTGRES_HOST=$POSTGRES_HOST" >> $ENV_PATH
     echo -e "DB_NAME=$DB_NAME" >> $ENV_PATH
     echo -e "DB_USER=$DB_USER" >> $ENV_PATH
+    echo -e "DEBUG=$DEBUG" >> $ENV_PATH
     echo -e "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> $ENV_PATH
 
     # Success message
