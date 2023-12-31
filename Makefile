@@ -13,6 +13,10 @@ all:
 	@echo "${GREEN}Starting containers.."
 	@docker compose -f $(DOCKERCOMPOSE) up -d --build
 
+front:
+	@echo "${GREEN}Starting front container.."
+	@docker compose -f $(DOCKERCOMPOSE) up -d --build front
+
 django:
 	@echo "${GREEN}Starting django container.."
 	@docker compose -f $(DOCKERCOMPOSE) up -d --build django
@@ -36,4 +40,4 @@ env: ## Create/Overwrite .env file
 	@chmod +x $(ENVSCRIPT)
 	@bash $(ENVSCRIPT)
 
-.phony: django db all down clean re env
+.phony: front django db all down clean re env

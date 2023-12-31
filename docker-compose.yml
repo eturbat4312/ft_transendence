@@ -4,6 +4,30 @@ networks:
     transcendence:
         driver: bridge
 services:
+    front:
+        build:
+            context: ./src/app/front
+            dockerfile: Dockerfile
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./src/app/front:/app/front
+        depends_on:
+            - django
+        networks:
+            - transcendence
+    #nginx:
+    #    build:
+    #        context: ./src/app/nginx
+    #        dockerfile: Dockerfile
+    #    ports:
+    #        - "80:80"
+    #    volumes:
+    #        - ./src/app/nginx:/app/nginx
+    #    depends_on:
+    #        - django
+    #    networks:
+    #        - transcendence
     django:
         build:
             context: ./src/app/django
