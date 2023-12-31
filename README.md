@@ -16,62 +16,56 @@ This is a group project about creating a single page web application platform to
 <br/>
 [Enkhbaatar Turbat](https://github.com/eturbat4312)<br/>
 &emsp;42intra profile : [eturbat](https://profile.intra.42.fr/users/eturbat)<br/>
-<br/>
 
 ## Mandatory part
 
 - **Overview**
 
-Thanks to your website, users will play Pong with others. You have to provide a nice user interface and real-time multiplayer online games!
-• Your project needs to adhere to the following guidelines as a minimum requirement, contributing only a small portion to the final grade.
-• The second part of this subject will offer additional modules that can replace or complete the following rules.
-In this Subject, certain words are highlighted in green. These represent technology choices that will evolve over time. Pay close attention to the version of the subject.
-<br/>
+Thanks to your website, users will play Pong with others. You have to provide a nice user interface and real-time multiplayer online games !
+- *Your project needs to adhere to the following guidelines as a minimum requirement, contributing only a small portion to the final grade.*
+- *The second part of this subject will offer additional modules that can replace or complete the following rules.*
 
-- **Minimal technical requirement
+
+- **Minimal technical requirement**
 
 Your project has to comply with the following rules:
 
-<br/>
-
 You are free to develop the site, with or without a backend.
-◦ If you choose to include a backend, it must be written in pure Ruby . However,
-this requirement can be overridden by the Framework module.
-◦ If your backend or framework uses a database, you must follow the constraints
-of the Database module.
-• The frontend should be developed using pure vanilla Javascript . However, this
-requirement can be altered through the FrontEnd module.
-• Your website must be a single-page application. The user should be able to use the
-Back and Forward buttons of the browser.
-• Your website must be compatible with the latest stable up-to-date version of
-Google Chrome .
-• The user should encounter no unhandled errors and no warnings when browsing the
-website.
-• Everything must be launched with a single command line to run an autonomous
-container provided by Docker . Example : docker-compose up --build
-<br/>
+- *If you choose to include a backend, it must be written in pure Ruby . However,
+this requirement can be overridden by the Framework module.*
+- *If your backend or framework uses a database, you must follow the constraints
+of the Database module.*
+- *The frontend should be developed using pure vanilla Javascript . However, this
+requirement can be altered through the FrontEnd module.*
+- *Your website must be a single-page application. The user should be able to use the
+Back and Forward buttons of the browser.*
+- *Your website must be compatible with the latest stable up-to-date version of
+Google Chrome.*
+- *The user should encounter no unhandled errors and no warnings when browsing the
+website.*
+- *Everything must be launched with a single command line to run an autonomous
+container provided by Docker . Example : docker-compose up --build*
 
-- **Game**-
+
+- **Game**
 
 The main purpose of this website is to play Pong versus other players.
-• Therefore, users must have the ability to participate in a live Pong game against another player directly on the website. Both players will use the same keyboard. The Remote players module can enhance this functionality with remote players.
-• A player must be able to play against another player, but it should also be possible to propose a tournament. This tournament will consist of multiple players who can take turns playing against each other. You have flexibility in how you implement the tournament, but it must clearly display who is playing against whom and the order of the players.
-• A registration system is required: at the start of a tournament, each player must input their alias name. The aliases will be reset when a new tournament begins. However, this requirement can be modified using the Standard User Management module.
-• There must be a matchmaking system: the tournament system organize the matchmaking of the participants, and announce the next fight.
-• All players must adhere to the same rules, which includes having identical paddle speed. This requirement also applies when using AI; the AI must exhibit the same speed as a regular player.
-• The game itself must be developed in accordance with the default frontend con- straints (as outlined above), or you may choose to utilize the FrontEnd module, or you have the option to override it with the Graphics module. While the visual aesthetics can vary, it must still capture the essence of the original Pong (1972).
+- *Therefore, users must have the ability to participate in a live Pong game against another player directly on the website. Both players will use the same keyboard. The Remote players module can enhance this functionality with remote players.*
+- *A player must be able to play against another player, but it should also be possible to propose a tournament. This tournament will consist of multiple players who can take turns playing against each other. You have flexibility in how you implement the tournament, but it must clearly display who is playing against whom and the order of the players.*
+- *A registration system is required: at the start of a tournament, each player must input their alias name. The aliases will be reset when a new tournament begins. However, this requirement can be modified using the Standard User Management module.*
+- *There must be a matchmaking system: the tournament system organize the matchmaking of the participants, and announce the next fight.*
+- *All players must adhere to the same rules, which includes having identical paddle speed. This requirement also applies when using AI; the AI must exhibit the same speed as a regular player.*
+- *The game itself must be developed in accordance with the default frontend constraints (as outlined above), or you may choose to utilize the FrontEnd module, or you have the option to override it with the Graphics module. While the visual aesthetics can vary, it must still capture the essence of the original Pong (1972).*
 
-<br/>
 
-- **Security concerns**-
+- **Security concerns**
 
 In order to create a basic functional website, here are a few security concerns that you have to tackle:
-• Any password stored in your database, if applicable, must be hashed.
-• Your website must be protected against SQL injections/XSS.
-• If you have a backend or any other features, it is mandatory to enable an HTTPS connection for all aspects (Utilize wss instead of ws...).
-• You must implement some form of validation for forms and any user input, either within the base page if no backend is used or on the server side if a backend is employed.
+- *Any password stored in your database, if applicable, must be hashed.*
+- *Your website must be protected against SQL injections/XSS.*
+- *If you have a backend or any other features, it is mandatory to enable an HTTPS connection for all aspects (Utilize wss instead of ws...).*
+- *You must implement some form of validation for forms and any user input, either within the base page if no backend is used or on the server side if a backend is employed.*
 
-<br/>
 
 ## Modules
 
