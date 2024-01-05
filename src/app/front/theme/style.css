@@ -79,3 +79,11 @@ body {
     border-right: .5vh solid var(--foreground-color);
 
 }
+
+.background-section {
+    background-image: url("../images/pong.jpg"); /* Remplacez par le chemin de votre image */
+    height: 500px; /* Ou la hauteur désirée */
+    background-size: cover; /* Pour couvrir toute la largeur de la div */
+    background-position: center; /* Pour centrer l'image dans la div */
+    background-repeat: no-repeat; /* Pour éviter la répétition de l'image */
+}
