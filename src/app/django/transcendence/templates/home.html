@@ -1,1 +1,96 @@
-<h1>Home Template</h1>
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ping Pong Game</title>
+    <style>
+        body {
+            background-image: url("{% static 'images/bg.jpg' %}");
+            background-position: 10% 40%;
+            -webkit-background-size: cover;
+            -moz-background-size: cover;
+            -o-background-size: cover;
+            background-size: cover;
+            background-color: rgba(0, 0, 0, 0.5);
+        }
+
+        .fadeIn {
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        /* header {
+            background-color: #f2f2f2;
+            padding: 20px;
+            border-radius: 10px;
+        } */
+
+        header {
+            text-align: center;
+            color: #fff;
+            animation: fadeIn 1s ease-in-out;
+        }
+
+        header h1 {
+            color: #ed5656;
+            font-size: 70px;
+            animation: fadeIn 1s ease-in-out;
+
+        }
+
+        #play-link {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 18px;
+            text-decoration: none;
+            background-color: #4caf50;
+            color: #fff;
+            border-radius: 5px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #play-link:hover {
+            background-color: #45a049;
+        }
+
+        #sign-up {
+            display: inline-block;
+            padding: 10px 20px;
+            font-size: 18px;
+            text-decoration: none;
+            background-color: #0bef16bb;
+            color: #fff;
+            border-radius: 5px;
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+        }
+
+        #sign-up:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>Welcome to the Ping Pong Game!</h1>
+    </header>
+
+    <section>
+
+
+        <a id="play-link" href="{% url 'registration:login' %}">Log in</a>
+        <!-- <a id="sign-up" href="#">Sign up</a> -->
+        <a id="sign-up" href="{% url 'registration:signup' %}" style="left: calc(50% + 100px);">Sign Up</a>
+
+    </section>
+</body>
+
+</html>
