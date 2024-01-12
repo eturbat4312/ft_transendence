@@ -13,7 +13,6 @@
   SECRET_KEY='django-insecure-rmg-2_m8-mq=!fw8osm^@&_z60)gj4rw3%qh&(#o*2kaq&a9mj'
   DB_HOST=db
   DB_PORT=5432
-  POSTGRES_HOST=0.0.0.0
   DB_NAME=postgres
   DB_USER=postgres
   DEBUG=True

@@ -7,6 +7,7 @@ ENV PYTHONUNBUFFERED 1
 WORKDIR /app/django
 
 RUN pip install --upgrade pip
+RUN apt-get update && apt-get install -y postgresql-client
 
 COPY ./requirements.txt /app/django/requirements.txt
 
