@@ -4,6 +4,7 @@ import Dashboard from "./views/Dashboard.js";
 import landing from "./views/landing.js";
 import login from "./views/login.js";
 import signup from "./views/signup.js";
+import NotFound from "./views/NotFound.js";
 
 const pathToRegex = path => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
 
@@ -41,7 +42,7 @@ const router = async () => {
 
     if (!match) {
         match = {
-            route: routes[0],
+            route: {path: location.pathname, view: NotFound},
             result: [location.pathname]
         };
     }
