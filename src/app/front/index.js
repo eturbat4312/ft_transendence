@@ -5,6 +5,7 @@ import landing from "./views/landing.js";
 import login from "./views/login.js";
 import signup from "./views/signup.js";
 import NotFound from "./views/NotFound.js";
+import about from "./views/about.js";
 
 const pathToRegex = path => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
 
@@ -24,10 +25,11 @@ const navigateTo = url => {
 
 const router = async () => {
     const routes = [
-        { path: "/", view: landing},
+        { path: "/", view: landing },
         { path: "/login", view: login },
         { path: "/signup", view: signup },
-        { path: "/dashboard", view: Dashboard }
+        { path: "/dashboard", view: Dashboard },
+        { path: "/about", view: about}
     ];
 
     // Test each route for potential match
@@ -37,16 +39,18 @@ const router = async () => {
             result: location.pathname.match(pathToRegex(route.path))
         };
     });
-
+    console.log(potentialMatches);
     let match = potentialMatches.find(potentialMatch => potentialMatch.result !== null);
 
     if (!match) {
         match = {
-            route: {path: location.pathname, view: NotFound},
+            route: { path: location.pathname, view: NotFound },
             result: [location.pathname]
         };
     }
 
+    console.log(match);
+    console.log(location.pathname);
     const view = new match.route.view(getParams(match));
 
     document.querySelector("#app").innerHTML = await view.getHtml();
