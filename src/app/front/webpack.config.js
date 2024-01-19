@@ -3,35 +3,35 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 
 module.exports = {
     mode: 'development',
-    entry: './src/index.js', // Point d'entrée de votre application
+    entry: './src/index.js',
     output: {
         filename: 'bundle.js',
         path: path.resolve(__dirname, 'dist'),
     },
     plugins: [
         new HtmlWebpackPlugin({
-            template: './src/index.html' // Chemin vers votre fichier HTML
+            template: './src/index.html'
         })
     ],
     devServer: {
         static: {
             directory: path.join(__dirname, 'dist'),
         },
-        hot: true, // Active le rechargement à chaud
+        hot: true,
     },
     module:{
         rules: [
             {
                 test: /\.css$/i,
-                use: ['style-loader', 'css-loader'], // Ajoute les fichiers CSS à la page
+                use: ['style-loader', 'css-loader'],
             },
             {
                 test: /\.(png|svg|jpg|jpeg|gif)$/i,
-                type: 'asset/resource', // Ajoute les images à la page
+                type: 'asset/resource',
             },
             {
                 test: /\.(woff|woff2|eot|ttf|otf)$/i,
-                type: 'asset/resource', // Ajoute les polices à la page
+                type: 'asset/resource',
             },
         ],
     },
