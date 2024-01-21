@@ -19,10 +19,24 @@ const getParams = match => {
     }));
 };
 
+(function(history){
+    const pushState = history.pushState;
+    history.pushState = function(state) {
+        if (typeof history.onpushstate == "function") {
+            history.onpushstate({state: state});
+        }
+        return pushState.apply(history, arguments);
+    };
+})(window.history);
+
+window.addEventListener('pushstate', () => {
+    router();
+});
+
 const navigateTo = url => {
     history.pushState(null, null, url);
-    router();
 };
+
 
 const router = async () => {
     const routes = [
@@ -60,12 +74,5 @@ const router = async () => {
 window.addEventListener("popstate", router);
 
 document.addEventListener("DOMContentLoaded", () => {
-    document.body.addEventListener("click", e => {
-        if (e.target.matches("[data-link]")) {
-            e.preventDefault();
-            navigateTo(e.target.href);
-        }
-    });
-
     router();
 });
