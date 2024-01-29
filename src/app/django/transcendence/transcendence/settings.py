@@ -43,7 +43,7 @@ INSTALLED_APPS = [
     "dotenv",
     "registration.apps.RegistrationConfig",
     "rest_framework",
-    # "rest_framework.contrib.authtoken",
+    "rest_framework.authtoken",
 ]
 
 MIDDLEWARE = [
