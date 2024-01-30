@@ -33,6 +33,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
@@ -44,6 +45,8 @@ INSTALLED_APPS = [
     "registration.apps.RegistrationConfig",
     "rest_framework",
     "rest_framework.authtoken",
+    "channels",
+    "game.apps.GameConfig",
 ]
 
 MIDDLEWARE = [
@@ -76,7 +79,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "transcendence.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
@@ -86,7 +88,7 @@ DATABASES = {
         "NAME": os.getenv("DB_NAME"),
         "USER": os.getenv("DB_USER"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
+        "HOST": "localhost",#os.getenv("DB_HOST"),
         "PORT": os.getenv("DB_PORT"),
     }
 }
@@ -131,3 +133,6 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# Daphne
+ASGI_APPLICATION = "transcendence.asgi.application"
