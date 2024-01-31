@@ -40,8 +40,8 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
     "bootstrap5",
-    "dotenv",
     "registration.apps.RegistrationConfig",
+    "dotenv",
     "rest_framework",
     "rest_framework.authtoken",
 ]
@@ -57,6 +57,10 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "transcendence.urls"
+
+# settings.py
+AUTH_USER_MODEL = "registration.User"
+
 
 TEMPLATES = [
     {
@@ -83,10 +87,10 @@ WSGI_APPLICATION = "transcendence.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME"),
+        "NAME": "registration_user",
         "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
+        "PASSWORD": "markhoyor",
+        "HOST": "localhost",
         "PORT": os.getenv("DB_PORT"),
     }
 }

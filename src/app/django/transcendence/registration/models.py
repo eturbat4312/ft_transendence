@@ -1,3 +1,15 @@
+# models.py
+from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-# Create your models here.
+
+class User(AbstractUser):
+    # Add your additional fields here
+    custom_field = models.CharField(max_length=255)
+
+    def __str__(self):
+        return self.username
+
+    class Meta:
+        # Add the following line to resolve the related_name conflict
+        swappable = "AUTH_USER_MODEL"
