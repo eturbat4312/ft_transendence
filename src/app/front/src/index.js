@@ -1,12 +1,15 @@
-
-
-import Dashboard from "../views/dashboard.js";
-import landing from "../views/landing.js";
-import login from "../views/login.js";
-import signup from "../views/signup.js";
+import Tournament from "../views/Tournament.js";
+import Landing from "../views/Landing.js";
+import Login from "../views/Login.js";
+import Signup from "../views/Signup.js";
 import NotFound from "../views/NotFound.js";
-import about from "../views/about.js";
-import '../theme/style.css';
+import About from "../views/about.js";
+import Profile from "../views/Profile.js";
+import Settings from "../views/Settings.js";
+import { getNav, getSocial, getChat } from '../views/utils.js';
+import '../theme/base.css'
+import '../theme/game.css'
+import '../theme/index.css'
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 const pathToRegex = path => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
 
@@ -37,14 +40,17 @@ const navigateTo = url => {
     history.pushState(null, null, url);
 };
 
-
 const router = async () => {
     const routes = [
-        { path: "/", view: landing },
-        { path: "/login", view: login },
-        { path: "/signup", view: signup },
-        { path: "/dashboard", view: Dashboard },
-        { path: "/about", view: about}
+        { path: "/", view: Landing },
+        { path: "/login", view: Login },
+        { path: "/signup", view: Signup },
+        { path: "/tournament", view: Tournament },
+        { path: "/about", view: About},
+        { path: "/profile", view: Profile},
+        { path: "/settings", view: Settings},
+        { path: "/404", view: NotFound},
+        
     ];
 
     // Test each route for potential match
@@ -67,6 +73,17 @@ const router = async () => {
     console.log(match);
     console.log(location.pathname);
     const view = new match.route.view(getParams(match));
+
+    const currentPath = location.pathname;
+
+    const navHTML = (currentPath === "/login" || currentPath === "/signup") ? '' : await getNav(currentPath);
+    document.querySelector("#nav").innerHTML = navHTML;
+
+    const chatHTML = (currentPath === "/login" || currentPath === "/signup") ? '' : await getChat(currentPath);
+    document.querySelector("#chat").innerHTML = chatHTML;
+
+    const socialHTML = (currentPath === "/login" || currentPath === "/signup") ? '' : await getSocial(currentPath);
+    document.querySelector("#social").innerHTML = socialHTML;
 
     document.querySelector("#app").innerHTML = await view.getHtml();
 };

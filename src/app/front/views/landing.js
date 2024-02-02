@@ -3,30 +3,26 @@ import AbstractView from "./AbstractView.js";
 export default class extends AbstractView {
     constructor(params) {
         super(params);
-        this.setTitle("landing");
+        this.setTitle("Landing");
     }
 
     async getHtml() {
         return `
-    <div class="background-section">
-
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-        <a class="navbar-brand" href="#">Transcendence</a>
-        <div class="collapse navbar-collapse" id="navbarNav">
-            <ul class="navbar-nav mx-auto">
-                <li class="nav-item">
-                    <a class="nav-link" href="/login" data-link>LOGIN</a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="/signup" data-link>SIGN UP</a>
-                </li>
-                 <li class="nav-item">
-                    <a class="nav-link" href="/about" data-link>ABOUT</a>
-                </li>
-            </ul>
-        </div>
-        </nav>ß
-    </div>
+        <div id="game" class="container-fluid">
+        <div class="game-container">
+           <div id="center-line"></div>
+           <div class="ball"></div>
+           <div class="paddle" id="paddle1"></div>
+           <div class="paddle" id="paddle2"></div>
+           <div id="countdown" class="countdown-display"></div>
+           <button class="btn btn-primary btn-start" style="z-index: 1;">Start</button>
+           <div id="score">
+              <span id="player1-score" class="score">0</span>
+              <span id="player2-score" class="score">0</span>
+           </div>
+           <div id="winner"></div>       
+        </div>   
+     </div>
         `;
     }
 }
