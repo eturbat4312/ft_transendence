@@ -10,6 +10,7 @@ import { getNav, getSocial, getChat } from '../views/utils.js';
 import '../theme/base.css'
 import '../theme/game.css'
 import '../theme/index.css'
+import '../theme/style.css'
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 const pathToRegex = path => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
 

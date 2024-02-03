@@ -54,9 +54,9 @@ const getSocial = async () => {
             </div>
         </div>
     </div>
-    <div id="friend-bar" class="friend-bar">
+    <div id="friend-bar" class="friend-bar bg-dark">
         <h2>Social</h2>
-        <div id="friend-list-container" class="container">
+            <div id="friend-list-container" class="container">
         <ul id="friend-list" class="friend-list"></ul>
         </div>
     </div>
@@ -65,8 +65,8 @@ const getSocial = async () => {
 
 const getChat = async () => {
     return `
-    <div class="offcanvas offcanvas-start bg-dark" data-bs-backdrop="false" id="offcanvasChat" style="top: 72px;">
-        <button class="btn btn-dark offcanvas-btn position-absolute mt-2 btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasChat">
+    <div class="offcanvas offcanvas-start bg-dark text-light" data-bs-backdrop="false" id="offcanvasChat" style="top: 72px;">
+        <button class="btn btn-dark offcanvas-btn mt-2 position-absolute btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasChat">
             <span>Open</span><span>Close</span>
         </button>
         <div class="chat-header">

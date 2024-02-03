@@ -8,14 +8,14 @@ export default class extends AbstractView {
 
     async getHtml() {
         return `
-        <div class="container mt-5">
-        <div class="row">
-            <div class="col-md-8 offset-md-2">
-                <h1 class="text-center">About FT_TRANSCENDENCE</h1>
-                <p>
+        <div class="container mt-3">
+        <div class="card bg-dark text-light mx-auto" style="max-width: 800px;">
+            <div class="card-body">
+                <h1 class="card-title text-center">About FT_TRANSCENDENCE</h1>
+                <p class="card-text">
                     Welcome to the About page of our website! This is the last project of the 42 common core.
                 </p>
-                <p>
+                <p class="card-text">
                     <strong>Features:</strong>
                     <ul>
                         <li>Classic Pong gameplay</li>
@@ -27,7 +27,7 @@ export default class extends AbstractView {
                         <li>Social space</li>
                     </ul>
                 </p>
-                <p>
+                <p class="card-text">
                     <strong>About the Team:</strong>
                     <br>
                     We are a team of 3 students from 42 Lausanne.
@@ -40,6 +40,7 @@ export default class extends AbstractView {
             </div>
         </div>
     </div>
+    
         `;
     }
 }
