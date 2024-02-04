@@ -12,5 +12,6 @@ urlpatterns = [
     re_path("login/", views.login),
     re_path("register/", views.register),
     re_path("test_token/", views.test_token),
+    re_path("logout/", views.logout),
     path("", include(router.urls)),
 ]
