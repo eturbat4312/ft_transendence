@@ -241,6 +241,42 @@ document.addEventListener("DOMContentLoaded", function () {
         ball.style.display = "block"; // Affichage de la balle
         playButton.style.display = "none";
     }
+
+    document.addEventListener('click', function (event) {
+        if (event.target.matches('.btn-4players')) {
+            selectTournament(4);
+        };
+        if (event.target.matches('.btn-8players')) {
+            selectTournament(8);
+        }
+    });
+
+    function selectTournament(players) {
+        const tournamentInfoDiv = document.getElementById('tournamentInfo');
+        const joinMatchmakingBtn = document.getElementById('joinMatchmakingBtn');
+    
+        if (tournamentInfoDiv) {
+            tournamentInfoDiv.innerHTML = '';
+    
+            const tournamentType = players === 4 ? "4 Players Tournament" : "8 Players Tournament";
+            const tournamentDescription = players === 4 ? "Join the 4 players tournament!" : "Join the 8 players tournament!";
+    
+            const tournamentInfoHTML = `
+                <h4>${tournamentType}</h4>
+                <p>${tournamentDescription}</p>
+            `;
+    
+            tournamentInfoDiv.innerHTML = tournamentInfoHTML;
+    
+            joinMatchmakingBtn.disabled = false;
+        } else {
+            console.error("Element with ID 'tournamentInfo' not found.");
+        }
+    }
+    
+    function joinMatchmaking() {
+        alert('Joining Matchmaking...');
+    }
 });
 
 

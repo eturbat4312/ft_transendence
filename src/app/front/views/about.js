@@ -10,8 +10,10 @@ export default class extends AbstractView {
         return `
         <div class="container mt-3">
         <div class="card bg-dark text-light mx-auto" style="max-width: 800px;">
+            <div class="card-header text-center">
+                <h2>About FT_TRANSCENDENCE</h2>
+            </div>
             <div class="card-body">
-                <h1 class="card-title text-center">About FT_TRANSCENDENCE</h1>
                 <p class="card-text">
                     Welcome to the About page of our website! This is the last project of the 42 common core.
                 </p>
@@ -19,7 +21,6 @@ export default class extends AbstractView {
                     <strong>Features:</strong>
                     <ul>
                         <li>Classic Pong gameplay</li>
-                        <li>Responsive design for various screen sizes</li>
                         <li>Customizable settings</li>
                         <li>Multiplayer mode</li>
                         <li>Global chat and private chat</li>

@@ -10,6 +10,9 @@ export default class Settings extends AbstractView {
         return `
         <div class="container mt-3">
             <div class="card overflow-hidden mx-auto bg-dark text-light">
+                <div class="card-header text-center">
+                    <h2>Settings</h2>
+                </div>
                 <div class="row no-gutters row-bordered row-border-light">
                     <div class="col-md-3 pt-0">
                         <div class="list-group list-group-flush account-settings-links">

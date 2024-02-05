@@ -8,24 +8,27 @@ export default class extends AbstractView {
 
     async getHtml() {
         return `
-        <div id="tournament">
-            <div class="container">
-               <div class="row">
-                  <div class="col">
-                     <h1 class="text-center">Tournament</h1>
-                     <p class="text-center">Lorem
-                        ipsum dolor sit amet, consectetur adipiscing elit. Donec
-                        aliquet, tortor sed accumsan bibendum, erat ligula
-                        aliquet magna, vitae ornare odio metus a mi. Morbi ac
-                        orci et nisl hendrerit mollis. Suspendisse ut massa
-                        nec nisi aliquam ultricies. Duis sit amet commodo
-                        tortor. Proin quis neque lacinia, aliquet massa
-                        eget
-                        </p>
-                  </div>
-               </div>
+        <div class="container mt-3">
+        <div class="card bg-dark text-light mx-auto" style="max-width: 800px;">
+            <div class="card-header text-center">
+                <h2>Tournament</h2>
             </div>
-         </div>
+            <div class="card-body">
+                <div class="text-center mb-4">
+                    <h4>Choose Tournament Type</h4>
+                    <div class="btn-group" role="group" aria-label="Tournament Type">
+                    <button type="button" class="btn btn-primary btn-4players">4 Players Tournament</button>
+                    <button type="button" class="btn btn-primary btn-8players">8 Players Tournament</button>
+                </div>
+                </div>
+                <div class="text-center mt-3">
+                    <button type="button" class="btn btn-success" id="joinMatchmakingBtn" onclick="joinMatchmaking()" disabled>Join Matchmaking</button>
+                </div>
+                <div id="tournamentInfo" class="text-center">
+                </div>
+            </div>
+        </div>
+    </div>
         `;
     }
 }
