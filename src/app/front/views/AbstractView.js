@@ -10,4 +10,8 @@ export default class {
     async getHtml() {
         return "";
     }
+
+    redirect(path) {
+        window.location = path;
+    }
 }

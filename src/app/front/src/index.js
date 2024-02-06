@@ -19,24 +19,23 @@ const getParams = match => {
     }));
 };
 
-(function(history){
+(function (history) {
     const pushState = history.pushState;
-    history.pushState = function(state) {
+    history.pushState = function (state) {
         if (typeof history.onpushstate == "function") {
-            history.onpushstate({state: state});
+            history.onpushstate({ state: state });
         }
         return pushState.apply(history, arguments);
     };
 })(window.history);
 
-window.addEventListener('pushstate', () => {
+window.onpushstate = () => {
     router();
-});
+};
 
 const navigateTo = url => {
     history.pushState(null, null, url);
 };
-
 
 const router = async () => {
     const routes = [
@@ -44,34 +43,39 @@ const router = async () => {
         { path: "/login", view: login },
         { path: "/signup", view: signup },
         { path: "/dashboard", view: Dashboard },
-        { path: "/about", view: about}
+        { path: "/about", view: about }
     ];
 
-    // Test each route for potential match
-    const potentialMatches = routes.map(route => {
-        return {
-            route: route,
-            result: location.pathname.match(pathToRegex(route.path))
-        };
-    });
-    console.log(potentialMatches);
-    let match = potentialMatches.find(potentialMatch => potentialMatch.result !== null);
+    try {
+        const potentialMatches = routes.map(route => {
+            return {
+                route: route,
+                result: location.pathname.match(pathToRegex(route.path))
+            };
+        });
 
-    if (!match) {
-        match = {
-            route: { path: location.pathname, view: NotFound },
-            result: [location.pathname]
-        };
+        let match = potentialMatches.find(potentialMatch => potentialMatch.result !== null);
+
+        if (!match) {
+            match = {
+                route: { path: location.pathname, view: NotFound },
+                result: [location.pathname]
+            };
+        }
+
+        const view = new match.route.view(getParams(match));
+
+        document.querySelector("#app").innerHTML = await view.getHtml();
+
+        if (typeof view.initialize === 'function') {
+            await view.initialize();
+        }
+    } catch (error) {
+        console.error(error);
     }
-
-    console.log(match);
-    console.log(location.pathname);
-    const view = new match.route.view(getParams(match));
-
-    document.querySelector("#app").innerHTML = await view.getHtml();
 };
 
-window.addEventListener("popstate", router);
+window.onpopstate = router;
 
 document.addEventListener("DOMContentLoaded", () => {
     router();
