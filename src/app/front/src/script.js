@@ -40,7 +40,6 @@ document.addEventListener("DOMContentLoaded", function () {
 		updatePaddlePositions();
     }
 
-    // Fonction de gestion des collisions de la balle
     function handleBallCollision() {
         if (ballY < 5 || ballY > 395) ballSpeedY = -ballSpeedY;
 
@@ -50,20 +49,17 @@ document.addEventListener("DOMContentLoaded", function () {
         if (isCollisionWithPaddle()) ballSpeedX = -ballSpeedX;
     }
 
-    // Fonction de détection des collisions avec les palettes
     function isCollisionWithPaddle() {
         const paddle1Collision = ballX < 25 && ballX > 15 && ballY > paddle1Y && ballY < paddle1Y + 80;
         const paddle2Collision = ballX > 575 && ballX < 585 && ballY > paddle2Y && ballY < paddle2Y + 80;
         return paddle1Collision || paddle2Collision;
     }
 
-    // Fonction de mise à jour de la position de la balle
     function updateBallPosition() {
         ball.style.left = ballX + "px";
         ball.style.top = ballY + "px";
     }
 
-    // Fonction de marquage de points
     function scorePoint(player) {
         (player === 1) ? player1Score++ : player2Score++;
 
@@ -71,7 +67,6 @@ document.addEventListener("DOMContentLoaded", function () {
         (player1Score === 5 || player2Score === 5) ? endGame() : reset();
     }
 
-    // Fonction de réinitialisation de la balle
     function resetBall() {
         ballX = 300;
         ballY = 200;
@@ -169,13 +164,11 @@ document.addEventListener("DOMContentLoaded", function () {
 		paddle2.style.top = paddle2Y + "px";
 	}
     // const saveScore = (player1Score, player2Score) => {
-    //     // Obtenez le jeton CSRF à partir des cookies
     //     const csrfToken = document.cookie
     //         .split('; ')
     //         .find(row => row.startsWith('csrftoken='))
     //         .split('=')[1];
     
-    //     // Données à envoyer dans la requête POST
     //     const data = {
     //         player1_score: player1Score,
     //         player2_score: player2Score,
@@ -189,12 +182,10 @@ document.addEventListener("DOMContentLoaded", function () {
     //     })
     //     .then(response => {
     //         console.log(response.data);
-    //         // Gérez la réponse en fonction de vos besoins
     //         addScoreToHistory(player1Score, player2Score);
     //     })
     //     .catch(error => {
     //         console.error(error);
-    //         // Gérez les erreurs en fonction de vos besoins
     //     });
     // };
 
@@ -204,7 +195,6 @@ document.addEventListener("DOMContentLoaded", function () {
     //     newScoreItem.textContent = `Player 1: ${player1Score}, Player 2: ${player2Score}`;
     //     scoreList.appendChild(newScoreItem);
     
-    //     // Stockez également localement pour les futures actualisations de la page
     //     const scoreHistory = JSON.parse(localStorage.getItem('scoreHistory')) || [];
     //     scoreHistory.push({ player1Score, player2Score });
     //     localStorage.setItem('scoreHistory', JSON.stringify(scoreHistory));
@@ -216,7 +206,6 @@ document.addEventListener("DOMContentLoaded", function () {
     //         .then(response => {
     //             const scoreList = document.getElementById('score-list');
     
-    //             // Afficher les scores récupérés dans l'historique
     //             response.data.forEach(score => {
     //                 const newScoreItem = document.createElement('li');
     //                 newScoreItem.textContent = `Player 1: ${score.player1_score}, Player 2: ${score.player2_score}`;
@@ -236,9 +225,9 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     function startGame() {
-        gameActive = true; // Le jeu est actif
-        gameLoop(); // Démarrage de la boucle de jeu
-        ball.style.display = "block"; // Affichage de la balle
+        gameActive = true;
+        gameLoop(); 
+        ball.style.display = "block";
         playButton.style.display = "none";
     }
 
