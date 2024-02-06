@@ -6,8 +6,10 @@ import login from "../views/login.js";
 import signup from "../views/signup.js";
 import NotFound from "../views/NotFound.js";
 import about from "../views/about.js";
+import game from "../views/game.js";
 import '../theme/style.css';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
+//import 'bootstrap';
 const pathToRegex = path => new RegExp("^" + path.replace(/\//g, "\\/").replace(/:\w+/g, "(.+)") + "$");
 
 const getParams = match => {
@@ -44,7 +46,8 @@ const router = async () => {
         { path: "/login", view: login },
         { path: "/signup", view: signup },
         { path: "/dashboard", view: Dashboard },
-        { path: "/about", view: about}
+        { path: "/about", view: about},
+        { path: "/game", view: game}
     ];
 
     // Test each route for potential match
@@ -54,7 +57,7 @@ const router = async () => {
             result: location.pathname.match(pathToRegex(route.path))
         };
     });
-    console.log(potentialMatches);
+    //console.log(potentialMatches);
     let match = potentialMatches.find(potentialMatch => potentialMatch.result !== null);
 
     if (!match) {
@@ -64,8 +67,8 @@ const router = async () => {
         };
     }
 
-    console.log(match);
-    console.log(location.pathname);
+    //console.log(match);
+    //console.log(location.pathname);
     const view = new match.route.view(getParams(match));
 
     document.querySelector("#app").innerHTML = await view.getHtml();
