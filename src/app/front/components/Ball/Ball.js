@@ -29,14 +29,16 @@ export default class Ball {
     }
 
     reset() {
-        this.x = 50
-        this.y = 50
-        this.direction = { x: 0.75, y: 0.5 }
-        while (Math.abs(this.direction.x) <= 0.2 || Math.abs(this.direction.y) <= 0.9) {
-            const heading = randomNumberBetween(0, 2 * Math.PI)
-            this.direction = { x: Math.cos(heading), y: Math.sin(heading) }
+        if (this.element) {
+            this.x = 50
+            this.y = 50
+            this.direction = {x: 0.75, y: 0.5}
+            while (Math.abs(this.direction.x) <= 0.2 || Math.abs(this.direction.y) <= 0.9) {
+                const heading = randomNumberBetween(0, 2 * Math.PI)
+                this.direction = {x: Math.cos(heading), y: Math.sin(heading)}
+            }
+            this.velocity = INITIAL_VELOCITY
         }
-        this.velocity = INITIAL_VELOCITY
     }
 
     update(delta, paddleRects) {

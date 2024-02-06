@@ -13,12 +13,12 @@
 }
 
 
-/*body {
+body {
     margin: 0;
     background-color: var(--background-color);
     overflow: hidden;
 }
-*/
+
 .paddle {
     --position: 50;
 
