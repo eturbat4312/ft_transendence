@@ -8,7 +8,9 @@ from rest_framework.permissions import IsAuthenticated
 from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
 from .models import User as UserModel
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth import authenticate
+from django.contrib.auth import authenticate, get_user_model, logout
+
+UserModel = get_user_model()
 
 
 @api_view(["POST"])
@@ -18,8 +20,8 @@ def register(request):
     if serializer.is_valid():
         # print("serialized")
         # Hash the password before saving
-        hashed_password = make_password(request.data["password"])
-        serializer.validated_data["password"] = hashed_password
+        # hashed_password = make_password(request.data["password"])
+        # serializer.validated_data["password"] = hashed_password
 
         # Save the user
         serializer.save()
@@ -30,9 +32,10 @@ def register(request):
 
 @api_view(["POST"])
 def login(request):
-    user = authenticate(
-        username=request.data["username"], password=request.data["password"]
-    )
+    username = request.data.get("username")
+    password = request.data.get("password")
+    # print(f"Attempting login for : {password}")
+    user = authenticate(request, username=username, password=password)
 
     if user is not None:
         serializer = UserSerializer(instance=user)
@@ -41,6 +44,14 @@ def login(request):
         return Response(
             {"error": "Wrong username or password"}, status=status.HTTP_400_BAD_REQUEST
         )
+
+
+@api_view(["POST"])
+@permission_classes([IsAuthenticated])
+@authentication_classes([TokenAuthentication, SessionAuthentication])
+def logout(request):
+    logout(request)
+    return Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
 
 
 @api_view(["GET"])
