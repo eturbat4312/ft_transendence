@@ -12,6 +12,9 @@ const getNav = async () => {
                             <a href="/" class="nav__link" data-link>Home</a>
                         </li>
                         <li class="nav-item">
+                            <a href="/game" class="nav__link" data-link>Game</a>
+                        </li>
+                        <li class="nav-item">
                             <a href="/tournament" class="nav__link" data-link>Tournament</a>
                         </li>
                         <li class="nav-item">

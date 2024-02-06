@@ -218,10 +218,10 @@ document.addEventListener("DOMContentLoaded", function () {
     // }
 
     // window.onload = loadScoreHistory;
-    document.addEventListener('click', function (event) {
-        if (event.target.matches('.btn-start')) {
+    document.querySelectorAll('.btn-start').forEach(button => {
+        button.addEventListener('click', function() {
             startGame();
-        }
+        });
     });
 
     function startGame() {
@@ -231,14 +231,24 @@ document.addEventListener("DOMContentLoaded", function () {
         playButton.style.display = "none";
     }
 
-    document.addEventListener('click', function (event) {
-        if (event.target.matches('.btn-4players')) {
+    document.querySelectorAll('.btn-4players').forEach(button => {
+        button.addEventListener('click', function() {
             selectTournament(4);
-        };
-        if (event.target.matches('.btn-8players')) {
-            selectTournament(8);
-        }
+        });
     });
+    
+    document.querySelectorAll('.btn-8players').forEach(button => {
+        button.addEventListener('click', function() {
+            selectTournament(8);
+        });
+    });
+    
+    document.querySelectorAll('.btn-matchmaking').forEach(button => {
+        button.addEventListener('click', function() {
+            joinMatchmaking();
+        });
+    });
+    
 
     function selectTournament(players) {
         const tournamentInfoDiv = document.getElementById('tournamentInfo');
@@ -264,7 +274,7 @@ document.addEventListener("DOMContentLoaded", function () {
     }
     
     function joinMatchmaking() {
-        alert('Joining Matchmaking...');
+            alert("Joining matchmaking...");
     }
 });
 

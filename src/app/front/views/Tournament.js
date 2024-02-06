@@ -22,7 +22,7 @@ export default class extends AbstractView {
                 </div>
                 </div>
                 <div class="text-center mt-3">
-                    <button type="button" class="btn btn-success" id="joinMatchmakingBtn" onclick="joinMatchmaking()" disabled>Join Matchmaking</button>
+                    <button type="button" class="btn btn-success btn-matchmaking" id="joinMatchmakingBtn" disabled>Join Matchmaking</button>
                 </div>
                 <div id="tournamentInfo" class="text-center">
                 </div>

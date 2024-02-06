@@ -6,6 +6,7 @@ import NotFound from "../views/NotFound.js";
 import About from "../views/about.js";
 import Profile from "../views/Profile.js";
 import Settings from "../views/Settings.js";
+import Game from "../views/Game.js";
 import { getNav, getSocial, getChat } from '../views/utils.js';
 import '../theme/base.css'
 import '../theme/game.css'
@@ -46,6 +47,7 @@ const router = async () => {
         { path: "/", view: Landing },
         { path: "/login", view: Login },
         { path: "/signup", view: Signup },
+        { path: "/game", view: Game},
         { path: "/tournament", view: Tournament },
         { path: "/about", view: About},
         { path: "/profile", view: Profile},
