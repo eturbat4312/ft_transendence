@@ -33,18 +33,19 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    "daphne",
     "django.contrib.admin",
     "django.contrib.auth",
     "django.contrib.contenttypes",
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
-    "bootstrap5",
-    "registration.apps.RegistrationConfig",
     "dotenv",
+    "registration.apps.RegistrationConfig",
     "rest_framework",
     "rest_framework.authtoken",
-    "corsheaders",
+    "channels",
+    "game",
 ]
 
 MIDDLEWARE = [
@@ -55,21 +56,9 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
-    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "transcendence.urls"
-
-# settings.py
-AUTH_USER_MODEL = "registration.User"
-
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:8080",  # Replace this with the actual origin of your frontend
-]
-
-# Optional: If you want to allow credentials (cookies, Authorization headers, etc.)
-CORS_ALLOW_CREDENTIALS = True
-
 
 TEMPLATES = [
     {
@@ -89,17 +78,16 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "transcendence.wsgi.application"
 
-
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": "registration_user",
+        "NAME": os.getenv("DB_NAME"),
         "USER": os.getenv("DB_USER"),
-        "PASSWORD": "markhoyor",
-        "HOST": "localhost",
+        "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
+        "HOST": "localhost",#os.getenv("DB_HOST"),
         "PORT": os.getenv("DB_PORT"),
     }
 }
@@ -145,9 +133,14 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-REST_FRAMEWORK = {
-    "DEFAULT_AUTHENTICATION_CLASSES": [
-        "rest_framework.authentication.TokenAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
-    ],
+# Daphne
+ASGI_APPLICATION = "transcendence.routing.application"
+
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            "hosts": [('127.0.0.1', 6379)],
+        },
+    },
 }
