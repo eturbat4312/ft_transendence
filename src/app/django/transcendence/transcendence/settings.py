@@ -134,7 +134,7 @@ STATIC_URL = "static/"
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Daphne
-ASGI_APPLICATION = "transcendence.routing.application"
+ASGI_APPLICATION = "transcendence.asgi.application"
 
 CHANNEL_LAYERS = {
     'default': {
