@@ -2,6 +2,8 @@ const SPEED = 0.02
 
 export default class Paddle {
     constructor(paddleElem) {
+
+        if(!paddleElem) throw new Error("Paddle element is not defined")
         this.paddleElem = paddleElem
         this.reset()
     }
@@ -20,7 +22,10 @@ export default class Paddle {
     }
 
     reset() {
-        this.position = 50
+        if(this.paddleElem)
+        {
+            this.position = 50
+        }
     }
 
     update(delta, ballHeight) {

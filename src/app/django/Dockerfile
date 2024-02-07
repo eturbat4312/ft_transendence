@@ -22,3 +22,4 @@ RUN chmod +x /app/django/entrypoint.sh
 EXPOSE 8000
 
 CMD ["/app/django/entrypoint.sh"]
+#CMD ["daphne",]

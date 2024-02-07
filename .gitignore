@@ -6,4 +6,3 @@ node_modules/
 .env
 logs
 *.log
-test.rest
