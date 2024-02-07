@@ -5,14 +5,13 @@ import AbstractView from "./AbstractView.js";
 export default class extends AbstractView {
     constructor(params) {
         super(params);
-        this.setTitle("login");
+        this.setTitle("Login");
     }
 
 
 
     async getHtml() {
         return `
-        <div class="background-section">
         <div class="container">
         <div class="row">
             <div class="col-md-6 offset-md-3">
@@ -37,7 +36,6 @@ export default class extends AbstractView {
                 </div>
             </div>
         </div>
-    </div>
     </div>
         `;
     }
@@ -91,7 +89,7 @@ export default class extends AbstractView {
 
             if (response.ok) {
                 console.log('Login successful!');
-                redirect('/dashboard');
+                redirect('/');
             } else {
                 console.log('Login failed!');
                 console.log(response.statusText);
