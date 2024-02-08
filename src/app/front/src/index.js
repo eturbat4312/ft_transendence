@@ -21,11 +21,11 @@ const getParams = match => {
     }));
 };
 
-(function(history){
+(function (history) {
     const pushState = history.pushState;
-    history.pushState = function(state) {
+    history.pushState = function (state) {
         if (typeof history.onpushstate == "function") {
-            history.onpushstate({state: state});
+            history.onpushstate({ state: state });
         }
         return pushState.apply(history, arguments);
     };
@@ -46,8 +46,8 @@ const router = async () => {
         { path: "/login", view: login },
         { path: "/signup", view: signup },
         { path: "/dashboard", view: Dashboard },
-        { path: "/about", view: about},
-        { path: "/game", view: game}
+        { path: "/about", view: about },
+        { path: "/game", view: game }
     ];
 
     // Test each route for potential match
@@ -71,7 +71,11 @@ const router = async () => {
     //console.log(location.pathname);
     const view = new match.route.view(getParams(match));
 
+
     document.querySelector("#app").innerHTML = await view.getHtml();
+    if (view.initialize) {
+        view.initialize();
+    }
 };
 
 window.addEventListener("popstate", router);
