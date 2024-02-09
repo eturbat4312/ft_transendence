@@ -6,3 +6,5 @@ node_modules/
 .env
 logs
 *.log
+db/
+env/

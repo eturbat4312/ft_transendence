@@ -1,0 +1,103 @@
+.pong-title {
+    color: white;
+    left: 20px;
+    text-shadow: 2px 2px 2px #000;
+    font-family: 'Press Start 2P', cursive;
+}
+
+#friend-list-container {
+   margin-top: 20px;
+   padding: 0;
+}
+ 
+.friend-bar {
+   position: fixed;
+   right: 0;
+   top: 72px;
+   width: 250px;
+   height: 100%;
+   color: #fff;
+   padding: 10px;
+}
+
+.friend-list li {
+   display: flex;
+   align-items: center;
+   margin-bottom: 30px;
+   justify-content: flex-start;
+}
+
+.friend-status {
+   width: 10px;
+   height: 10px;
+   border-radius: 50%;
+   margin-right: 5px;
+}
+
+.online {
+   background-color: #4CAF50;
+}
+
+.offline {
+   background-color: #808080;
+}
+
+.friend-info {
+   display: flex;
+   align-items: center;
+}
+
+.friend-avatar {
+   width: 40px;
+   height: 40px;
+   border-radius: 50%;
+   margin-right: 10px;
+}
+
+.friend-name {
+   margin: 0;
+}
+
+
+.offcanvas-btn {
+   left: 420px;
+   visibility: visible;
+ }
+ 
+ .offcanvas-btn span:last-child,
+ .offcanvas.show .offcanvas-btn span:first-child {
+   display: none;
+ }
+ 
+ .offcanvas.show .offcanvas-btn span:last-child {
+   display: inline;
+ }
+
+  li.dropdown:last-child .dropdown-menu {
+   right: 0;
+   left: auto;
+ }
+
+.box-area {
+    width: 400px;
+    height: 500px;
+}
+
+ .background {
+   background-size: cover;
+   background-position: center;
+   background-repeat: no-repeat;
+   height: 100vh;
+   width: 100vw;
+   top: 0;
+   left: 0;
+   z-index: -1;
+ }
+
+ .modal-backdrop{
+   z-index:-1;
+}
+
+ .hidden {
+    display: none;
+ }
