@@ -230,24 +230,38 @@ document.addEventListener("DOMContentLoaded", function () {
         ball.style.display = "block";
         playButton.style.display = "none";
     }
+});
 
-    document.querySelectorAll('.btn-4players').forEach(button => {
-        button.addEventListener('click', function() {
-            selectTournament(4);
+    export function addTournamentEventListeners() {
+
+        // console.log("tedddst");
+
+        // var bouton = document.querySelectorAll(".btn-4players");
+
+        // if (bouton) {
+        //     console.log("FOUND");
+        // }
+        // else {
+        //     console.log("NO");
+        // }
+        document.querySelectorAll('.btn-4players').forEach(button => {
+            button.addEventListener('click', function() {
+                selectTournament(4);
+            });
         });
-    });
     
-    document.querySelectorAll('.btn-8players').forEach(button => {
-        button.addEventListener('click', function() {
-            selectTournament(8);
+        document.querySelectorAll('.btn-8players').forEach(button => {
+            button.addEventListener('click', function() {
+                selectTournament(8);
+            });
         });
-    });
     
-    document.querySelectorAll('.btn-matchmaking').forEach(button => {
-        button.addEventListener('click', function() {
-            joinMatchmaking();
+        document.querySelectorAll('.btn-matchmaking').forEach(button => {
+            button.addEventListener('click', function() {
+                joinMatchmaking();
+            });
         });
-    });
+    }
     
 
     function selectTournament(players) {
@@ -276,8 +290,3 @@ document.addEventListener("DOMContentLoaded", function () {
     function joinMatchmaking() {
             alert("Joining matchmaking...");
     }
-});
-
-
-
-
