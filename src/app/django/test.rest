@@ -1,0 +1,26 @@
+POST http://127.0.0.1:8000/login/
+Content-Type: application/json
+
+{"username": "john", "password": "1234", "email": "turbat.xt@gmail.com"}
+
+###  
+
+POST http://127.0.0.1:8000/register/
+Content-Type: application/json
+
+{"username": "john1", "password": "1234", "email": "turbat.xt@gmail.com"}
+
+  
+###
+
+POST http://127.0.0.1:8000/logout/
+Content-Type: application/json
+
+{}
+
+###
+
+GET http://127.0.0.1:8000/test_token
+Content-Type: application/json
+
+{"username": "user2", "password": "123"}
