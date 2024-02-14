@@ -4,6 +4,8 @@ export default class extends AbstractView {
     constructor(params) {
         super(params);
         this.setTitle("Signup");
+        // Bind the registerUser method to the class instance
+        this.registerUser = this.registerUser.bind(this);
     }
 
     async initialize() {
@@ -16,7 +18,7 @@ export default class extends AbstractView {
         const form = document.getElementById("signup-form");
         if (form) {
             // Add submit listener
-            form.addEventListener('submit', (event) => this.registerUser(event));
+            form.addEventListener('submit', this.registerUser);
             console.log("initialized!!!");
         } else {
             console.error("Form element not found");
@@ -24,7 +26,6 @@ export default class extends AbstractView {
     }
 
     async getHtml() {
-
         return `
             <div class="background-section">
                 <div class="container">
@@ -64,32 +65,25 @@ export default class extends AbstractView {
         `;
     }
 
-
     async registerUser(event) {
-
         const form = event.target;
         console.log('Form Element:', form);
 
         // Log input values  
         const inputs = form.elements;
-
         for (let input of inputs) {
             console.log(input.name, ':', input.value);
         }
+
         const formData = new FormData(form);
         event.preventDefault();
 
         console.log("submit");
 
-
-
         const searchParams = new URLSearchParams(formData);
         console.log(searchParams.get("username"));
 
-
-
         try {
-            // console.log("try");
             const response = await fetch('http://localhost:8000/register/', {
                 method: 'POST',
                 body: searchParams,
@@ -105,15 +99,8 @@ export default class extends AbstractView {
                 console.log('Registration failed!');
                 console.log(response.statusText);
             }
-
         } catch (error) {
             console.log(error);
         }
     }
 }
-
-// Create an instance of SignUpView
-// document.addEventListener('DOMContentLoaded', () => {
-//     const signUpView = new SignUpView();
-//     signUpView.initialize();
-// });

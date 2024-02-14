@@ -44,6 +44,7 @@ INSTALLED_APPS = [
     "registration.apps.RegistrationConfig",
     "rest_framework",
     "rest_framework.authtoken",
+    "corsheaders",
     "channels",
     "game",
 ]
@@ -56,9 +57,15 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "corsheaders.middleware.CorsMiddleware",
 ]
 
 ROOT_URLCONF = "transcendence.urls"
+
+CORS_ORIGIN_ALLOW_ALL = True
+
+AUTH_USER_MODEL = "registration.User"
+
 
 TEMPLATES = [
     {
@@ -84,7 +91,7 @@ WSGI_APPLICATION = "transcendence.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME"),
+        "NAME": "registration_user",
         "USER": os.getenv("DB_USER"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
         "HOST": os.getenv("DB_HOST"),
@@ -137,10 +144,10 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 ASGI_APPLICATION = "transcendence.asgi.application"
 
 CHANNEL_LAYERS = {
-    'default': {
-        'BACKEND': 'channels_redis.core.RedisChannelLayer',
-        'CONFIG': {
-            "hosts": [('127.0.0.1', 6379)],
+    "default": {
+        "BACKEND": "channels_redis.core.RedisChannelLayer",
+        "CONFIG": {
+            "hosts": [("127.0.0.1", 6379)],
         },
     },
 }

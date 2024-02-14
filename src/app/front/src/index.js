@@ -28,9 +28,10 @@ const loadView = async (path) => {
         import(`../views/${view}.js`).then(module => {
             const View = module.default;
             const viewInstance = new View(); 
-            viewInstance.initialize();
             viewInstance.getHtml().then(html => {
                 document.querySelector('#app').innerHTML = html;
+            viewInstance.initialize();
+
                 
                 if (path === '/tournament') {
                     addTournamentEventListeners();
