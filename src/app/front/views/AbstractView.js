@@ -11,6 +11,10 @@ export default class {
         return "";
     }
 
+    async initialize() {
+        // shared initialize logic 
+    }
+
     redirect(path) {
         window.location = path;
     }
