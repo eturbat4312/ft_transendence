@@ -1,5 +1,7 @@
 import { getNav, getSocial, getChat } from '../views/utils.js';
 import { addTournamentEventListeners } from './script.js';
+//import Game from '../views/Game.js';
+import { addGameEventListeners } from '../views/Game.js';
 import '../theme/base.css'
 import '../theme/game.css'
 import '../theme/index.css'
@@ -32,6 +34,9 @@ const loadView = async (path) => {
                 document.querySelector('#app').innerHTML = html;
                 if (path === '/tournament') {
                     addTournamentEventListeners();
+                }
+                if (path === '/game') {
+                    addGameEventListeners();
                 }
             });
         }).catch(error => {
