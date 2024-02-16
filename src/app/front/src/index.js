@@ -7,7 +7,8 @@ import '../theme/style.css'
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
 const routes = [
-    { path: "/", view: "Landing" },
+    { path: "/", view: "Welcome", showHeader: false,},
+    { path: "/landing", view: "Landing", showHeader: true },
     { path: "/login", view: "Login" },
     { path: "/signup", view: "Signup" },
     { path: "/game", view: "Game" },
@@ -18,21 +19,42 @@ const routes = [
 ];
 
 const loadView = async (path) => {
-    // const isLoggedIn = await checkIfLoggedIn();
-    // if (!isLoggedIn && path !== "/login" && path !== "/signup") {
-    //     navigate("/login");
-    //     return;
-    // }
-    const { view } = routes.find(route => route.path === path) || {};
+    const { view, showHeader } = routes.find(route => route.path === path) || {};
     if (view) {
+        let showChat = true;
+        let showSocial = true;
+        if (path === '/'){
+            showChat = false;
+            showSocial = false;
+        }
         import(`../views/${view}.js`).then(module => {
             const View = module.default;
             const viewInstance = new View(); 
             viewInstance.getHtml().then(html => {
                 document.querySelector('#app').innerHTML = html;
-            viewInstance.initialize();
-
+                viewInstance.initialize();
                 
+                if (!showHeader) {
+                    // Hide the header if showHeader is set to false
+                    document.querySelector('#nav').style.display = 'none';
+                } else {
+                    document.querySelector('#nav').style.display = 'block';
+                }
+
+                if (!showChat) {
+                    // Hide the chat if showChat is set to false
+                    document.querySelector('#chat').style.display = 'none';
+                } else {
+                    document.querySelector('#chat').style.display = 'block';
+                }
+
+                if (!showSocial) {
+                    // Hide the social section if showSocial is set to false
+                    document.querySelector('#social').style.display = 'none';
+                } else {
+                    document.querySelector('#social').style.display = 'block';
+                }
+
                 if (path === '/tournament') {
                     addTournamentEventListeners();
                 }
