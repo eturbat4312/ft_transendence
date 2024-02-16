@@ -101,6 +101,8 @@ export default class Game extends AbstractView {
             this.websocket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 if (data.action === "update_ball_position") {
+                    // je dois implementer le fait que la ball s update par les socket seulement avec le jouer qui neset pas le ballmaster
+                    console.log("test");
                     this.updateBallPosition(data.ball_data);
                 }
                 if (data.action === "update_score") {
