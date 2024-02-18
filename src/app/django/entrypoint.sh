@@ -2,6 +2,7 @@
 
 # Apply database migrations
 echo "Applying database migrations..."
+python transcendence/manage.py makemigrations
 python transcendence/manage.py migrate
 
 # Start server
