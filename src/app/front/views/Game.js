@@ -100,8 +100,7 @@ export default class Game extends AbstractView {
             }
             this.websocket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                if (data.action === "update_ball_position") {
-                    // je dois implementer le fait que la ball s update par les socket seulement avec le jouer qui neset pas le ballmaster
+                if (data.action === "update_ball_position" && this.player2) {
                     this.updateBallPosition(data.ball_data);
                 }
                 if (data.action === "update_score") {
@@ -123,8 +122,6 @@ export default class Game extends AbstractView {
     }
 
     startGame = () => {
-        if (!this.player1)
-            this.player2 = true;
         this.resetBall();
         this.gameActive = true;
         this.gameLoop();
@@ -291,6 +288,7 @@ export default class Game extends AbstractView {
             }
         });
         this.websocket.send(message);
+        (this.player1Score === 3 || this.player2Score === 3) ? this.endGame() : this.resetBall();
     };
 
     resetBall = () => {
@@ -370,6 +368,8 @@ export default class Game extends AbstractView {
                     console.log("gameId = ", gameId);
                     self.websocket = new WebSocket('ws://localhost:8000/ws/game');
                     self.websocket.onopen = function() {
+                        if (!self.player1)
+                            self.player2 = true;
                         console.log("Game WebSocket connection established");
                         self.websocket.send(JSON.stringify({ action: "start_game", game_id: gameId }));
                         self.startGame();
