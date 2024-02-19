@@ -1,4 +1,4 @@
-*,
+/* *,
 *::after,
 *::before {
     box-sizing: border-box;
@@ -77,4 +77,118 @@ body {
 .score> :first-child {
     text-align: right;
     border-right: .5vh solid var(--foreground-color);
+} */
+
+.game-container {
+    position: absolute;
+    width: 600px;
+    height: 400px;
+    background-color: #242323;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Press Start 2P', cursive;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.paddle {
+    position: absolute;
+    width: 8px;
+    height: 60px;
+    background-color: #fff;
+    border: 1px solid #000;
+}
+
+#paddle1 {
+    left: 10px;
+}
+
+#paddle2 {
+    right: 10px;
+}
+
+.ball {
+    position: absolute;
+    width: 15px;
+    height: 15px;
+    background-color: white;
+    border-radius: 50%;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    display: none;
+}
+
+#play-button {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    cursor: pointer;
+    font-family: 'Press Start 2P', cursive;
+}
+
+#center-line {
+    border-left: 6px dashed white;
+    height: 100%;
+    position: absolute;
+    left: 50%;
+    top: 0;
+    bottom: 0;
+    transform: translateX(-50%);
+}
+
+#score {
+    position: absolute;
+    top: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    display: flex;
+    font-size: 20px;
+    color: #fff;
+}
+
+#player1-score, #player2-score {
+    width: 30px;
+    text-align: center;
+    margin: 0 10px;
+}
+
+.countdown-display {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 54px;
+    color: #cccaca;
+    text-shadow: 2px 2px 2px #000;
+    -webkit-text-stroke: #000;
+}
+
+#winner {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    color: #cccaca;
+    text-shadow: 2px 2px 2px #000;
+    -webkit-text-stroke: #000;
+}
+
+#score-history {
+    position: absolute;
+    top: 72px;
+    right: 0;
+    padding: 20px;
+    background-color: #771818; /* Ajoutez une couleur de fond si nécessaire */
+}
+
+#score-list {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
 }

@@ -9,7 +9,7 @@ const getNav = async () => {
                     <p class="navbar-brand col-lg-3 me-0 pong-title" href="#">PONG</p>
                     <ul class="navbar-nav col-lg-6 justify-content-lg-center">
                         <li class="nav-item">
-                            <a href="/" class="nav__link" data-link>Home</a>
+                            <a href="/home" class="nav__link" data-link>Home</a>
                         </li>
                         <li class="nav-item">
                             <a href="/game" class="nav__link" data-link>Game</a>
