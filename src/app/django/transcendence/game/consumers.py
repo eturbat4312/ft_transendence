@@ -1,5 +1,4 @@
-# game/consumers.py
-import json, logging, asyncio, random
+import json, logging, asyncio, secrets
 from channels.generic.websocket import AsyncWebsocketConsumer
 
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
@@ -8,8 +7,6 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(leve
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
         logging.info("Game WebSocket connection established.")
-        self.game_group_name = 'game_room'
-        await self.channel_layer.group_add(self.game_group_name, self.channel_name)
         await self.accept()
 
     async def disconnect(self, close_code):
@@ -30,6 +27,14 @@ class GameConsumer(AsyncWebsocketConsumer):
                 }
             )
         if action == 'start_game':
+            game_id = text_data_json['game_id']
+            logging.info(game_id)
+            if game_id:
+                self.game_group_name = f'game_{game_id}'
+                await self.channel_layer.group_add(self.game_group_name, self.channel_name)
+            else:
+                logging.error("No game_id provided. Closing connection.")
+                await self.close()
             await self.startGame()
         if action == "update_score":
             await self.channel_layer.group_send(
@@ -98,12 +103,24 @@ class GameConsumer(AsyncWebsocketConsumer):
 
 class MatchmakingConsumer(AsyncWebsocketConsumer):
     ball_master = None
+    waiting_players = []
 
     async def connect(self):
         await self.channel_layer.group_add("matchmaking", self.channel_name)
         await self.accept()
+        self.waiting_players.append(self.channel_name)
+        if len(self.waiting_players) >= 2:
+            player1_channel = self.waiting_players.pop(0)
+            player2_channel = self.waiting_players.pop(0)
+            game_id = self.generate_game_id()
+            game_group_name = f"game_{game_id}"
+            await self.channel_layer.group_add(game_group_name, player1_channel)
+            await self.channel_layer.group_add(game_group_name, player2_channel)
+            await self.channel_layer.group_send(game_group_name, {"type": "match_found", "game_id": game_id})
 
     async def disconnect(self, close_code):
+        if self.channel_name in self.waiting_players:
+            self.waiting_players.remove(self.channel_name)
         await self.channel_layer.group_discard("matchmaking", self.channel_name)
 
     # async def receive(self, text_data):
@@ -117,9 +134,8 @@ class MatchmakingConsumer(AsyncWebsocketConsumer):
     async def receive(self, text_data):
         data = json.loads(text_data)
         print("Received: ", data)
-        # Envoyer à tous les clients si c'est le premier à rejoindre
         if len(self.channel_layer.groups.get("matchmaking", [])) == 1:
-            await self.channel_layer.group_send("matchmaking", {"type": "ball_master", "is_master": True})
+            await self.channel_layer.send(self.channel_name, {"type": "ball_master", "is_master": True})
         else:
             await self.channel_layer.send(self.channel_name, {"type": "ball_master", "is_master": False})
 
@@ -136,7 +152,16 @@ class MatchmakingConsumer(AsyncWebsocketConsumer):
     #         await self.channel_layer.group_send("matchmaking_queue", {"type": "match_found"})
 
 
+    @classmethod
+    def generate_game_id(cls):
+        return secrets.token_urlsafe(8)
+
     async def match_found(self, event):
-        await self.send(text_data=json.dumps({"action": "match_found"}))
-        await self.channel_layer.group_discard("matchmaking_queue", self.channel_name)
-        await self.channel_layer.group_add("game_room", self.channel_name)
+        game_id = event.get("game_id")
+        if game_id:
+            game_group_name = f"game_{game_id}"
+            await self.send(text_data=json.dumps({"action": "match_found", "game_id": game_id}))
+            await self.channel_layer.group_discard("matchmaking_queue", self.channel_name)
+            await self.channel_layer.group_add(game_group_name, self.channel_name)
+        else:
+            logging.error("Aucun game_id trouvé dans l'événement match_found.")
