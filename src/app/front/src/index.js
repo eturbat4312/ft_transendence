@@ -20,14 +20,8 @@ const routes = [
 ];
 
 const loadView = async (path) => {
-    const { view, showHeader } = routes.find(route => route.path === path) || {};
+    const { view } = routes.find(route => route.path === path) || {};
     if (view) {
-        let showChat = true;
-        let showSocial = true;
-        if (path === '/'){
-            showChat = false;
-            showSocial = false;
-        }
         import(`../views/${view}.js`).then(module => {
             const View = module.default;
             const viewInstance = new View(); 
@@ -68,6 +62,7 @@ const addNavEventListeners = () => {
     const navLinks = document.querySelectorAll('.nav__link');
     navLinks.forEach(link => {
         link.addEventListener('click', (event) => {
+            console.log("lggg:", link.getAttribute('href'));
             event.preventDefault();
             const path = link.getAttribute('href');
             navigate(path);

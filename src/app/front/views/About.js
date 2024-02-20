@@ -8,7 +8,7 @@ export default class extends AbstractView {
 
     async getHtml() {
         return `
-        <div class="container mt-3">
+        <div class="container mt-3 centered">
         <div class="card bg-dark text-light mx-auto" style="max-width: 800px;">
             <div class="card-header text-center">
                 <h2>About FT_TRANSCENDENCE</h2>

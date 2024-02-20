@@ -1,5 +1,4 @@
 import AbstractView from "./AbstractView.js";
-import bg from '../images/bg.jpg';
 
 export default class extends AbstractView {
     constructor(params) {
@@ -8,34 +7,23 @@ export default class extends AbstractView {
     }
 
     async getHtml() {
-        const bgStyle = `background-image: url(${bg});
-                        background-size: cover;
-                        background-position: center;`;
-
         return `
-            <body style="${bgStyle}">
-                <div class="container">
-                    <div class="content">
-                        <h1>Welcome to Ping Pong Game</h1>
-                        <button id="loginBtn">Log in</button>
-                        <p>Don't have an account? <a href="/signup">Sign Up</a></p>
-                    </div>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6 centered">
+            <div class="card my-5 bg-dark">
+                <div class="card-body">
+                    <div class="d-flex flex-column align-items-center">
+                        <p class="text-light fs-3 game-font">Welcome to</p>
+                        <p class="pong-logo" href="#">PONG</p>
+                        <a href="/login" class="btn btn-primary mb-3 btn-lg-width nav__link" style="font-family: 'Press Start 2P', cursive;" data-link>Login</a>     
+                        <a href="/signup" class="btn btn-outline-primary btn-lg-width nav__link" style="font-family: 'Press Start 2P', cursive;" data-link>Register</a>
+                    </div> 
                 </div>
-            </body>
+            </div>
+        </div>
+    </div>
+</div>
         `;
-    }
-
-    async initialize() {
-        // Call the parent class method to initialize
-        super.initialize();
-
-        // Add event listener to the "Log in" button
-        const loginBtn = document.getElementById('loginBtn');
-        if (loginBtn) {
-            loginBtn.addEventListener('click', () => {
-                // Redirect to the login page
-                window.location.href = '/login';
-            });
-        }
     }
 }

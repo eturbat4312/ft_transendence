@@ -1,6 +1,6 @@
 const getNav = async () => {
         return `
-        <nav class="navbar navbar-expand-sm navbar-dark bg-dark">
+        <nav class="navbar navbar-expand-sm navbar-dark bg-dark fixed-top" style="height: 60px;">
             <div class="container-fluid">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" >
                     <span class="navbar-toggler-icon"></span>
@@ -9,16 +9,16 @@ const getNav = async () => {
                     <p class="navbar-brand col-lg-3 me-0 pong-title" href="#">PONG</p>
                     <ul class="navbar-nav col-lg-6 justify-content-lg-center">
                         <li class="nav-item">
-                            <a href="/home" class="nav__link" data-link>Home</a>
+                            <a href="/home" class="nav__link game-font fs-2" data-link>Home</a>
                         </li>
                         <li class="nav-item">
-                            <a href="/game" class="nav__link" data-link>Game</a>
+                            <a href="/game" class="nav__link game-font fs-2" data-link>Game</a>
                         </li>
                         <li class="nav-item">
-                            <a href="/tournament" class="nav__link" data-link>Tournament</a>
+                            <a href="/tournament" class="nav__link game-font fs-2" data-link>Tournament</a>
                         </li>
                         <li class="nav-item">
-                            <a href="/about" class="nav__link" data-link>About</a>
+                            <a href="/about" class="nav__link game-font fs-2" data-link>About</a>
                         </li>
                     </ul>
                     <ul class="navbar-nav col-lg-3 justify-content-lg-end">
@@ -68,7 +68,7 @@ const getSocial = async () => {
 
 const getChat = async () => {
     return `
-    <div class="offcanvas offcanvas-start bg-dark text-light" data-bs-backdrop="false" id="offcanvasChat" style="top: 72px;">
+    <div class="offcanvas offcanvas-start bg-dark text-light" data-bs-backdrop="false" id="offcanvasChat" style="top: 60px;">
         <button class="btn btn-dark offcanvas-btn mt-2 position-absolute btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasChat">
             <span>Open</span><span>Close</span>
         </button>

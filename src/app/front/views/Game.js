@@ -37,7 +37,7 @@ export default class Game extends AbstractView {
 
     async getHtml() {
         return `
-        <div id="game" class="container-fluid">
+        <div id="game" class="container-fluid centered">
         <div class="game-container">
            <div id="center-line"></div>
            <div class="ball"></div>
