@@ -1,6 +1,5 @@
 .pong-title {
     color: white;
-    left: 20px;
     text-shadow: 2px 2px 2px #000;
     font-family: 'Press Start 2P', cursive;
 }
@@ -24,7 +23,7 @@
 .friend-bar {
    position: fixed;
    right: 0;
-   top: 60px;
+   top: 56px;
    width: 250px;
    height: 100%;
    color: #fff;

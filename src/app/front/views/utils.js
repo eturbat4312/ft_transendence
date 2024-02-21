@@ -1,31 +1,31 @@
 const getNav = async () => {
         return `
-        <nav class="navbar navbar-expand-sm navbar-dark bg-dark fixed-top" style="height: 60px;">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
             <div class="container-fluid">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" >
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse d-lg-flex" id="navbarSupportedContent" style="z-index: 1;">
-                    <p class="navbar-brand col-lg-3 me-0 pong-title" href="#">PONG</p>
+                    <a class="navbar-brand col-lg-3 me-0 pong-title" href="#">PONG</a>
                     <ul class="navbar-nav col-lg-6 justify-content-lg-center">
                         <li class="nav-item">
-                            <a href="/home" class="nav__link game-font fs-2" data-link>Home</a>
+                            <a href="/home" class="nav__link nav-link active" data-link>Home</a>
                         </li>
                         <li class="nav-item">
-                            <a href="/game" class="nav__link game-font fs-2" data-link>Game</a>
+                            <a href="/game" class="nav__link nav-link active" data-link>Game</a>
                         </li>
                         <li class="nav-item">
-                            <a href="/tournament" class="nav__link game-font fs-2" data-link>Tournament</a>
+                            <a href="/tournament" class="nav__link nav-link active" data-link>Tournament</a>
                         </li>
                         <li class="nav-item">
-                            <a href="/about" class="nav__link game-font fs-2" data-link>About</a>
+                            <a href="/about" class="nav__link nav-link active" data-link>About</a>
                         </li>
                     </ul>
                     <ul class="navbar-nav col-lg-3 justify-content-lg-end">
                         <li class="nav-item dropdown">
-                            <button class="btn dropdown-toggle d-block link-body-emphasis" data-bs-toggle="dropdown" aria-expanded="false">
-                            <img src="https://m.media-amazon.com/images/I/51G2Jr9BjOL._AC_UF1000,1000_QL80_.jpg" alt="mdo" width="32" height="32" class="rounded-circle">
-                            </button>
+                            <a class="dropdown-toggle nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                            PP
+                            </a>
                             <ul class="dropdown-menu" style>
                             <li><a href="/profile" class="nav__link dropdown-item" data-link>View my profile</a></li>
                             <li><a href="/settings" class="nav__link dropdown-item" data-link>Settings</a></li>
@@ -68,7 +68,7 @@ const getSocial = async () => {
 
 const getChat = async () => {
     return `
-    <div class="offcanvas offcanvas-start bg-dark text-light" data-bs-backdrop="false" id="offcanvasChat" style="top: 60px;">
+    <div class="offcanvas offcanvas-start bg-dark text-light" data-bs-backdrop="false" id="offcanvasChat" style="top: 56px;">
         <button class="btn btn-dark offcanvas-btn mt-2 position-absolute btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasChat">
             <span>Open</span><span>Close</span>
         </button>
