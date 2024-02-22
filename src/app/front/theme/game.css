@@ -122,6 +122,16 @@ body {
     display: none;
 }
 
+.end-game-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.btn-reset {
+    margin-top: 100px;
+}
+
 #play-button {
     position: absolute;
     top: 50%;

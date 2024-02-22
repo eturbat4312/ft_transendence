@@ -52,7 +52,10 @@ export default class Game extends AbstractView {
               <span id="player1-score" class="score">0</span>
               <span id="player2-score" class="score">0</span>
            </div>
-           <div id="winner"></div>       
+           <div class="end-game-container">
+                <div id="winner"></div>
+                <button class="btn btn-primary btn-reset" style="z-index: 1; display: none;">Reset</button>
+            </div>  
         </div>   
      </div>
         `;
@@ -118,7 +121,8 @@ export default class Game extends AbstractView {
                 }
             };
         }
-        requestAnimationFrame(this.gameLoop);
+        if (this.gameActive)
+            requestAnimationFrame(this.gameLoop);
     }
 
     startGame = () => {
@@ -324,7 +328,38 @@ export default class Game extends AbstractView {
         }
        // saveScore(player1Score, player2Score);
         this.gameActive = false;
+        this.websocket.close();
+        this.websocket = null;
+        const resetButton = document.querySelector(".btn-reset");
+        resetButton.style.display = "block";
+        resetButton.addEventListener("click", this.resetGame);
     }
+
+    resetGame = () => {
+        this.paddle1Y = 170;
+        this.paddle2Y = 170;
+        this.ballX = 300;
+        this.ballY = 200;
+        this.ballSpeedX = 2;
+        this.ballSpeedY = 2;
+        this.player1Score = 0;
+        this.player2Score = 0;
+        this.gameActive = true;
+        this.isOffline = false;
+        this.isMaster = false;
+        this.player1 = false;
+        this.player2 = false;
+    
+        this.paddle1.style.top = "170px";
+        this.paddle2.style.top = "170px";
+        this.ball.style.display = "none";
+        this.scoreDisplay1.innerText = "0";
+        this.scoreDisplay2.innerText = "0";
+        document.getElementById("winner").innerText = "";
+        document.getElementById("start-game").style.display = "block";
+        document.getElementById("countdown").style.display = "none";
+        document.querySelector(".btn-reset").style.display = "none";
+    };
 
     handleKeyDown = (event) => {
         this.handleKeyPress(event.key, true);

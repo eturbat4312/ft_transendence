@@ -1,6 +1,6 @@
 const getNav = async () => {
         return `
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="z-index: 1;">
             <div class="container-fluid">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" >
                     <span class="navbar-toggler-icon"></span>
@@ -68,7 +68,7 @@ const getSocial = async () => {
 
 const getChat = async () => {
     return `
-    <div class="offcanvas offcanvas-start bg-dark text-light" data-bs-backdrop="false" id="offcanvasChat" style="top: 56px;">
+    <div class="offcanvas offcanvas-start bg-dark text-light" data-bs-backdrop="false" id="offcanvasChat" style="top: 56px; z-index: 0;">
         <button class="btn btn-dark offcanvas-btn mt-2 position-absolute btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasChat">
             <span>Open</span><span>Close</span>
         </button>
