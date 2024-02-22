@@ -83,6 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadComponents();
     addNavEventListeners();
     loadView(location.pathname);
+    addChatEventListeners();
 });
 
 // const checkIfLoggedIn = async () => {

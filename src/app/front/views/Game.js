@@ -10,7 +10,6 @@ export default class Game extends AbstractView {
         this.playButton = document.querySelector(".btn-start");
         this.scoreDisplay1 = document.getElementById("player1-score");
         this.scoreDisplay2 = document.getElementById("player2-score");
-        this.gameContainer = document.querySelector(".game-container");
         this.websocket = null;
         this.paddle1Y = 170;
         this.paddle2Y = 170;
