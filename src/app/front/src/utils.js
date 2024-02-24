@@ -1,13 +1,13 @@
-export default class Chat {
+/*export default class Chat {
     constructor() {
         this.websocket = null;
     }
 
-    startChat = () {
+    startChat () {
 
     }
 
-    sendMessage = () {
+    sendMessage () {
 
     }
 
@@ -25,4 +25,4 @@ export function addChatEventListeners() {
             chatBox.sendMessage();
         })
     })
-}
+}*/
