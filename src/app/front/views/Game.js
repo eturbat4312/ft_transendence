@@ -7,7 +7,6 @@ export default class Game extends AbstractView {
         this.paddle1 = document.getElementById("paddle1");
         this.paddle2 = document.getElementById("paddle2");
         this.ball = document.querySelector(".ball");
-        this.playButton = document.querySelector(".btn-start");
         this.scoreDisplay1 = document.getElementById("player1-score");
         this.scoreDisplay2 = document.getElementById("player2-score");
         this.websocket = null;
@@ -146,6 +145,7 @@ export default class Game extends AbstractView {
                 this.updatePaddlePosition();
         }
         if (this.player1) {
+            console.log("test");
 		    this.sendPaddle1Position();
         }
         else if (this.player2) {
@@ -327,7 +327,8 @@ export default class Game extends AbstractView {
         }
        // saveScore(player1Score, player2Score);
         this.gameActive = false;
-        this.websocket.close();
+        if (!this.isOffline)
+            this.websocket.close();
         this.websocket = null;
         const resetButton = document.querySelector(".btn-reset");
         resetButton.style.display = "block";
@@ -433,6 +434,10 @@ export default class Game extends AbstractView {
     };
 
     initOfflineGame = () => {
+        if (this.websocket)
+            this.websocket.close();
+        this.player1 = false;
+        this.player2 = false;
         this.isOffline = true;
         this.isMaster = true;
         this.startGame();

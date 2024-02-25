@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en">
+<html lang="en" data-bs-theme="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport"
@@ -10,7 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Micro+5&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="bg-success bg-gradient background">
+    <div class="bg-dark-subtle bg-gradient background">
+        <div class="circle pink"></div>
+        <div class="circle green"></div>
         <div id="component">
            <div id="social"></div>
            <div id="nav"></div>
@@ -19,6 +21,49 @@
         <div id="app"></div>
      </div>
      <script src="./bundle.js"></script>
+     <script>
+document.addEventListener('DOMContentLoaded', function() {
+  const pinkCircle = document.querySelector('.pink');
+  const greenCircle = document.querySelector('.green');
+
+  let xPos = 0;
+  let yPos = 0;
+  let xDirection = 1;
+  let yDirection = 1;
+  const speed = 0.5;
+
+  function moveCircles() {
+    xPos += speed * xDirection;
+    yPos += speed * yDirection;
+
+    const maxX = window.innerWidth - 200;
+    const maxY = window.innerHeight - 200;
+
+    if (xPos >= maxX || xPos <= 0) {
+      const angle = Math.atan2(yDirection, xDirection);
+      xDirection = -Math.cos(angle);
+      yDirection = Math.sin(angle);
+    }
+
+    if (yPos >= maxY || yPos <= 0) {
+      const angle = Math.atan2(yDirection, xDirection);
+      yDirection = -Math.sin(angle);
+      xDirection = Math.cos(angle);
+    }
+
+    pinkCircle.style.left = xPos + 'px';
+    pinkCircle.style.top = yPos + 'px';
+
+    greenCircle.style.left = (xPos * 0.8) + 'px';
+    greenCircle.style.top = (yPos * 0.8) + 'px';
+
+    requestAnimationFrame(moveCircles);
+  }
+
+  moveCircles();
+});
+
+     </script>
      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js" integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL" crossorigin="anonymous"></script>
 </body>
 </html>

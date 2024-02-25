@@ -3,13 +3,15 @@ export default class Chat {
         this.websocket = null;
     }
 
-    startChat = () {
-
+    startChat = () => {
+        document.getElementById("start-chat").style.display = "none";
+        const chatBox = document.querySelector(".chat-box");
+        chatBox.style.display = "block";
     }
 
-    sendMessage = () {
+    // sendMessage = () => {
 
-    }
+    // }
 
 }
 

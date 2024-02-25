@@ -72,12 +72,12 @@ const getChat = async () => {
         <button class="btn btn-dark offcanvas-btn mt-2 position-absolute btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasChat">
             <span>Open</span><span>Close</span>
         </button>
-        <div class="chat-header">
-            <h1 class="active">Chat</h1>
-        </div>
-        <div class="chat-body">
-            <div class="chat-message">
-                <p>Message</p>
+        <button id="start-chat" class="btn btn-success btn-chat-connect btn-lg">Join Chat</button>
+        <div class="chat-box" style="z-index: 1; display: none;">
+            <div id="messages" class="chat-messages"></div>
+            <div class="input-group mb-3 position-absolute bottom-0 start-0 w-100">
+                <input type="text" class="form-control" id="messageInput" placeholder="Type your message...">
+                <button class="btn btn-primary btn-chat-send" type="button" id="sendMessageBtn">Send</button>
             </div>
         </div>
     </div>
