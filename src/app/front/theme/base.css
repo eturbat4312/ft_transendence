@@ -1,8 +1,18 @@
 .pong-title {
     color: white;
-    left: 20px;
     text-shadow: 2px 2px 2px #000;
     font-family: 'Press Start 2P', cursive;
+}
+
+.pong-logo {
+   color: rgb(213, 213, 213);
+   text-shadow: 2px 2px 2px #000;
+   font-family: 'Press Start 2P', cursive;
+   font-size: 6vw;
+}
+
+.game-font {
+   font-family: 'Micro 5', cursive;
 }
 
 #friend-list-container {
@@ -13,7 +23,7 @@
 .friend-bar {
    position: fixed;
    right: 0;
-   top: 72px;
+   top: 56px;
    width: 250px;
    height: 100%;
    color: #fff;
@@ -83,16 +93,16 @@
     height: 500px;
 }
 
- .background {
+.background {
    background-size: cover;
    background-position: center;
    background-repeat: no-repeat;
-   height: 100vh;
-   width: 100vw;
    top: 0;
    left: 0;
+   height: 100vh;
+   width: 100vw;
    z-index: -1;
- }
+}
 
  .modal-backdrop{
    z-index:-1;

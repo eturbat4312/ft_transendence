@@ -8,7 +8,7 @@ export default class Settings extends AbstractView {
 
     async getHtml() {
         return `
-        <div class="container mt-3">
+        <div class="container mt-3 centered">
             <div class="card overflow-hidden mx-auto bg-dark text-light">
                 <div class="card-header text-center">
                     <h2>Settings</h2>

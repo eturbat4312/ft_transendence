@@ -89,7 +89,7 @@ export default class extends AbstractView {
 
             if (response.ok) {
                 console.log('Login successful!');
-                redirect('/landing');
+                redirect('/home');
             } else {
                 console.log('Login failed!');
                 console.log(response.statusText);

@@ -1,5 +1,6 @@
 import { getNav, getSocial, getChat } from '../views/utils.js';
 import { addTournamentEventListeners } from './script.js';
+import { addGameEventListeners } from '../views/Game.js';
 import '../theme/base.css'
 import '../theme/game.css'
 import '../theme/index.css'
@@ -7,8 +8,8 @@ import '../theme/style.css'
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
 const routes = [
-    { path: "/", view: "Welcome", showHeader: false,},
-    { path: "/landing", view: "Landing", showHeader: true },
+    { path: "/", view: "Welcome" },
+    { path: "/home", view: "Home" },
     { path: "/login", view: "Login" },
     { path: "/signup", view: "Signup" },
     { path: "/game", view: "Game" },
@@ -19,44 +20,19 @@ const routes = [
 ];
 
 const loadView = async (path) => {
-    const { view, showHeader } = routes.find(route => route.path === path) || {};
+    const { view } = routes.find(route => route.path === path) || {};
     if (view) {
-        let showChat = true;
-        let showSocial = true;
-        if (path === '/'){
-            showChat = false;
-            showSocial = false;
-        }
         import(`../views/${view}.js`).then(module => {
             const View = module.default;
             const viewInstance = new View(); 
             viewInstance.getHtml().then(html => {
                 document.querySelector('#app').innerHTML = html;
                 viewInstance.initialize();
-                
-                if (!showHeader) {
-                    // Hide the header if showHeader is set to false
-                    document.querySelector('#nav').style.display = 'none';
-                } else {
-                    document.querySelector('#nav').style.display = 'block';
-                }
-
-                if (!showChat) {
-                    // Hide the chat if showChat is set to false
-                    document.querySelector('#chat').style.display = 'none';
-                } else {
-                    document.querySelector('#chat').style.display = 'block';
-                }
-
-                if (!showSocial) {
-                    // Hide the social section if showSocial is set to false
-                    document.querySelector('#social').style.display = 'none';
-                } else {
-                    document.querySelector('#social').style.display = 'block';
-                }
-
                 if (path === '/tournament') {
                     addTournamentEventListeners();
+                }
+                if (path === '/game') {
+                    addGameEventListeners();
                 }
             });
         }).catch(error => {
@@ -70,7 +46,7 @@ const loadView = async (path) => {
 
 const loadComponents = async () => {
     const currentPath = location.pathname;
-    if (currentPath !== "/login" && currentPath !== "/signup") {
+    if (currentPath !== "/login" && currentPath !== "/signup" && currentPath !== "/") {
         const navHTML = await getNav(currentPath);
         document.querySelector("#nav").innerHTML = navHTML;
 
@@ -86,6 +62,7 @@ const addNavEventListeners = () => {
     const navLinks = document.querySelectorAll('.nav__link');
     navLinks.forEach(link => {
         link.addEventListener('click', (event) => {
+            console.log("lggg:", link.getAttribute('href'));
             event.preventDefault();
             const path = link.getAttribute('href');
             navigate(path);
@@ -106,6 +83,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadComponents();
     addNavEventListeners();
     loadView(location.pathname);
+    addChatEventListeners();
 });
 
 // const checkIfLoggedIn = async () => {
