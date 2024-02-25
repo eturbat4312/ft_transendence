@@ -73,12 +73,15 @@ const getChat = async () => {
             <span>Open</span><span>Close</span>
         </button>
         <button id="start-chat" class="btn btn-success btn-chat-connect btn-lg">Join Chat</button>
-        <div class="chat-box" style="z-index: 1; display: none;">
-            <div id="messages" class="chat-messages"></div>
-            <div class="input-group mb-3 position-absolute bottom-0 start-0 w-100">
+        <div class="chat-container" style="z-index: 1; display: none;">
+            <div class="chat-box">
+                <div id="messages" class="chat-messages">
+                </div>
+            </div>
+            <div class="input-group mb-3" style="position: absolute; bottom: 0; left: 0; width: calc(100% - 20px);">
                 <input type="text" class="form-control" id="messageInput" placeholder="Type your message...">
                 <button class="btn btn-primary btn-chat-send" type="button" id="sendMessageBtn">Send</button>
-            </div>
+             </div>
         </div>
     </div>
     `;

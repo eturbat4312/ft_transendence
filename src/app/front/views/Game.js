@@ -301,6 +301,7 @@ export default class Game extends AbstractView {
         this.ballSpeedY = 0;
         this.ball.style.display = "block";
 
+        //il faut fix le probleme de countdown quand on change de page, peut etre une condition qui verifie si le countdown est là
 		let counter = 3;
 		const counterInterval = setInterval( () => {
 			document.getElementById("countdown").innerText = counter;
@@ -391,7 +392,7 @@ export default class Game extends AbstractView {
             this.websocket = new WebSocket('ws://localhost:8000/ws/matchmaking');
             this.websocket.onopen = () => {
                 console.log("Matchmaking WebSocket connection established");
-                this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
+              //  this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
             };
             const self = this;
             this.websocket.onmessage = function(event) {
@@ -429,7 +430,7 @@ export default class Game extends AbstractView {
             };
         } else {
             console.log("WebSocket connection is already open.");
-            this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
+        //    this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
         }
     };
 

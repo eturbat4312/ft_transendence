@@ -77,17 +77,21 @@
 
 .chat-box {
    position: relative;
-   height: 100%;
+   display: flex;
+   flex-direction: column;
+   height: calc(100vh - 150px);
    overflow-y: auto;
+   box-shadow: 0px 5px 5px -5px rgba(0, 0, 0, 0.5);
  }
  
  .chat-messages {
    padding: 10px;
+   bottom: 20px;
  }
  
  .input-group {
-   position: sticky;
    bottom: 0;
+   left: 0;
    padding: 10px;
  }
 
