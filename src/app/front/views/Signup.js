@@ -1,5 +1,8 @@
 import AbstractView from "./AbstractView.js";
 
+const INVALID_USERNAME_MSG = "Invalid username or password. Please try again";
+const DUPLICATE_USERNAME_MSG = "This username is already taken. Please try a different one.";
+
 export default class extends AbstractView {
     constructor(params) {
         super(params);
@@ -65,9 +68,14 @@ export default class extends AbstractView {
         `;
     }
 
+
+
     async registerUser(event) {
         const form = event.target;
         console.log('Form Element:', form);
+
+
+
 
         // Log input values  
         const inputs = form.elements;
@@ -78,7 +86,7 @@ export default class extends AbstractView {
         const formData = new FormData(form);
         event.preventDefault();
 
-        console.log("submit");
+        console.log("submitttt");
 
         const searchParams = new URLSearchParams(formData);
         console.log(searchParams.get("username"));
@@ -92,13 +100,23 @@ export default class extends AbstractView {
                 },
             });
 
-            if (response.ok) {
+            if (!response.ok) {
+                // console.log(response.status);
+                if (response.status === 400) {
+                    // Invalid/empty username
+                    alert(INVALID_USERNAME_MSG);
+                } else if (response.status === 500) {
+                    // Duplicate username
+                    alert(DUPLICATE_USERNAME_MSG);
+                } else {
+                    console.log('Registration failed!!!');
+                }
+            } else {
+                // Registration successful
                 console.log('Registration successful!');
                 this.redirect('/login');
-            } else {
-                console.log('Registration failed!');
-                console.log(response.statusText);
             }
+
         } catch (error) {
             console.log(error);
         }

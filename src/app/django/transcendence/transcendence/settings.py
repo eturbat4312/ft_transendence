@@ -91,10 +91,11 @@ WSGI_APPLICATION = "transcendence.wsgi.application"
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.postgresql",
+        "AUTO_CREATE_DB": True,
         "NAME": os.getenv("DB_NAME"),
         "USER": os.getenv("DB_USER"),
         "PASSWORD": os.getenv("POSTGRES_PASSWORD"),
-        "HOST": os.getenv("DB_HOST"),
+        "HOST": "db",
         "PORT": os.getenv("DB_PORT"),
     }
 }
