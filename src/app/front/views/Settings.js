@@ -9,7 +9,7 @@ export default class Settings extends AbstractView {
     async getHtml() {
         return `
         <div class="container mt-3 centered">
-            <div class="card overflow-hidden mx-auto bg-dark text-light">
+            <div class="card overflow-hidden mx-auto bg-dark text-light" style="max-width: 800px;">
                 <div class="card-header text-center">
                     <h2>Settings</h2>
                 </div>
@@ -22,7 +22,7 @@ export default class Settings extends AbstractView {
                         </div>
                     </div>
                     <div class="col-md-9">
-                        <div class="tab-content">
+                        <div class="tab-content" style="height: 500px; overflow-y: auto;">
                             <div class="tab-pane fade active show" id="account-general">
                                 <div class="card-body media align-items-center">
                                 <img src="https://m.media-amazon.com/images/I/51G2Jr9BjOL._AC_UF1000,1000_QL80_.jpg" alt="Photo de profil" class="img-fluid rounded-circle" style="width: 150px; height: 150px;"> 
@@ -98,11 +98,9 @@ export default class Settings extends AbstractView {
                         </div>
                     </div>
                 </div>
+                <button type="button" style="bottom: 0; left: 0;" class="btn btn-primary">Save changes</button>&nbsp;
             </div>
-        <div class="text-right mt-3">
-            <button type="button" class="btn btn-primary">Save changes</button>&nbsp;
         </div>
-    </div>
         `;
     }
 }
