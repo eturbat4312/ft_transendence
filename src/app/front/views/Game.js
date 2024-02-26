@@ -41,7 +41,7 @@ export default class Game extends AbstractView {
            <div class="ball"></div>
            <div class="paddle" id="paddle1"></div>
            <div class="paddle" id="paddle2"></div>
-           <div id="countdown" class="countdown-display"></div>
+           <div id="countdown" class="countdown-display" style="display: none;"></div>
            <div id="start-game" class="btn-group" role="group">
               <button class="btn btn-secondary btn-start-offline" style="z-index: 1;">Offline</button>   
               <button class="btn btn-primary btn-start" style="z-index: 1;">Online</button>
@@ -93,6 +93,11 @@ export default class Game extends AbstractView {
     };
 
     gameLoop = () => {
+        const checkIfGamePage = document.getElementById("game");
+        if (!checkIfGamePage) {
+            console.log("game stopped");
+            this.gameActive = false;
+        }
         this.update();
         if (!this.isOffline) {
             if (this.websocket.readyState !== WebSocket.OPEN) {
@@ -301,9 +306,12 @@ export default class Game extends AbstractView {
         this.ballSpeedY = 0;
         this.ball.style.display = "block";
 
-        //il faut fix le probleme de countdown quand on change de page, peut etre une condition qui verifie si le countdown est là
 		let counter = 3;
 		const counterInterval = setInterval( () => {
+            if (!document.getElementById("countdown") || !(document.getElementById("start-game").style.display === "none")) {
+                clearInterval(counterInterval);
+                return;
+            }
 			document.getElementById("countdown").innerText = counter;
 			document.getElementById("countdown").style.display = "block";
 			counter--;
