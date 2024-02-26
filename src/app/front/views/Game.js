@@ -150,7 +150,6 @@ export default class Game extends AbstractView {
                 this.updatePaddlePosition();
         }
         if (this.player1) {
-            console.log("test");
 		    this.sendPaddle1Position();
         }
         else if (this.player2) {
@@ -400,7 +399,7 @@ export default class Game extends AbstractView {
             this.websocket = new WebSocket('ws://localhost:8000/ws/matchmaking');
             this.websocket.onopen = () => {
                 console.log("Matchmaking WebSocket connection established");
-              //  this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
+                this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
             };
             const self = this;
             this.websocket.onmessage = function(event) {
