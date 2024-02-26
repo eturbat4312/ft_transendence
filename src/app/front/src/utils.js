@@ -12,14 +12,21 @@ export default class Chat {
             this.websocket = new WebSocket('ws://localhost:8000/ws/chat');
             this.websocket.onopen = () => {
                 console.log("Chat WebSocket connection established");
-            //    this.websocket.send(JSON.stringify({ action: "join_chat" }));
+                const message = JSON.stringify({
+                    action: 'join_chat',
+                    clientName: this.name
+                });
+                this.websocket.send(message);
             };
             const self = this;
             this.websocket.onmessage = function(event) {
                 const data = JSON.parse(event.data);                
-                if (data.action === "print_message") {
+                if (data.action === "print_message")
                    self.printMessage(data.message_data);
-                }
+                if (data.action === "join_chat")
+                    self.joinMessage(data.name_data);
+                if (data.action === "left_chat")
+                    self.leftMessage(data.message_data);
             };
             this.websocket.onclose = (event) => {
                 console.log("Chat WebSocket connection closed", event);
@@ -42,6 +49,20 @@ export default class Chat {
         messageElement.classList.add("chat-message");
         messageElement.textContent = print;
         messagesDiv.appendChild(messageElement);
+    }
+
+    joinMessage = (data) => {
+        const username = data;
+        const print = username + " has entered the chat!";
+        const messagesDiv = document.getElementById("messages");
+        const messageElement = document.createElement("div");
+        messageElement.classList.add("chat-message");
+        messageElement.textContent = print;
+        messagesDiv.appendChild(messageElement);
+    }
+
+    leftMessage = (data) => {
+
     }
 
     sendMessagetoServer = () => {

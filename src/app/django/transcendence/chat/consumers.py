@@ -5,9 +5,8 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(leve
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        await self.channel_layer.group_add("chat", self.channel_name)
-        logging.info("Chat WebSocket connection established.")
         await self.accept()
+        logging.info("Chat WebSocket connection established.")
 
     async def disconnect(self, close_code):
         logging.info("Chat WebSocket connection closed.")
@@ -17,6 +16,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
         text_data_json = json.loads(text_data)
         action = text_data_json['action']
 
+        if action == 'join_chat':
+            username = text_data_json['clientName']
+            await self.channel_layer.group_add("chat", self.channel_name)
+            logging.info(f"User '{username}' connected to chat.")
+            await self.channel_layer.group_send(
+                "chat",
+                {
+                    'type': 'joinMessage',
+                    'name_data': username
+                }
+        )
         if action == 'client_message':
             await self.channel_layer.group_send(
                 "chat",
@@ -26,9 +36,17 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 }
             )
 
+
     async def transmitMessage(self, event):
         message_data = event['message_data']
         await self.send(text_data=json.dumps({
             'action': 'print_message',
             'message_data': message_data
+    }))
+
+    async def joinMessage(self, event):
+        username = event['name_data']
+        await self.send(text_data=json.dumps({
+            'action': 'join_chat',
+            'name_data': username
     }))
