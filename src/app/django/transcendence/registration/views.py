@@ -49,7 +49,7 @@ def login(request):
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 @authentication_classes([TokenAuthentication, SessionAuthentication])
-def logout(request):
+def logout_django(request):
     logout(request)
     return Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
 
