@@ -7,7 +7,6 @@ export default class Game extends AbstractView {
         this.paddle1 = document.getElementById("paddle1");
         this.paddle2 = document.getElementById("paddle2");
         this.ball = document.querySelector(".ball");
-        this.playButton = document.querySelector(".btn-start");
         this.scoreDisplay1 = document.getElementById("player1-score");
         this.scoreDisplay2 = document.getElementById("player2-score");
         this.websocket = null;
@@ -146,6 +145,7 @@ export default class Game extends AbstractView {
                 this.updatePaddlePosition();
         }
         if (this.player1) {
+            console.log("test");
 		    this.sendPaddle1Position();
         }
         else if (this.player2) {
@@ -301,6 +301,7 @@ export default class Game extends AbstractView {
         this.ballSpeedY = 0;
         this.ball.style.display = "block";
 
+        //il faut fix le probleme de countdown quand on change de page, peut etre une condition qui verifie si le countdown est là
 		let counter = 3;
 		const counterInterval = setInterval( () => {
 			document.getElementById("countdown").innerText = counter;
@@ -327,7 +328,8 @@ export default class Game extends AbstractView {
         }
        // saveScore(player1Score, player2Score);
         this.gameActive = false;
-        this.websocket.close();
+        if (!this.isOffline)
+            this.websocket.close();
         this.websocket = null;
         const resetButton = document.querySelector(".btn-reset");
         resetButton.style.display = "block";
@@ -390,7 +392,7 @@ export default class Game extends AbstractView {
             this.websocket = new WebSocket('ws://localhost:8000/ws/matchmaking');
             this.websocket.onopen = () => {
                 console.log("Matchmaking WebSocket connection established");
-                this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
+              //  this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
             };
             const self = this;
             this.websocket.onmessage = function(event) {
@@ -428,11 +430,15 @@ export default class Game extends AbstractView {
             };
         } else {
             console.log("WebSocket connection is already open.");
-            this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
+        //    this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
         }
     };
 
     initOfflineGame = () => {
+        if (this.websocket)
+            this.websocket.close();
+        this.player1 = false;
+        this.player2 = false;
         this.isOffline = true;
         this.isMaster = true;
         this.startGame();

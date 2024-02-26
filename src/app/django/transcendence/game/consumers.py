@@ -15,7 +15,6 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        #print("Received: ", data)
         action = text_data_json['action']
 
         if action == 'update_ball_position':

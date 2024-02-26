@@ -1,6 +1,7 @@
 import { getNav, getSocial, getChat } from '../views/utils.js';
 import { addTournamentEventListeners } from './script.js';
 import { addGameEventListeners } from '../views/Game.js';
+import { addChatEventListeners } from './utils.js';
 import '../theme/base.css'
 import '../theme/game.css'
 import '../theme/index.css'
