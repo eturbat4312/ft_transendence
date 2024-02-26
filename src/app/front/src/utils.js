@@ -26,7 +26,7 @@ export default class Chat {
                 if (data.action === "join_chat")
                     self.joinMessage(data.name_data);
                 if (data.action === "left_chat")
-                    self.leftMessage(data.message_data);
+                    self.leftMessage(data.name_data);
             };
             this.websocket.onclose = (event) => {
                 console.log("Chat WebSocket connection closed", event);
@@ -49,6 +49,8 @@ export default class Chat {
         messageElement.classList.add("chat-message");
         messageElement.textContent = print;
         messagesDiv.appendChild(messageElement);
+        const chatBox = document.querySelector(".chat-box");
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     joinMessage = (data) => {
@@ -59,16 +61,25 @@ export default class Chat {
         messageElement.classList.add("chat-message");
         messageElement.textContent = print;
         messagesDiv.appendChild(messageElement);
+        const chatBox = document.querySelector(".chat-box");
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     leftMessage = (data) => {
-
+        const username = data;
+        const print = username + " has left the chat!";
+        const messagesDiv = document.getElementById("messages");
+        const messageElement = document.createElement("div");
+        messageElement.classList.add("chat-message");
+        messageElement.textContent = print;
+        messagesDiv.appendChild(messageElement);
+        const chatBox = document.querySelector(".chat-box");
+        chatBox.scrollTop = chatBox.scrollHeight;
     }
 
     sendMessagetoServer = () => {
         const messageInput = document.getElementById("messageInput");
         const messageText = messageInput.value.trim();
-        const chatBox = document.querySelector(".chat-box");
         if (messageText !== '') {
             const message = JSON.stringify({
                 action: 'client_message',
@@ -79,7 +90,6 @@ export default class Chat {
             });
             this.websocket.send(message);
             messageInput.value = '';
-            chatBox.scrollTop = chatBox.scrollHeight;
         }
     }
 
@@ -98,9 +108,11 @@ export function addChatEventListeners() {
         })
     })
     const messageInput = document.getElementById("messageInput");
-    messageInput.addEventListener('keydown', (event) => {
-        if (event.key === 'Enter') {
-            chatBox.sendMessagetoServer();
-        }
-    });
+    if (messageInput != null) {
+        messageInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                chatBox.sendMessagetoServer();
+            }
+        });
+    }
 }
