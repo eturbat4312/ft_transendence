@@ -23,6 +23,7 @@ export default class Game extends AbstractView {
         this.isMaster = false;
         this.player1 = false;
         this.player2 = false;
+        this.playerDisconnected = false;
         this.keysPressed = {
             ArrowUp: false,
             ArrowDown: false,
@@ -99,7 +100,7 @@ export default class Game extends AbstractView {
             this.gameActive = false;
         }
         this.update();
-        if (!this.isOffline) {
+        if (!this.isOffline && this.gameActive) {
             if (this.websocket.readyState !== WebSocket.OPEN) {
                 console.log("WebSocket is not open, attempting to reconnect...");
                 this.initWebSocket();
@@ -120,6 +121,12 @@ export default class Game extends AbstractView {
                 if (this.player2) {
                     if (data.action === "update_paddle1_position") {
                         this.updatePaddle1Position(data.paddle_data);
+                    }
+                }
+                if (this.gameActive) {
+                    if (data.action === "player_disconnected") {
+                        this.playerDisconnected = true;
+                        this.endGame();
                     }
                 }
             };
@@ -144,8 +151,9 @@ export default class Game extends AbstractView {
         if (this.isMaster) {
             this.updateMasterBallPosition();
             this.handleBallCollision();
-            if (!this.isOffline)
+            if (!this.isOffline) {
                 this.sendBallData();
+            }
             if (this.isOffline)
                 this.updatePaddlePosition();
         }
@@ -220,62 +228,68 @@ export default class Game extends AbstractView {
     }
 
     sendPaddle1Position = () => {
-        if (this.keysPressed.ArrowUp) {
-            this.paddle1Y -= 3;
-        }
-        if (this.keysPressed.ArrowDown) {
-            this.paddle1Y += 3;
-        }
-        if (this.keysPressed.w) {
-            this.paddle1Y -= 3;
-        }
-        if (this.keysPressed.s) {
-            this.paddle1Y += 3;
-        }
-        const message = JSON.stringify({
-            action: 'update_paddle1_position',
-            paddle_data: {
-                paddle1: this.paddle1Y,
+        if (this.gameActive && this.websocket) {
+            if (this.keysPressed.ArrowUp) {
+                this.paddle1Y -= 3;
             }
-        });
-        this.websocket.send(message);
-        this.paddle1Y = Math.max(2, Math.min(this.paddle1Y, 338));   
-        this.paddle1.style.top = this.paddle1Y + "px";
+            if (this.keysPressed.ArrowDown) {
+                this.paddle1Y += 3;
+            }
+            if (this.keysPressed.w) {
+                this.paddle1Y -= 3;
+            }
+            if (this.keysPressed.s) {
+                this.paddle1Y += 3;
+            }
+            const message = JSON.stringify({
+                action: 'update_paddle1_position',
+                paddle_data: {
+                    paddle1: this.paddle1Y,
+                }
+            });
+            this.websocket.send(message);
+            this.paddle1Y = Math.max(2, Math.min(this.paddle1Y, 338));   
+            this.paddle1.style.top = this.paddle1Y + "px";
+        }
     };
 
     sendPaddle2Position = () => {
-        if (this.keysPressed.ArrowUp) {
-            this.paddle2Y -= 3;
-        }
-        if (this.keysPressed.ArrowDown) {
-            this.paddle2Y += 3;
-        }
-        if (this.keysPressed.w) {
-            this.paddle2Y -= 3;
-        }
-        if (this.keysPressed.s) {
-            this.paddle2Y += 3;
-        }
-        const message = JSON.stringify({
-            action: 'update_paddle2_position',
-            paddle_data: {
-                paddle2: this.paddle2Y,
+        if (this.gameActive && this.websocket) {
+            if (this.keysPressed.ArrowUp) {
+                this.paddle2Y -= 3;
             }
-        });
-        this.websocket.send(message);    
-        this.paddle2Y = Math.max(2, Math.min(this.paddle2Y, 338));   
-        this.paddle2.style.top = this.paddle2Y + "px";
+            if (this.keysPressed.ArrowDown) {
+                this.paddle2Y += 3;
+            }
+            if (this.keysPressed.w) {
+                this.paddle2Y -= 3;
+            }
+            if (this.keysPressed.s) {
+                this.paddle2Y += 3;
+            }
+            const message = JSON.stringify({
+                action: 'update_paddle2_position',
+                paddle_data: {
+                    paddle2: this.paddle2Y,
+                }
+            });
+            this.websocket.send(message);    
+            this.paddle2Y = Math.max(2, Math.min(this.paddle2Y, 338));   
+            this.paddle2.style.top = this.paddle2Y + "px";
+    }
     };
 
     sendBallData = () => {
-        const message = JSON.stringify({
-            action: 'update_ball_position',
-            ball_data: {
-                x: this.ballX,
-                y: this.ballY,
-            }
-        });
-        this.websocket.send(message);
+        if (this.gameActive && this.websocket) {
+            const message = JSON.stringify({
+                action: 'update_ball_position',
+                ball_data: {
+                    x: this.ballX,
+                    y: this.ballY,
+                }
+            });
+            this.websocket.send(message);
+        }
     };
 
     scorePoint = (player) => {
@@ -327,7 +341,10 @@ export default class Game extends AbstractView {
         this.ballSpeedX = 0;
         this.ballSpeedY = 0;
         this.ball.style.display = "none";
-        if (this.player1Score > this.player2Score) {
+        if (this.playerDisconnected) {
+            document.getElementById("winner").innerText = "Your opponent just disconnected...";
+        }
+        else if (this.player1Score > this.player2Score) {
             document.getElementById("winner").innerText = "Player 1 wins!";
         }
         else {
@@ -335,8 +352,10 @@ export default class Game extends AbstractView {
         }
        // saveScore(player1Score, player2Score);
         this.gameActive = false;
-        if (!this.isOffline)
+        if (!this.isOffline) {
+            ("close websocket")
             this.websocket.close();
+        }
         this.websocket = null;
         const resetButton = document.querySelector(".btn-reset");
         resetButton.style.display = "block";
@@ -406,7 +425,7 @@ export default class Game extends AbstractView {
                 const data = JSON.parse(event.data);
                 if (data.action === "match_found") {
                     console.log("match found");
-                    self.websocket.close();
+                //    self.websocket.close();
                     const gameId = data.game_id;
                     console.log("gameId = ", gameId);
                     self.websocket = new WebSocket('ws://localhost:8000/ws/game');
