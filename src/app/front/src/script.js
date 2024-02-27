@@ -290,3 +290,44 @@ function selectTournament(players) {
 function joinMatchmaking() {
         alert("Joining matchmaking...");
 }
+
+document.addEventListener('DOMContentLoaded', function() {
+    const pinkCircle = document.querySelector('.pink');
+    const greenCircle = document.querySelector('.green');
+  
+    let xPos = 0;
+    let yPos = 0;
+    let xDirection = 1;
+    let yDirection = 1;
+    const speed = 0.5;
+  
+    function moveCircles() {
+      xPos += speed * xDirection;
+      yPos += speed * yDirection;
+  
+      const maxX = window.innerWidth - 200;
+      const maxY = window.innerHeight - 200;
+  
+      if (xPos >= maxX || xPos <= 0) {
+        const angle = Math.atan2(yDirection, xDirection);
+        xDirection = -Math.cos(angle);
+        yDirection = Math.sin(angle);
+      }
+  
+      if (yPos >= maxY || yPos <= 0) {
+        const angle = Math.atan2(yDirection, xDirection);
+        yDirection = -Math.sin(angle);
+        xDirection = Math.cos(angle);
+      }
+  
+      pinkCircle.style.left = xPos + 'px';
+      pinkCircle.style.top = yPos + 'px';
+  
+      greenCircle.style.left = (xPos * 0.8) + 'px';
+      greenCircle.style.top = (yPos * 0.8) + 'px';
+  
+      requestAnimationFrame(moveCircles);
+    }
+  
+    moveCircles();
+  });

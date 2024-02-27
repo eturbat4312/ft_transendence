@@ -1,6 +1,7 @@
 import { getNav, getSocial, getChat } from '../views/utils.js';
 import { addTournamentEventListeners } from './script.js';
 import { addGameEventListeners } from '../views/Game.js';
+import { addChatEventListeners } from './utils.js';
 import '../theme/base.css'
 import '../theme/game.css'
 import '../theme/index.css'
@@ -62,7 +63,7 @@ const addNavEventListeners = () => {
     const navLinks = document.querySelectorAll('.nav__link');
     navLinks.forEach(link => {
         link.addEventListener('click', (event) => {
-            console.log("lggg:", link.getAttribute('href'));
+        //    console.log("page:", link.getAttribute('href'));
             event.preventDefault();
             const path = link.getAttribute('href');
             navigate(path);

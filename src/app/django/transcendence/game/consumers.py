@@ -11,11 +11,11 @@ class GameConsumer(AsyncWebsocketConsumer):
 
     async def disconnect(self, close_code):
         logging.info("WebSocket connection closed.")
+        await self.channel_layer.group_send(self.game_group_name,{ 'type': 'player_disconnected'})
         await self.channel_layer.group_discard(self.game_group_name, self.channel_name)
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
-        #print("Received: ", data)
         action = text_data_json['action']
 
         if action == 'update_ball_position':
@@ -100,6 +100,12 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'message': message
         }))
+
+    async def player_disconnected(self, event):
+        logging.info("playerDisconnected method")
+        await self.send(text_data=json.dumps({
+        'action': 'player_disconnected'
+    }))
 
 class MatchmakingConsumer(AsyncWebsocketConsumer):
     ball_master = None
