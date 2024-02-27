@@ -342,7 +342,7 @@ export default class Game extends AbstractView {
         this.ballSpeedY = 0;
         this.ball.style.display = "none";
         if (this.playerDisconnected) {
-            document.getElementById("winner").innerText = "Your opponent just disconnected...";
+            document.getElementById("winner").innerText = "Opponent disconnected...";
         }
         else if (this.player1Score > this.player2Score) {
             document.getElementById("winner").innerText = "Player 1 wins!";
@@ -425,7 +425,7 @@ export default class Game extends AbstractView {
                 const data = JSON.parse(event.data);
                 if (data.action === "match_found") {
                     console.log("match found");
-                //    self.websocket.close();
+                    self.websocket.close();
                     const gameId = data.game_id;
                     console.log("gameId = ", gameId);
                     self.websocket = new WebSocket('ws://localhost:8000/ws/game');
