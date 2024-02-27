@@ -34,6 +34,6 @@ RUN mkdir -p /var/run/nginx
 
 # Copy nginx configuration
 COPY ./conf/nginx.conf /etc/nginx/http.d/default.conf
-
+copy ./proxy_params /etc/nginx/
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]
