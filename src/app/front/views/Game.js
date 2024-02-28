@@ -1,4 +1,5 @@
 import AbstractView from "./AbstractView.js";
+import { serverIP } from "../src/index.js";
 
 export default class Game extends AbstractView {
     constructor(params) {
@@ -414,8 +415,9 @@ export default class Game extends AbstractView {
     }
 
     startMatchmaking = () => {
+        const serverIP = window.location.hostname;
         if (this.websocket === null || this.websocket.readyState !== WebSocket.OPEN) {
-            this.websocket = new WebSocket('ws://localhost:8000/ws/matchmaking');
+            this.websocket = new WebSocket('ws://' + serverIP + ':8000/ws/matchmaking');
             this.websocket.onopen = () => {
                 console.log("Matchmaking WebSocket connection established");
                 this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
@@ -428,7 +430,7 @@ export default class Game extends AbstractView {
                     self.websocket.close();
                     const gameId = data.game_id;
                     console.log("gameId = ", gameId);
-                    self.websocket = new WebSocket('ws://localhost:8000/ws/game');
+                    self.websocket = new WebSocket('ws://' + serverIP + ':8000/ws/game');
                     self.websocket.onopen = function() {
                         if (!self.player1)
                             self.player2 = true;

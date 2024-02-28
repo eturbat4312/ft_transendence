@@ -9,7 +9,8 @@ export default class Chat {
         const chatBox = document.querySelector(".chat-container");
         chatBox.style.display = "block";
         if (this.websocket === null || this.websocket.readyState !== WebSocket.OPEN) {
-            this.websocket = new WebSocket('ws://localhost:8000/ws/chat');
+            const serverIP = window.location.hostname;
+            this.websocket = new WebSocket('ws://' + serverIP + ':8000/ws/chat');
             this.websocket.onopen = () => {
                 console.log("Chat WebSocket connection established");
                 const message = JSON.stringify({
