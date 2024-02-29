@@ -63,7 +63,7 @@ const addNavEventListeners = () => {
     const navLinks = document.querySelectorAll('.nav__link');
     navLinks.forEach(link => {
         link.addEventListener('click', (event) => {
-            console.log("lggg:", link.getAttribute('href'));
+        //    console.log("page:", link.getAttribute('href'));
             event.preventDefault();
             const path = link.getAttribute('href');
             navigate(path);
