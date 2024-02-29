@@ -310,7 +310,7 @@ export default class Game extends AbstractView {
             }
         });
         this.websocket.send(message);
-        (this.player1Score === 3 || this.player2Score === 3) ? this.endGame() : this.resetBall();
+    //    (this.player1Score === 3 || this.player2Score === 3) ? this.endGame() : this.resetBall();
     };
 
     resetBall = () => {
