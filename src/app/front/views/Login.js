@@ -1,14 +1,10 @@
 import AbstractView from "./AbstractView.js";
 
-
-
 export default class extends AbstractView {
     constructor(params) {
         super(params);
         this.setTitle("Login");
     }
-
-
 
     async getHtml() {
         return `
@@ -39,6 +35,7 @@ export default class extends AbstractView {
     </div>
         `;
     }
+    
     async initialize() {
 
 
@@ -55,6 +52,8 @@ export default class extends AbstractView {
     }
 
     async loginUser(event) {
+
+        const serverIP = window.location.hostname;
 
         event.preventDefault();
         console.log(this);
@@ -79,7 +78,7 @@ export default class extends AbstractView {
 
 
         try {
-            const response = await fetch('http://localhost:8000/login/', {
+            const response = await fetch('http://' + serverIP + ':8000/login/', {
                 method: 'POST',
                 body: searchParams,
                 headers: {
@@ -107,4 +106,3 @@ export default class extends AbstractView {
 //     const loginView = new LoginView();
 //     loginView.initialize();
 // });
-
