@@ -29,7 +29,7 @@ const getNav = async () => {
                             <ul class="dropdown-menu" style>
                             <li><a href="/profile" class="nav__link dropdown-item" data-link>View my profile</a></li>
                             <li><a href="/settings" class="nav__link dropdown-item" data-link>Settings</a></li>
-                            <li><a href="/logout" class="nav__link dropdown-item" data-link>Logout</a></li>
+                            <li><a href="#" id="logout" class="dropdown-item" data-link>Logout</a></li>
                             </ul>
                         </li>
                     </ul>
@@ -87,6 +87,29 @@ const getChat = async () => {
     `;
 };
 
-export { getNav };
-export { getSocial };
-export { getChat };
+const handleLogout = async () => {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (token) {
+        try {
+            const response = await fetch('http://' + serverIP + ':8000/api/logout/', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Token ' + token
+                }
+            });
+            if (response.ok) {
+                localStorage.removeItem('token');
+                window.location.href = '/';
+            } else {
+                console.log('Failed to logout');
+            }
+        } catch (error) {
+            console.error('Error logging out:', error);
+        }
+    } else {
+        console.log('No token found');
+    }
+}
+
+export { getNav, getSocial, getChat, handleLogout };

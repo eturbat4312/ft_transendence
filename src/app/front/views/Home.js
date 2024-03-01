@@ -4,45 +4,51 @@ export default class extends AbstractView {
     constructor(params) {
         super(params);
         this.setTitle("Home");
-
-        this.handleLogout = this.handleLogout.bind(this);
     }
 
     async getHtml() {
         return `
         <div class="container mt-3 centered">
             <div class="card bg-dark text-light mx-auto" style="max-width: 800px;">
-                <button id="logout">Logout</button>
+                <button id="token">TOKEN</button>
+                <div id="username"></div>
             </div>
         </div>
         `;
     }
 
-    async initialize() {
-        document.getElementById('logout').addEventListener('click', this.handleLogout);
-    }
+     async initialize() {
+         document.getElementById('token').addEventListener('click', this.tokentest);
+     }
 
-    async handleLogout() {
+    async tokentest() {
+        const serverIP = window.location.hostname;
+        const token = localStorage.getItem('token');
+        console.log(token);
+        if (!token) {
+            console.log('Token not found');
+            return;
+        }
+    
         try {
-            const urlParams = new URLSearchParams(window.location.search);
-            const response = await fetch('http://localhost:8000/logout/', {
-                method: 'POST',
+            const response = await fetch('http://' + serverIP + ':8000/api/get_username/', {
+                method: 'GET',
                 headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    // Include any necessary data for the logout request
-                    // For example: user ID, session token, etc.
-                })
+                    'Authorization': 'Token ' + token
+                }
             });
-
+    
             if (response.ok) {
-                this.redirect('/login');
+                const data = await response.json();
+                const username = data.username;
+                console.log('Username:', username);
+                document.getElementById('username').innerText = 'Username: ' + username;
             } else {
-                console.error('Logout failed:', response.statusText);
+                console.log('Failed to get username:', await response.text());
             }
+    
         } catch (error) {
-            console.error(error);
+            console.log('Error:', error);
         }
     }
-}    
+}
