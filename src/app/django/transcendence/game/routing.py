@@ -4,8 +4,8 @@ from channels.auth import AuthMiddlewareStack
 from . import consumers
 
 websocket_urlpatterns = [
-    path("ws/game", consumers.GameConsumer.as_asgi()),
-    path("ws/matchmaking", consumers.MatchmakingConsumer.as_asgi()),
+    path("wss/game", consumers.GameConsumer.as_asgi()),
+        path("wss/matchmaking", consumers.MatchmakingConsumer.as_asgi()),
 ]
 
 application = ProtocolTypeRouter({

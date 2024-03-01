@@ -80,7 +80,7 @@ export default class Game extends AbstractView {
 
 
     initWebSocket = () => {
-        this.websocket = new WebSocket('ws://localhost:8000/ws/matchmaking');
+        this.websocket = new WebSocket('wss://localhost:8000/ws/matchmaking');
 
         this.websocket.onopen = () => {
             console.log("WebSocket connection established");

@@ -6,7 +6,7 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(leve
 
 class GameConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        logging.info("Game WebSocket connection established.")
+        logging.info("Game WebSocket connection established %s.",self)
         await self.accept()
 
     async def disconnect(self, close_code):

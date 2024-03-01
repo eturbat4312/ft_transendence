@@ -8,6 +8,8 @@ services:
         build:
             context: ./src/app/front
             dockerfile: Dockerfile
+        container_name: front
+        restart: always
         ports:
             - "8080:8080"
         volumes:
@@ -16,22 +18,27 @@ services:
             - django
         networks:
             - transcendence
-    #nginx:
-    #    build:
-    #        context: ./src/app/nginx
-    #        dockerfile: Dockerfile
-    #    ports:
-    #        - "80:80"
-    #    volumes:
-    #        - ./src/app/nginx:/app/nginx
-    #    depends_on:
-    #        - django
-    #    networks:
-    #        - transcendence
+    nginx:
+        build:
+            context: ./src/app/nginx
+            dockerfile: Dockerfile
+        container_name: nginx
+        restart: always
+        ports:
+            - "443:443"
+            #- "80:80"
+        volumes:
+            - ./src/app/nginx:/app/nginx
+        depends_on:
+            - django
+        networks:
+            - transcendence
     django:
         build:
             context: ./src/app/django
             dockerfile: Dockerfile
+        container_name: django
+        restart: always
         ports:
             - "8000:8000"
         volumes:
@@ -44,6 +51,8 @@ services:
             - transcendence
     db:
         image: postgres:15.5-bullseye
+        container_name: postgres
+        restart: always
         ports:
             - "5432:5432"
         volumes:
