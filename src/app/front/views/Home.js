@@ -24,7 +24,6 @@ export default class extends AbstractView {
     async tokentest() {
         const serverIP = window.location.hostname;
         const token = localStorage.getItem('token');
-        console.log(token);
         if (!token) {
             console.log('Token not found');
             return;
@@ -41,7 +40,6 @@ export default class extends AbstractView {
             if (response.ok) {
                 const data = await response.json();
                 const username = data.username;
-                console.log('Username:', username);
                 document.getElementById('username').innerText = 'Username: ' + username;
             } else {
                 console.log('Failed to get username:', await response.text());

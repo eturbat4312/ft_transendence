@@ -1,7 +1,7 @@
 import { getNav, getSocial, getChat, handleLogout } from '../views/utils.js';
 import { addTournamentEventListeners } from './script.js';
 import { addGameEventListeners } from '../views/Game.js';
-import { addChatEventListeners } from './utils.js';
+import { addChatEventListeners, getUsername } from './utils.js';
 import { getSocialState } from './friendModal.js';
 import '../theme/base.css'
 import '../theme/game.css'
@@ -141,8 +141,37 @@ window.addEventListener('popstate', () => {
     loadView(location.pathname);
 });
 
+const checkIfConnected = async () => {
+    const auth = await isAuthenticated();
+    if (!auth) {
+        console.log("RETURN");
+        return;
+    }
+    const username = await getUsername();
+    console.log("username: ", username);
+    const serverIP = window.location.hostname;
+    var websocket = new WebSocket('ws://' + serverIP + ':8000/ws/connect');
+    websocket.onopen = function(event) {
+        console.log('Connexion WebSocket établie');
+        websocket.send(JSON.stringify({ username: username}));
+    }
+
+    websocket.onclose = function(event) {
+        console.log('Connexion WebSocket fermée');
+    }
+
+    websocket.onmessage = function(event) {
+        var message = JSON.parse(event.data);
+    }
+
+    websocket.onerror = function(event) {
+        console.error('Erreur WebSocket:', event);
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async () => {
     await loadComponents();
     await loadView(location.pathname);
     addChatEventListeners();
+    checkIfConnected();
 });

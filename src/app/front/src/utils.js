@@ -117,3 +117,32 @@ export function addChatEventListeners() {
         });
     }
 }
+
+export async function getUsername() {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+    
+    try {
+        const response = await fetch('http://' + serverIP + ':8000/api/get_username/', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Token ' + token
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const username = data.username;
+            return (username);
+        } else {
+            console.log('Failed to get username:', await response.text());
+        }
+
+    } catch (error) {
+        console.log('Error:', error);
+    }
+}
