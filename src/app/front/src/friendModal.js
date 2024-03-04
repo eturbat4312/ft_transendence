@@ -1,4 +1,4 @@
-document.addEventListener("DOMContentLoaded", function () {
+const getSocialState = async () => {
 
     const friendList = document.getElementById("friend-list");
 
@@ -49,4 +49,6 @@ document.addEventListener("DOMContentLoaded", function () {
             friendModal.show();
         });
     });
-});
+}
+
+export { getSocialState };

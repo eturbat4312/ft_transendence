@@ -13,16 +13,16 @@ export default class extends AbstractView {
 
     async initialize() {
         // Get HTML
-        const html = await this.getHtml();
+        //const html = await this.getHtml();
 
         // Render HTML 
-        document.getElementById("app").innerHTML = html;
+        //document.getElementById("app").innerHTML = html;
 
         const form = document.getElementById("signup-form");
         if (form) {
             // Add submit listener
             form.addEventListener('submit', this.registerUser);
-            console.log("initialized!!!");
+            //console.log("initialized!!!");
         } else {
             console.error("Form element not found");
         }
@@ -56,7 +56,7 @@ export default class extends AbstractView {
                                         </div>
                                         <button type="submit" class="btn btn-primary">Sign Up</button>
                                         <p class="mt-3">
-                                            Already have an account? <a href="/login" data-link>Login here</a>
+                                            Already have an account? <a href="/login" class="nav__link" data-link>Login here</a>
                                         </p>
                                     </form>
                                 </div>
@@ -71,10 +71,9 @@ export default class extends AbstractView {
 
 
     async registerUser(event) {
+        const serverIP = window.location.hostname;
         const form = event.target;
         console.log('Form Element:', form);
-
-
 
 
         // Log input values  
@@ -92,7 +91,7 @@ export default class extends AbstractView {
         console.log(searchParams.get("username"));
 
         try {
-            const response = await fetch('http://localhost:8000/register/', {
+            const response = await fetch('http://' + serverIP + ':8000/register/', {
                 method: 'POST',
                 body: searchParams,
                 headers: {
@@ -114,7 +113,7 @@ export default class extends AbstractView {
             } else {
                 // Registration successful
                 console.log('Registration successful!');
-                this.redirect('/login');
+                window.location.href = '/login';
             }
 
         } catch (error) {

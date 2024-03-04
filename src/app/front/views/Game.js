@@ -97,8 +97,11 @@ export default class Game extends AbstractView {
     gameLoop = () => {
         const checkIfGamePage = document.getElementById("game");
         if (!checkIfGamePage) {
-            console.log("game stopped");
             this.gameActive = false;
+            if (!this.isOffline) {
+                this.websocket.close();
+                this.websocket = null;
+            }
         }
         this.update();
         if (!this.isOffline && this.gameActive) {
@@ -310,7 +313,7 @@ export default class Game extends AbstractView {
             }
         });
         this.websocket.send(message);
-        (this.player1Score === 3 || this.player2Score === 3) ? this.endGame() : this.resetBall();
+    //    (this.player1Score === 3 || this.player2Score === 3) ? this.endGame() : this.resetBall();
     };
 
     resetBall = () => {
@@ -450,11 +453,23 @@ export default class Game extends AbstractView {
                     }
                 }
             };
+            const checkPageChange = () => {
+                if (!document.getElementById("game")) {
+                    console.log("change page");
+                    this.websocket.close();
+                    this.websocket = null;
+                    clearInterval(intervalId);
+                }
+            }
+            const intervalId = setInterval(checkPageChange, 1000);
+
             this.websocket.onclose = (event) => {
                 console.log("Matchmaking WebSocket connection closed", event);
+                clearInterval(intervalId); 
             };
             this.websocket.onerror = (error) => {
                 console.error("WebSocket error:", error);
+                clearInterval(intervalId);
             };
         } else {
             console.log("WebSocket connection is already open.");
