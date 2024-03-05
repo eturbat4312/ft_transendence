@@ -100,6 +100,7 @@ const handleLogout = async () => {
             });
             if (response.ok) {
                 localStorage.removeItem('token');
+                localStorage.removeItem('username');
                 window.location.href = '/';
             } else {
                 console.log('Failed to logout');

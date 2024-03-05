@@ -147,21 +147,25 @@ const checkIfConnected = async () => {
         console.log("RETURN");
         return;
     }
-    const username = await getUsername();
-    console.log("username: ", username);
+    const username = localStorage.getItem('username');
     const serverIP = window.location.hostname;
     var websocket = new WebSocket('ws://' + serverIP + ':8000/ws/connect');
-    websocket.onopen = function(event) {
-        console.log('Connexion WebSocket établie');
-        websocket.send(JSON.stringify({ username: username}));
+    websocket.onopen = () => {
+        console.log("Connect WebSocket connection established");
+        const message = JSON.stringify({ action: 'connect', username: username });
+        websocket.send(message);
     }
 
     websocket.onclose = function(event) {
-        console.log('Connexion WebSocket fermée');
+        console.log('Connect WebSocket closed');
     }
 
     websocket.onmessage = function(event) {
-        var message = JSON.parse(event.data);
+        const data = JSON.parse(event.data);                
+            if (data.action === "connected")
+               console.log(data.username, " is online !");
+            if (data.action === "disconnected")
+                console.log(data.username, " is offline !");
     }
 
     websocket.onerror = function(event) {

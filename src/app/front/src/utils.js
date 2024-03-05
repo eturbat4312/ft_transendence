@@ -1,7 +1,7 @@
 export default class Chat {
     constructor() {
         this.websocket = null;
-        this.name = Math.floor(Math.random() * 100) + 1;
+        this.username = localStorage.getItem('username');
     }
 
     startChat = () => {
@@ -15,7 +15,7 @@ export default class Chat {
                 console.log("Chat WebSocket connection established");
                 const message = JSON.stringify({
                     action: 'join_chat',
-                    clientName: this.name
+                    clientName: this.username
                 });
                 this.websocket.send(message);
             };
@@ -85,7 +85,7 @@ export default class Chat {
             const message = JSON.stringify({
                 action: 'client_message',
                 message_data: {
-                    clientName: this.name,
+                    clientName: this.username,
                     clientMessage: messageText,
                 }
             });
@@ -137,7 +137,7 @@ export async function getUsername() {
         if (response.ok) {
             const data = await response.json();
             const username = data.username;
-            return (username);
+            localStorage.setItem('username', username);
         } else {
             console.log('Failed to get username:', await response.text());
         }

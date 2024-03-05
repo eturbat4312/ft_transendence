@@ -1,4 +1,5 @@
 import AbstractView from "./AbstractView.js";
+import { getUsername } from "../src/utils.js";
 
 export default class extends AbstractView {
     constructor(params) {
@@ -83,6 +84,7 @@ export default class extends AbstractView {
                 const data = await response.json();
                 const token = data.token;
                 localStorage.setItem('token', token);
+                await getUsername();
                 console.log('Login successful! Token:', token);
                 window.location.href = '/home';
             } else {

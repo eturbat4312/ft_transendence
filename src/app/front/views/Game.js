@@ -78,22 +78,6 @@ export default class Game extends AbstractView {
         (this.player1Score === 3 || this.player2Score === 3) ? this.endGame() : this.resetBall();
 	}
 
-
-    initWebSocket = () => {
-        this.websocket = new WebSocket('ws://localhost:8000/ws/matchmaking');
-
-        this.websocket.onopen = () => {
-            console.log("WebSocket connection established");
-            };
-        this.websocket.onclose = (event) => {
-            console.log("WebSocket connection closed", event);
-        };
-
-        this.websocket.onerror = (error) => {
-            console.error("WebSocket error:", error);
-        };
-    };
-
     gameLoop = () => {
         const checkIfGamePage = document.getElementById("game");
         if (!checkIfGamePage) {
@@ -105,10 +89,6 @@ export default class Game extends AbstractView {
         }
         this.update();
         if (!this.isOffline && this.gameActive) {
-            if (this.websocket.readyState !== WebSocket.OPEN) {
-                console.log("WebSocket is not open, attempting to reconnect...");
-                this.initWebSocket();
-            }
             this.websocket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 if (data.action === "update_ball_position" && this.player2) {

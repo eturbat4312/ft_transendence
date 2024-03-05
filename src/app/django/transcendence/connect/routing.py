@@ -4,7 +4,7 @@ from channels.auth import AuthMiddlewareStack
 from . import consumers
 
 websocket_urlpatterns = [
-    path('ws/connect', consumers.ConnectConsumer.as_asgi()),
+    path("ws/connect", consumers.ConnectConsumer.as_asgi()),
 ]
 
 application = ProtocolTypeRouter({
