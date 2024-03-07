@@ -5,9 +5,15 @@ logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(leve
 
 class ConnectConsumer(AsyncWebsocketConsumer):
     connected_users = set()
-    
+    username = None
     async def connect(self):
         await self.accept()
+        for user in self.connected_users:
+            if user != self.username:
+                await self.send(text_data=json.dumps({
+                    'action': 'connected',
+                    'username': user,
+                }))
 
     async def disconnect(self, close_code):
         if self.username:
@@ -26,6 +32,7 @@ class ConnectConsumer(AsyncWebsocketConsumer):
 
         if action == 'connect':
             self.username = text_data_json['username']
+            await self.channel_layer.group_add("connected_users", self.channel_name)
             self.connected_users.add(self.username)
             await self.channel_layer.group_send(
                 "connected_users",
@@ -34,18 +41,13 @@ class ConnectConsumer(AsyncWebsocketConsumer):
                     'username': self.username,
                 }
             )
-            for user in self.connected_users:
-                if user != self.username:
-                    await self.send(text_data=json.dumps({
-                        'action': 'connected',
-                        'username': user,
-                    }))
 
     async def user_connected(self, event):
-        await self.send(text_data=json.dumps({
-            "username": event["username"],
-            "action": "connected",
-        }))
+        if self.username != event["username"]:
+            await self.send(text_data=json.dumps({
+                "username": event["username"],
+                "action": "connected",
+            }))
 
     async def user_disconnected(self, event):
         await self.send(text_data=json.dumps({
