@@ -41,14 +41,14 @@ const getNav = async () => {
 
 const getSocial = async () => {
     return `
-    <div class="modal fade" id="friendModal" tabindex="-1" aria-labelledby="friendModalLabel" aria-hidden="true">
+    <div class="modal fade" id="playerModal" tabindex="-1" aria-labelledby="playerModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="friendModalLabel">Modal title</h1>
+                    <h1 class="modal-title fs-5" id="playerModalLabel">Modal title</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
-                <div class="modal-body" id="friendModalBody">
+                <div class="modal-body" id="playerModalBody">
                     ...
                 </div>
                 <div class="modal-footer">
@@ -57,10 +57,10 @@ const getSocial = async () => {
             </div>
         </div>
     </div>
-    <div id="friend-bar" class="friend-bar bg-dark">
+    <div id="player-bar" class="player-bar bg-dark">
         <h2>Social</h2>
-            <div id="friend-list-container" class="container">
-        <ul id="friend-list" class="friend-list"></ul>
+            <div id="player-list-container" class="container">
+        <ul id="player-list" class="player-list"></ul>
         </div>
     </div>
     `;

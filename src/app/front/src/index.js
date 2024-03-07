@@ -1,8 +1,8 @@
 import { getNav, getSocial, getChat, handleLogout } from '../views/utils.js';
 import { addTournamentEventListeners } from './script.js';
 import { addGameEventListeners } from '../views/Game.js';
-import { addChatEventListeners, getUsername } from './utils.js';
-import { getSocialState } from './friendModal.js';
+import { addChatEventListeners } from './utils.js';
+import { updateConnectedPlayer, removeDisconnectedPlayer } from './friendModal.js';
 import '../theme/base.css'
 import '../theme/game.css'
 import '../theme/index.css'
@@ -109,7 +109,6 @@ const loadComponents = async () => {
 
         const socialHTML = await getSocial(currentPath);
         document.querySelector("#social").innerHTML = socialHTML;
-        getSocialState();
     }
     addNavEventListeners();
 };
@@ -162,10 +161,16 @@ const checkIfConnected = async () => {
 
     websocket.onmessage = function(event) {
         const data = JSON.parse(event.data);                
-            if (data.action === "connected")
-               console.log(data.username, " is online !");
-            if (data.action === "disconnected")
+            if (data.action === "connected") {
+                console.log(data.username, " is online !");
+                updateConnectedPlayer(data.username, true);
+                // const message = JSON.stringify({ action: 'connected_player', username: username });
+                // websocket.send(message);
+            }
+            if (data.action === "disconnected") {
                 console.log(data.username, " is offline !");
+                removeDisconnectedPlayer(data.username);
+            }
     }
 
     websocket.onerror = function(event) {

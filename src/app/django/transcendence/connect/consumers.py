@@ -4,18 +4,19 @@ import json, logging
 logging.basicConfig(level=logging.DEBUG, format='%(asctime)s - %(name)s - %(levelname)s - %(message)s')
 
 class ConnectConsumer(AsyncWebsocketConsumer):
-    username = None
+    connected_users = set()
+    
     async def connect(self):
         await self.accept()
 
     async def disconnect(self, close_code):
         if self.username:
-            await self.channel_layer.group_discard("connected_users", self.channel_name)
+            self.connected_users.remove(self.username)
             await self.channel_layer.group_send(
                 "connected_users",
                 {
-                    'type': 'disconnected',
-                    'username': self.username
+                    'type': 'user_disconnected',
+                    'username': self.username,
                 }
             )
 
@@ -25,23 +26,28 @@ class ConnectConsumer(AsyncWebsocketConsumer):
 
         if action == 'connect':
             self.username = text_data_json['username']
-            await self.channel_layer.group_add("connected_users", self.channel_name)
+            self.connected_users.add(self.username)
             await self.channel_layer.group_send(
                 "connected_users",
                 {
-                    'type': 'connected',
-                    'username': self.username
+                    'type': 'user_connected',
+                    'username': self.username,
                 }
-        )
+            )
+            for user in self.connected_users:
+                if user != self.username:
+                    await self.send(text_data=json.dumps({
+                        'action': 'connected',
+                        'username': user,
+                    }))
 
-    async def connected(self, event):
-        if self.username != event["username"]:
-            await self.send(text_data=json.dumps({
-                "username": event["username"],
-                "action": "connected",
-            }))
+    async def user_connected(self, event):
+        await self.send(text_data=json.dumps({
+            "username": event["username"],
+            "action": "connected",
+        }))
 
-    async def disconnected(self, event):
+    async def user_disconnected(self, event):
         await self.send(text_data=json.dumps({
             "username": event["username"],
             "action": "disconnected",
