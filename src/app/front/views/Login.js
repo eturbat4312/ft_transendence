@@ -54,6 +54,7 @@ export default class extends AbstractView {
     async loginUser(event) {
 
         const serverIP = window.location.hostname;
+        console.log(serverIP);
 
         event.preventDefault();
         console.log(this);
@@ -78,14 +79,14 @@ export default class extends AbstractView {
 
 
         try {
-            const response = await fetch('http://' + serverIP + ':8000/login/', {
+            const response = await fetch('http://nginx/api/login/', {
                 method: 'POST',
                 body: searchParams,
                 headers: {
                     'Content-Type': 'application/x-www-form-urlencoded'
                 }
             });
-
+            event.preventDefault();
             if (response.ok) {
                 console.log('Login successful!');
                 redirect('/home');
