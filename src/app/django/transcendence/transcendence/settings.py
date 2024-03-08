@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "channels",
     "game",
     "chat",
+    "connect",
 ]
 
 MIDDLEWARE = [
@@ -121,7 +122,6 @@ AUTH_PASSWORD_VALIDATORS = [
         "NAME": "django.contrib.auth.password_validation.NumericPasswordValidator",
     },
 ]
-
 
 # Internationalization
 # https://docs.djangoproject.com/en/5.0/topics/i18n/

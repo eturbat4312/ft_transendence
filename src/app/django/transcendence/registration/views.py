@@ -1,14 +1,15 @@
-from rest_framework.decorators import api_view
-from rest_framework.response import Response
 from rest_framework import status
-from django.shortcuts import get_object_or_404
-from rest_framework.decorators import authentication_classes, permission_classes
-from rest_framework.authentication import TokenAuthentication, SessionAuthentication
+from rest_framework.response import Response
+from rest_framework.views import APIView
+from rest_framework.decorators import api_view, authentication_classes, permission_classes
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.authentication import TokenAuthentication
+from rest_framework.authtoken.models import Token
 from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
 from .models import User as UserModel
+from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
-from django.contrib.auth import authenticate, get_user_model, logout
+from django.contrib.auth import authenticate, get_user_model, logout, login
 
 UserModel = get_user_model()
 
@@ -29,33 +30,49 @@ def register(request):
         return Response({"user": serializer.data})
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-@api_view(["POST"])
-def login(request):
-    username = request.data.get("username")
-    password = request.data.get("password")
-    # print(f"Attempting login for : {password}")
-    user = authenticate(request, username=username, password=password)
-
-    if user is not None:
-        serializer = UserSerializer(instance=user)
-        return Response({"user": serializer.data})
+@api_view(['GET'])
+def get_username(request):
+    if request.user.is_authenticated:
+        username = request.user.username
+        return Response({'username': username})
     else:
-        return Response(
-            {"error": "Wrong username or password"}, status=status.HTTP_400_BAD_REQUEST
-        )
+        return Response({'error': 'User is not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
 
+class LoginView(APIView):
+    def post(self, request):
+        username = request.data.get('username')
+        password = request.data.get('password')
 
-@api_view(["POST"])
-@permission_classes([IsAuthenticated])
-@authentication_classes([TokenAuthentication, SessionAuthentication])
-def logout_django(request):
-    logout(request)
-    return Response({"message": "Logout successful"}, status=status.HTTP_200_OK)
+        if username is None or password is None:
+            return Response({'error': 'Veuillez fournir à la fois le nom d\'utilisateur et le mot de passe'}, status=status.HTTP_400_BAD_REQUEST)
 
+        user = authenticate(username=username, password=password)
 
-@api_view(["GET"])
-@authentication_classes([TokenAuthentication, SessionAuthentication])
-@permission_classes([IsAuthenticated])
-def test_token(request):
-    return Response({"passed for {}".format(request.user.username)})
+        if not user:
+            return Response({'error': 'Identifiants invalides'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        token, _ = Token.objects.get_or_create(user=user)
+        return Response({'token': token.key}, status=status.HTTP_200_OK)
+
+class GetUsernameView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        username = request.user.username
+        return Response({'username': username})
+
+class VerifyTokenView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        return Response({'message': 'Token is valid'})
+
+class LogoutView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        request.user.auth_token.delete()
+        return Response({'message': 'Logged out successfully'})

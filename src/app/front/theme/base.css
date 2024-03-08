@@ -15,12 +15,12 @@
    font-family: 'Micro 5', cursive;
 }
 
-#friend-list-container {
+#player-list-container {
    margin-top: 20px;
    padding: 0;
 }
  
-.friend-bar {
+.player-bar {
    position: fixed;
    right: 0;
    top: 56px;
@@ -30,14 +30,14 @@
    padding: 10px;
 }
 
-.friend-list li {
+.player-list li {
    display: flex;
    align-items: center;
    margin-bottom: 30px;
    justify-content: flex-start;
 }
 
-.friend-status {
+.player-status {
    width: 10px;
    height: 10px;
    border-radius: 50%;
@@ -52,19 +52,19 @@
    background-color: #808080;
 }
 
-.friend-info {
+.player-info {
    display: flex;
    align-items: center;
 }
 
-.friend-avatar {
+.player-avatar {
    width: 40px;
    height: 40px;
    border-radius: 50%;
    margin-right: 10px;
 }
 
-.friend-name {
+.player-name {
    margin: 0;
 }
 

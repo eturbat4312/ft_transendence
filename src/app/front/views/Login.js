@@ -1,4 +1,5 @@
 import AbstractView from "./AbstractView.js";
+import { getUsername } from "../src/utils.js";
 
 export default class extends AbstractView {
     constructor(params) {
@@ -25,7 +26,7 @@ export default class extends AbstractView {
                             </div>
                             <button type="submit" class="btn btn-primary">Login</button>
                             <p class="mt-3">
-                                don't have an account? <a href="/signup" data-link>Sign Up here</a>
+                                don't have an account? <a href="/signup" class="nav__link" data-link>Sign Up here</a>
                             </p>
                         </form>
                     </div>
@@ -40,11 +41,11 @@ export default class extends AbstractView {
 
 
         // Render HTML
-        document.getElementById("app").innerHTML = await this.getHtml();
+        //document.getElementById("app").innerHTML = await this.getHtml();
 
         // Get login form
         const form = document.getElementById("login-form");
-        console.log("initialized!!!");
+        //console.log("initialized!!!");
 
         // Add submit handler
         form.addEventListener('submit', this.loginUser);
@@ -54,16 +55,15 @@ export default class extends AbstractView {
     async loginUser(event) {
 
         const serverIP = window.location.hostname;
-        console.log(serverIP);
 
         event.preventDefault();
-        console.log(this);
+      //  console.log(this);
 
         const form = event.target;
         // console.log('Form Element:', form);
 
         // Log input values
-        const inputs = form.elements;
+        //const inputs = form.elements;
 
         // for (let input of inputs) {
         //     console.log(input.name, ':', input.value);
@@ -71,25 +71,22 @@ export default class extends AbstractView {
         const formData = new FormData(form);
         // console.log(formData.get("username"));
 
-        const searchParams = new URLSearchParams(formData);
-
-        const redirect = (path) => {
-            window.location = path;
-        };
+        //const searchParams = new URLSearchParams(formData);
 
 
         try {
-            const response = await fetch('http://nginx/api/login/', {
+            const response = await fetch('http://' + serverIP + ':8000/api/login/', {
                 method: 'POST',
-                body: searchParams,
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded'
-                }
+                body: formData
             });
-            event.preventDefault();
+            console.log("NTM: ", response);
             if (response.ok) {
-                console.log('Login successful!');
-                redirect('/home');
+                const data = await response.json();
+                const token = data.token;
+                localStorage.setItem('token', token);
+                await getUsername();
+                console.log('Login successful! Token:', token);
+                window.location.href = '/home';
             } else {
                 console.log('Login failed!');
                 console.log(response.statusText);

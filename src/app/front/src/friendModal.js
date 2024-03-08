@@ -1,52 +1,55 @@
-document.addEventListener("DOMContentLoaded", function () {
+let connectedPlayers = [];
 
-    const friendList = document.getElementById("friend-list");
+function updateplayerModal() {
+    const playerList = document.getElementById("player-list");
 
-    if (!friendList) {
+    if (!playerList || connectedPlayers.length === 0) {
         return;
     };
 
-    const friends = [
-        { name: "game22", status: "online", avatar: "../images/avatar1.jpg" },
-        { name: "jules", status: "offline", avatar: "../images/avatar2.jpg" },
-        { name: "P{earl}", status: "online", avatar: "../images/avatar3.jpg" },
-    ];
+    const player = connectedPlayers[connectedPlayers.length - 1];
 
-    friends.forEach(friend => {
-        const listItem = document.createElement("li");
-        listItem.classList.add("friend-item", "clickable");	
+    const listItem = document.createElement("li");
+    listItem.classList.add("player-item", "clickable");
+    listItem.dataset.name = player.name;
 
-        const statusIcon = document.createElement("div");
-        statusIcon.classList.add("friend-status", friend.status === "online" ? "online" : "offline");
-        listItem.appendChild(statusIcon);
+    const statusIcon = document.createElement("div");
+    if (player.online) {
+        statusIcon.classList.add("player-status", "online");
+    }
+    listItem.appendChild(statusIcon);
 
-        const avatar = document.createElement("img");
-        avatar.src = friend.avatar;
-        avatar.alt = `${friend.name}'s avatar`;
-        avatar.classList.add("friend-avatar");
-        listItem.appendChild(avatar);
+    const playerName = document.createElement("p");
+    playerName.textContent = player.name;
+    playerName.classList.add("player-name");
+    console.log("add to html", player.name);
+    listItem.appendChild(playerName);
+    playerList.appendChild(listItem);
 
-        const friendInfo = document.createElement("div");
-        friendInfo.classList.add("friend-info");
-
-        const friendName = document.createElement("p");
-        friendName.textContent = friend.name;
-        friendName.classList.add("friend-name");
-        friendInfo.appendChild(friendName);
-
-        listItem.appendChild(friendInfo);
-
-        friendList.appendChild(listItem);
+    listItem.addEventListener('click', () => {
+        const playerName = listItem.dataset.name;
+        const playerInfoContent = `<p>Nom: ${playerName}</p>`;
+        document.getElementById('playerModalBody').innerHTML = playerInfoContent;
+        const playerModal = new bootstrap.Modal(document.getElementById('playerModal'));
+        playerModal.show();
     });
+}
 
-    const clickableFriends = document.querySelectorAll('.clickable');
-    clickableFriends.forEach(friend => {
-        friend.addEventListener('click', () => {
-            const friendInfoContent = `<p>Nom: ${friend.dataset.name}</p><p>Statut: ${friend.dataset.status}</p>`;
-            document.getElementById('friendModalBody').innerHTML = friendInfoContent;
+export function updateConnectedPlayer(username, online) {
+    let playerIndex = connectedPlayers.findIndex(player => player.name === username);
 
-            const friendModal = new bootstrap.Modal(document.getElementById('friendModal'));
-            friendModal.show();
-        });
-    });
-});
+    if (playerIndex !== -1) {
+        connectedPlayers[playerIndex].online = online;
+    } else {
+        connectedPlayers.push({ name: username, online });
+    }
+    updateplayerModal();
+}
+
+export function removeDisconnectedPlayer(playerName) {
+    connectedPlayers = connectedPlayers.filter(player => player.name !== playerName);
+    const playerElementToRemove = document.querySelector(`.player-item[data-name="${playerName}"]`);
+    if (playerElementToRemove) {
+        playerElementToRemove.remove();
+    }
+}

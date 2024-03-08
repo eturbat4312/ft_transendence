@@ -1,7 +1,7 @@
 export default class Chat {
     constructor() {
         this.websocket = null;
-        this.name = Math.floor(Math.random() * 100) + 1;
+        this.username = localStorage.getItem('username');
     }
 
     startChat = () => {
@@ -15,7 +15,7 @@ export default class Chat {
                 console.log("Chat WebSocket connection established");
                 const message = JSON.stringify({
                     action: 'join_chat',
-                    clientName: this.name
+                    clientName: this.username
                 });
                 this.websocket.send(message);
             };
@@ -85,7 +85,7 @@ export default class Chat {
             const message = JSON.stringify({
                 action: 'client_message',
                 message_data: {
-                    clientName: this.name,
+                    clientName: this.username,
                     clientMessage: messageText,
                 }
             });
@@ -115,5 +115,34 @@ export function addChatEventListeners() {
                 chatBox.sendMessagetoServer();
             }
         });
+    }
+}
+
+export async function getUsername() {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+    
+    try {
+        const response = await fetch('http://' + serverIP + ':8000/api/get_username/', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Token ' + token
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const username = data.username;
+            localStorage.setItem('username', username);
+        } else {
+            console.log('Failed to get username:', await response.text());
+        }
+
+    } catch (error) {
+        console.log('Error:', error);
     }
 }

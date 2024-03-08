@@ -78,34 +78,17 @@ export default class Game extends AbstractView {
         (this.player1Score === 3 || this.player2Score === 3) ? this.endGame() : this.resetBall();
 	}
 
-
-    initWebSocket = () => {
-        this.websocket = new WebSocket('wss://localhost:8000/wss/matchmaking');
-
-        this.websocket.onopen = () => {
-            console.log("WebSocket connection established");
-            };
-        this.websocket.onclose = (event) => {
-            console.log("WebSocket connection closed", event);
-        };
-
-        this.websocket.onerror = (error) => {
-            console.error("WebSocket error:", error);
-        };
-    };
-
     gameLoop = () => {
         const checkIfGamePage = document.getElementById("game");
         if (!checkIfGamePage) {
-            console.log("game stopped");
             this.gameActive = false;
+            if (!this.isOffline) {
+                this.websocket.close();
+                this.websocket = null;
+            }
         }
         this.update();
         if (!this.isOffline && this.gameActive) {
-            if (this.websocket.readyState !== WebSocket.OPEN) {
-                console.log("WebSocket is not open, attempting to reconnect...");
-                this.initWebSocket();
-            }
             this.websocket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
                 if (data.action === "update_ball_position" && this.player2) {
@@ -417,7 +400,7 @@ export default class Game extends AbstractView {
     startMatchmaking = () => {
         const serverIP = window.location.hostname;
         if (this.websocket === null || this.websocket.readyState !== WebSocket.OPEN) {
-            this.websocket = new WebSocket('wss://' + serverIP + ':8000/wss/matchmaking');
+            this.websocket = new WebSocket('ws://' + serverIP + ':8000/ws/matchmaking');
             this.websocket.onopen = () => {
                 console.log("Matchmaking WebSocket connection established");
                 this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
@@ -430,7 +413,7 @@ export default class Game extends AbstractView {
                     self.websocket.close();
                     const gameId = data.game_id;
                     console.log("gameId = ", gameId);
-                    self.websocket = new WebSocket('wss://' + serverIP + ':8000/wss/game');
+                    self.websocket = new WebSocket('ws://' + serverIP + ':8000/ws/game');
                     self.websocket.onopen = function() {
                         if (!self.player1)
                             self.player2 = true;
@@ -450,11 +433,23 @@ export default class Game extends AbstractView {
                     }
                 }
             };
+            const checkPageChange = () => {
+                if (!document.getElementById("game")) {
+                    console.log("change page");
+                    this.websocket.close();
+                    this.websocket = null;
+                    clearInterval(intervalId);
+                }
+            }
+            const intervalId = setInterval(checkPageChange, 1000);
+
             this.websocket.onclose = (event) => {
                 console.log("Matchmaking WebSocket connection closed", event);
+                clearInterval(intervalId); 
             };
             this.websocket.onerror = (error) => {
                 console.error("WebSocket error:", error);
+                clearInterval(intervalId);
             };
         } else {
             console.log("WebSocket connection is already open.");
