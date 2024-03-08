@@ -75,7 +75,7 @@ export default class extends AbstractView {
 
 
         try {
-            const response = await fetch('http://' + serverIP + ':8000/api/login/', {
+            const response = await fetch('http://nginx/api/login/', {
                 method: 'POST',
                 body: formData
             });
