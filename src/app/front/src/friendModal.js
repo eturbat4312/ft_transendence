@@ -28,10 +28,32 @@ function updateplayerModal() {
 
     listItem.addEventListener('click', () => {
         const playerName = listItem.dataset.name;
-        const playerInfoContent = `<p>Nom: ${playerName}</p>`;
+        const playerInfoContent = `<p>Name: ${playerName}</p><button id="addFriendBtn" data-user-id="${playerName}" class="btn btn-primary">Add to friends</button>`;
         document.getElementById('playerModalBody').innerHTML = playerInfoContent;
+        const addFriendBtn = document.getElementById('addFriendBtn');
+        addFriendBtn.addEventListener('click', function() {
+            sendFriendRequest(playerName);
+        });
         const playerModal = new bootstrap.Modal(document.getElementById('playerModal'));
         playerModal.show();
+    });
+}
+
+function sendFriendRequest(playerName)
+{
+    $.ajax({
+        url: '/send_friend_request/' + playerName + '/',
+        type: 'GET',
+        success: function(response) {
+            if (response.status === 'success') {
+                alert('Friend request sent successfully!');
+            } else {
+                alert('Error: ' + response.message);
+            }
+        },
+        error: function() {
+            alert('Error sending friend request.');
+        }
     });
 }
 

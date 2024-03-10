@@ -18,7 +18,8 @@ const routes = [
     { path: "/tournament", view: "Tournament" },
     { path: "/about", view: "About" },
     { path: "/profile", view: "Profile" },
-    { path: "/settings", view: "Settings" }
+    { path: "/settings", view: "Settings" },
+    { path: "/already-connected", view: "AlreadyConnected"}
 ];
 
 const isAuthenticated = async () => {
@@ -100,6 +101,8 @@ const loadComponents = async () => {
     const currentPath = location.pathname;
     const auth =  await isAuthenticated();
 
+    if (currentPath === "/already-connected")
+        return;
     if (auth) {
         const navHTML = await getNav(currentPath);
         document.querySelector("#nav").innerHTML = navHTML;
@@ -147,11 +150,13 @@ const checkIfConnected = async () => {
         return;
     }
     const username = localStorage.getItem('username');
+    const userId = localStorage.getItem('userId');
+    console.log("my userId: ", userId);
     const serverIP = window.location.hostname;
     var websocket = new WebSocket('ws://' + serverIP + ':8000/ws/connect');
     websocket.onopen = () => {
         console.log("Connect WebSocket connection established");
-        const message = JSON.stringify({ action: 'connect', username: username });
+        const message = JSON.stringify({ action: 'connect', username: username, userId: userId });
         websocket.send(message);
     }
 
@@ -160,10 +165,15 @@ const checkIfConnected = async () => {
     }
 
     websocket.onmessage = function(event) {
-        const data = JSON.parse(event.data);                
+        const data = JSON.parse(event.data);
+            if (data.action === 'error') {
+                window.location = "/already-connected";
+                websocket.close();
+            }            
             if (data.action === "connected") {
                 console.log(data.username, " is online !");
                 updateConnectedPlayer(data.username, true);
+                console.log("username: ", data.username, " userid: ", data.userId);
                 // const message = JSON.stringify({ action: 'connected_player', username: username });
                 // websocket.send(message);
             }
@@ -182,5 +192,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadComponents();
     await loadView(location.pathname);
     addChatEventListeners();
-    checkIfConnected();
+    if (location.pathname != "/already-connected")
+        checkIfConnected();
 });
