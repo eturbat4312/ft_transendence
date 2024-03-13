@@ -5,9 +5,10 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, FriendRequestSerializer
 from .models import User as UserModel
 from .models import FriendRequest
+from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth import authenticate, get_user_model, logout, login
@@ -30,28 +31,6 @@ def register(request):
 
         return Response({"user": serializer.data})
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-@api_view(['GET'])
-def get_username(request):
-    if request.user.is_authenticated:
-        username = request.user.username
-        return Response({'username': username})
-    else:
-        return Response({'error': 'User is not authenticated'}, status=status.HTTP_401_UNAUTHORIZED)
-
-def send_friend_request(request, to_user_id):
-    if request.user.is_authenticated:
-        to_user = get_object_or_404(User, id=to_user_id)
-        friend_request, created = FriendRequest.objects.get_or_create(
-            from_user=request.user,
-            to_user=to_user
-        )
-        if created:
-            return JsonResponse({'status': 'success'})
-        else:
-            return JsonResponse({'status': 'error', 'message': 'Friend request already sent.'})
-    else:
-        return JsonResponse({'status': 'error', 'message': 'User not authenticated.'})
 
 class LoginView(APIView):
     def post(self, request):
@@ -84,6 +63,60 @@ class GetUserIdView(APIView):
     def get(self, request):
         user_id = request.user.id
         return Response({'user_id': user_id})
+
+class GetUsernameFromIdView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        try:
+            user = UserModel.objects.get(id=user_id)
+            username = user.username
+            return Response({'username': username})
+        except User.DoesNotExist:
+            return Response({'username': 'Unknown User'})
+
+class SendFriendRequestView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, to_user_id):
+        to_user = get_object_or_404(UserModel, id=to_user_id)
+        friend_request, created = FriendRequest.objects.get_or_create(
+            from_user=request.user,
+            to_user=to_user
+        )
+        if created:
+            return Response({'status': 'success'})
+        else:
+            return Response({'status': 'error', 'message': 'Friend request already sent.'})
+
+class FriendRequestsView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        received_requests = FriendRequest.objects.filter(to_user=request.user, status='pending')
+        serializer = FriendRequestSerializer(received_requests, many=True)
+        return Response(serializer.data)
+
+class HandleFriendRequestView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+    def post(self, request, friend_request_id):
+        friend_request = get_object_or_404(FriendRequest, id=friend_request_id, to_user=request.user, status='pending')
+        
+        action = request.data.get('action', '')
+
+        if action == 'accept':
+            friend_request.status = 'accepted'
+            friend_request.save()
+            return Response({'status': 'success', 'message': 'Friend request accepted.'})
+        elif action == 'reject':
+            friend_request.delete()
+            return Response({'status': 'success', 'message': 'Friend request rejected.'})
+        else:
+            return Response({'status': 'error', 'message': 'Invalid action.'})
 
 class VerifyTokenView(APIView):
     authentication_classes = [TokenAuthentication]

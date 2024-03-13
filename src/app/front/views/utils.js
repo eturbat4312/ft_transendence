@@ -62,7 +62,25 @@ const getSocial = async () => {
             <div id="player-list-container" class="container">
         <ul id="player-list" class="player-list"></ul>
         </div>
+        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#friendRequestsModal">
+            Friends
+        </button>
     </div>
+    <div class="modal fade" id="friendRequestsModal" tabindex="-1" aria-labelledby="friendRequestsModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h1 class="modal-title fs-5" id="friendRequestsModalLabel">Friend Requests</h1>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body" id="friendRequestsModalBody">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
     `;
 };
 
@@ -70,7 +88,7 @@ const getChat = async () => {
     return `
     <div class="offcanvas offcanvas-start bg-dark text-light" data-bs-backdrop="false" id="offcanvasChat" style="top: 56px; z-index: 0;">
         <button class="btn btn-dark offcanvas-btn mt-2 position-absolute btn-sm" type="button" data-bs-toggle="offcanvas" data-bs-target="#offcanvasChat">
-            <span>Open</span><span>Close</span>
+            <span><i class="fa-solid fa-chevron-right"></i></span><span><i class="fa-solid fa-chevron-left"></i></span>
         </button>
         <button id="start-chat" class="btn btn-success btn-chat-connect btn-lg">Join Chat</button>
         <div class="chat-container" style="z-index: 1; display: none;">

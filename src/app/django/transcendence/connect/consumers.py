@@ -54,6 +54,18 @@ class ConnectConsumer(AsyncWebsocketConsumer):
                         'userId': self.user_id,
                     }
                 )
+        elif action == 'friend_request':
+            to_user_id = text_data_json['toUserId']
+            if to_user_id in self.connected_users:
+                await self.channel_layer.group_send(
+                    "connected_users",
+                    {
+                        'type': 'friend_request',
+                        'username': self.username,
+                        'to_user_id': to_user_id,
+                    }
+                )
+            
 
     async def user_connected(self, event):
         if self.username != event["username"]:
@@ -73,4 +85,11 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "action": "error",
             "message": message,
+        }))
+    
+    async def friend_request(self, event):
+        await self.send(text_data=json.dumps({
+            "username": event["username"],
+            "to_user_id": event["to_user_id"],
+            "action": "friend_request",
         }))
