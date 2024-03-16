@@ -60,8 +60,11 @@ const getSocial = async () => {
     <div id="player-bar" class="player-bar bg-dark">
         <h2>Social</h2>
             <div id="player-list-container" class="container">
-        <ul id="player-list" class="player-list"></ul>
-        </div>
+                <p>Friends</p>
+                <ul id="friend-list" class="player-list"></ul>
+                <p>Players</p>
+                <ul id="player-list" class="player-list"></ul>
+            </div>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#friendRequestsModal">
             Friends
         </button>

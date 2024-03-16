@@ -100,23 +100,39 @@ class FriendRequestsView(APIView):
         serializer = FriendRequestSerializer(received_requests, many=True)
         return Response(serializer.data)
 
-class HandleFriendRequestView(APIView):
+class RespondFriendRequestView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
-    def post(self, request, friend_request_id):
-        friend_request = get_object_or_404(FriendRequest, id=friend_request_id, to_user=request.user, status='pending')
-        
-        action = request.data.get('action', '')
+
+    def post(self, request, from_user_id):
+        friend_request = get_object_or_404(FriendRequest, from_user_id=from_user_id, to_user=request.user)
+        from_user = get_object_or_404(UserModel, id=from_user_id)
+        if friend_request.to_user != request.user:
+            return Response({'status': 'error', 'message': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
+        action = request.data.get('action')
 
         if action == 'accept':
-            friend_request.status = 'accepted'
-            friend_request.save()
+            request.user.friends.add(from_user)
+            from_user.friends.add(request.user)
+            friend_request.delete()
             return Response({'status': 'success', 'message': 'Friend request accepted.'})
+
         elif action == 'reject':
             friend_request.delete()
             return Response({'status': 'success', 'message': 'Friend request rejected.'})
+
         else:
-            return Response({'status': 'error', 'message': 'Invalid action.'})
+            return Response({'status': 'error', 'message': 'Invalid action.'}, status=status.HTTP_400_BAD_REQUEST)
+
+class GetFriendsView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        current_user = request.user
+        friends = current_user.friends.all()
+        serializer = UserSerializer(friends, many=True)
+        return Response({'friends': serializer.data})
 
 class VerifyTokenView(APIView):
     authentication_classes = [TokenAuthentication]

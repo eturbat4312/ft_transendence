@@ -1,6 +1,6 @@
 from django.urls import path, include, re_path
 from . import views
-from .views import LoginView, LogoutView, GetUsernameView, GetUserIdView, GetUsernameFromIdView, VerifyTokenView, SendFriendRequestView, FriendRequestsView, HandleFriendRequestView
+from .views import LoginView, LogoutView, GetUsernameView, GetUserIdView, GetUsernameFromIdView, VerifyTokenView, SendFriendRequestView, FriendRequestsView, RespondFriendRequestView, GetFriendsView
 from rest_framework.routers import DefaultRouter
 
 # from .views import UserViewSet
@@ -20,5 +20,6 @@ urlpatterns = [
     path("", include(router.urls)),
     path('api/send_friend_request/<int:to_user_id>/', SendFriendRequestView.as_view(), name='send-friend-request'),
     path('api/friend_requests/', FriendRequestsView.as_view(), name='friend-requests'),
-    path('api/handle_friends_requests/<int:friend_request_id>/', HandleFriendRequestView.as_view(), name='handle-friend-requests'),
+    path('api/respond_friend_request/<int:from_user_id>/', RespondFriendRequestView.as_view(), name='respond-friend-request'),
+    path('api/get_friends/', GetFriendsView.as_view(), name='get-friends'),
 ]

@@ -4,8 +4,9 @@ from django.db import models
 
 
 class User(AbstractUser):
-    # Add your additional fields here
+    friends = models.ManyToManyField('self', symmetrical=False, related_name='friends_list')
     custom_field = models.CharField(max_length=255)
+    
 
     def __str__(self):
         return self.username

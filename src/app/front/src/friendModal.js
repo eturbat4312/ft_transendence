@@ -86,6 +86,8 @@ export function updateConnectedPlayer(username, userId, online, websocket) {
         connectedPlayers.push({ name: username, id: userId, online });
     }
     updateplayerModal(websocket);
+    getFriends();
+
 }
 
 export function removeDisconnectedPlayer(playerName) {
@@ -169,7 +171,7 @@ async function fetchUsernameFromId(userId) {
     }
 }
 
-async function handleFriendRequest(request, userId, bool)
+async function respondFriendRequest(userId, bool)
 {
     const serverIP = window.location.hostname;
     const token = localStorage.getItem('token');
@@ -178,11 +180,12 @@ async function handleFriendRequest(request, userId, bool)
         return;
     }
     try {
-        const response = await fetch('http://' + serverIP + ':8000/api/handle_friends_requests/' + userId + '/', {
+        const response = await fetch('http://' + serverIP + ':8000/api/respond_friend_request/' + userId + '/', {
             method: 'POST',
             headers: {
                 'Authorization': 'Token ' + token,
                 'Content-Type': 'application/json',
+
             },
             body: JSON.stringify({ action: bool ? 'accept' : 'reject' })
         });
@@ -224,18 +227,52 @@ export async function updateFriendRequestsModal() {
             acceptButton.classList.add('btn', 'btn-success', 'btn-sm', 'tickcross');
             //acceptButton.setAttribute('data-user-id', request.from_user);
             acceptButton.innerHTML = '<i class="fas fa-check"></i>';
-            acceptButton.addEventListener('click', () => handleFriendRequest(request, request.from_user, true));
+            acceptButton.addEventListener('click', () => respondFriendRequest(request.from_user, true));
 
             const rejectButton = document.createElement('button');
             rejectButton.classList.add('btn', 'btn-danger', 'btn-sm', 'tickcross');
             //rejectButton.setAttribute('data-user-id', request.from_user);
             rejectButton.innerHTML = '<i class="fas fa-times"></i>';
-            rejectButton.addEventListener('click', () => handleFriendRequest(request, request.from_user, false));
+            rejectButton.addEventListener('click', () => respondFriendRequest(request.from_user, false));
 
             li.appendChild(acceptButton);
             li.appendChild(rejectButton);
             ul.appendChild(li);
         });
         friendRequestsContainer.appendChild(ul);
+    }
+}
+
+async function getFriends() {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+    try {
+        const response = await fetch('http://' + serverIP + ':8000/api/get_friends/', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Token ' + token,
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const friendsList = data.friends;
+            const friendsElement = document.getElementById('friend-list');
+            friendsElement.innerHTML = '';
+            friendsList.forEach(friend => {
+                const friendElement = document.createElement('li');
+                friendElement.textContent = friend.username;
+                friendsElement.appendChild(friendElement);
+            });
+        } else {
+            console.error('Failed to fetch friends:', response.statusText);
+        }
+    } catch (error) {
+        console.error('An error occurred while fetching friends:', error);
     }
 }
