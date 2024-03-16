@@ -21,9 +21,9 @@ export default class Chat {
             };
             const self = this;
             this.websocket.onmessage = function(event) {
-                const data = JSON.parse(event.data);                
+                const data = JSON.parse(event.data);
                 if (data.action === "print_message")
-                   self.printMessage(data.message_data);
+                    self.printMessage(data.message_data);
                 if (data.action === "join_chat")
                     self.joinMessage(data.name_data);
                 if (data.action === "left_chat")
@@ -37,7 +37,7 @@ export default class Chat {
             };
         } else {
             console.log("Chat WebSocket connection is already open.");
-        //    this.websocket.send(JSON.stringify({ action: "join_chat" }));
+            //    this.websocket.send(JSON.stringify({ action: "join_chat" }));
         }
     }
 

@@ -2,7 +2,7 @@ import { getNav, getSocial, getChat, handleLogout } from '../views/utils.js';
 import { addTournamentEventListeners } from './script.js';
 import { addGameEventListeners } from '../views/Game.js';
 import { addChatEventListeners } from './utils.js';
-import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, updateFriendRequestsModal } from './friendModal.js';
+import { updateConnectedPlayer, removeDisconnectedPlayer } from './friendModal.js';
 import '../theme/base.css'
 import '../theme/game.css'
 import '../theme/index.css'
@@ -23,6 +23,7 @@ const routes = [
 ];
 
 const isAuthenticated = async () => {
+
     const serverIP = window.location.hostname;
     const token = localStorage.getItem('token');
     if (!token) {
@@ -30,7 +31,7 @@ const isAuthenticated = async () => {
     }
 
     try {
-        const response = await fetch('http://' + serverIP + ':8000/api/verify_token/', {
+        const response = await fetch(`https://${serverIP}/api/verify-token/`, {
             method: 'GET',
             headers: {
                 'Authorization': 'Token ' + token
@@ -154,7 +155,7 @@ const checkIfConnected = async () => {
     const userId = localStorage.getItem('userId');
     console.log("my userId: ", userId);
     const serverIP = window.location.hostname;
-    var websocket = new WebSocket('ws://' + serverIP + ':8000/ws/connect');
+    var websocket = new WebSocket(`wss://${serverIP}/ws/connect`);
     websocket.onopen = () => {
         console.log("Connect WebSocket connection established");
         const message = JSON.stringify({ action: 'connect', username: username, userId: userId });
@@ -170,7 +171,7 @@ const checkIfConnected = async () => {
             if (data.action === 'error') {
                 window.location = "/already-connected";
                 websocket.close();
-            }            
+            }
             if (data.action === "connected") {
                 console.log(data.username, " is online !");
                 updateConnectedPlayer(data.username, data.userId, true, websocket);

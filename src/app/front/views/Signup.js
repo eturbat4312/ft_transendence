@@ -87,11 +87,12 @@ export default class extends AbstractView {
 
         console.log("submitttt");
 
+
         const searchParams = new URLSearchParams(formData);
         console.log(searchParams.get("username"));
 
         try {
-            const response = await fetch('http://' + serverIP + ':8000/register/', {
+            const response = await fetch(`https://${serverIP}/api/register`, {
                 method: 'POST',
                 body: searchParams,
                 headers: {

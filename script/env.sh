@@ -15,7 +15,7 @@
   DB_PORT=5432
   DB_NAME=postgres
   DB_USER=postgres
-  DEBUG=True
+  DEBUG=False
 
   # Catch if ctrl+c is pressed
   trap ctrl_c INT
