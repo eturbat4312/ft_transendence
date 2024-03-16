@@ -160,3 +160,11 @@
  .hidden {
     display: none;
  }
+
+ .tickcross {
+   margin-left: 5px;
+ }
+
+ .friend-request {
+   margin-top: 5px;
+ }

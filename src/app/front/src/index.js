@@ -2,7 +2,7 @@ import { getNav, getSocial, getChat, handleLogout } from '../views/utils.js';
 import { addTournamentEventListeners } from './script.js';
 import { addGameEventListeners } from '../views/Game.js';
 import { addChatEventListeners } from './utils.js';
-import { updateConnectedPlayer, removeDisconnectedPlayer } from './friendModal.js';
+import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, updateFriendRequestsModal } from './friendModal.js';
 import '../theme/base.css'
 import '../theme/game.css'
 import '../theme/index.css'
@@ -18,7 +18,8 @@ const routes = [
     { path: "/tournament", view: "Tournament" },
     { path: "/about", view: "About" },
     { path: "/profile", view: "Profile" },
-    { path: "/settings", view: "Settings" }
+    { path: "/settings", view: "Settings" },
+    { path: "/already-connected", view: "AlreadyConnected"}
 ];
 
 const isAuthenticated = async () => {
@@ -29,7 +30,7 @@ const isAuthenticated = async () => {
     }
 
     try {
-        const response = await fetch('http://' + serverIP + ':8000/api/verify-token/', {
+        const response = await fetch('http://' + serverIP + ':8000/api/verify_token/', {
             method: 'GET',
             headers: {
                 'Authorization': 'Token ' + token
@@ -100,6 +101,8 @@ const loadComponents = async () => {
     const currentPath = location.pathname;
     const auth =  await isAuthenticated();
 
+    if (currentPath === "/already-connected")
+        return;
     if (auth) {
         const navHTML = await getNav(currentPath);
         document.querySelector("#nav").innerHTML = navHTML;
@@ -146,12 +149,15 @@ const checkIfConnected = async () => {
         console.log("RETURN");
         return;
     }
+    updateFriendRequestsModal();
     const username = localStorage.getItem('username');
+    const userId = localStorage.getItem('userId');
+    console.log("my userId: ", userId);
     const serverIP = window.location.hostname;
     var websocket = new WebSocket('ws://' + serverIP + ':8000/ws/connect');
     websocket.onopen = () => {
         console.log("Connect WebSocket connection established");
-        const message = JSON.stringify({ action: 'connect', username: username });
+        const message = JSON.stringify({ action: 'connect', username: username, userId: userId });
         websocket.send(message);
     }
 
@@ -160,10 +166,15 @@ const checkIfConnected = async () => {
     }
 
     websocket.onmessage = function(event) {
-        const data = JSON.parse(event.data);                
+        const data = JSON.parse(event.data);
+            if (data.action === 'error') {
+                window.location = "/already-connected";
+                websocket.close();
+            }            
             if (data.action === "connected") {
                 console.log(data.username, " is online !");
-                updateConnectedPlayer(data.username, true);
+                updateConnectedPlayer(data.username, data.userId, true, websocket);
+                //console.log("username: ", data.username, " userid: ", data.userId);
                 // const message = JSON.stringify({ action: 'connected_player', username: username });
                 // websocket.send(message);
             }
@@ -171,6 +182,11 @@ const checkIfConnected = async () => {
                 console.log(data.username, " is offline !");
                 removeDisconnectedPlayer(data.username);
             }
+            if (data.action === "friend_request" && data.to_user_id === userId) {
+                showToast(data.username + " sent you a friend request !");
+                console.log(data.username, " sent you a friend request");
+            }
+
     }
 
     websocket.onerror = function(event) {
@@ -182,5 +198,6 @@ document.addEventListener('DOMContentLoaded', async () => {
     await loadComponents();
     await loadView(location.pathname);
     addChatEventListeners();
-    checkIfConnected();
+    if (location.pathname != "/already-connected")
+        checkIfConnected();
 });

@@ -146,3 +146,33 @@ export async function getUsername() {
         console.log('Error:', error);
     }
 }
+
+export async function getUserId() {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+
+    try {
+        const response = await fetch('http://' + serverIP + ':8000/api/get_user_id/', {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Token ' + token
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const userId = data.user_id;
+            localStorage.setItem('userId', userId);
+            return userId;
+        } else {
+            console.log('Failed to get user ID:', await response.text());
+        }
+
+    } catch (error) {
+        console.log('Error:', error);
+    }
+}
