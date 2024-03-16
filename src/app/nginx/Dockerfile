@@ -6,7 +6,7 @@ LABEL maintainer="btchiman@student.42lausanne.ch"
 # Install nginx
 RUN apk update && apk upgrade \
     && apk add --no-cache --quiet --update \
-    	   nginx openssl
+    	   nginx openssl curl
 
 # Expose port 443
 EXPOSE 443
@@ -27,13 +27,20 @@ RUN mkdir -p /etc/nginx/ssl/certs && \
 	# Outut file of the public key
 	-out /etc/nginx/ssl/certs/transcendence.crt \
 	# Certificate details
-	-subj "/CN=transcendence.42lausanne.fr/C=CH/ST=GE/L=GENEVA"
+	-subj "/CN=transcendence.42lausanne.ch/C=CH/ST=GE/L=GENEVA"
 
 # Folder for the server configuration files
 RUN mkdir -p /var/run/nginx
 
+# Redirect nginx log output to Docker log collector
+RUN ln -sf /dev/stdout /var/log/nginx/access.log \
+    && ln -sf /dev/stderr /var/log/nginx/error.log
+
+
 # Copy nginx configuration
 COPY ./conf/nginx.conf /etc/nginx/http.d/default.conf
-copy ./proxy_params /etc/nginx/
+COPY ./proxy_params /etc/nginx/
+
+
 # Start nginx
 CMD ["nginx", "-g", "daemon off;"]

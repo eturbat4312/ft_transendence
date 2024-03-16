@@ -22,6 +22,7 @@ const routes = [
 ];
 
 const isAuthenticated = async () => {
+
     const serverIP = window.location.hostname;
     const token = localStorage.getItem('token');
     if (!token) {
@@ -29,7 +30,7 @@ const isAuthenticated = async () => {
     }
 
     try {
-        const response = await fetch('http://' + serverIP + ':8000/api/verify-token/', {
+        const response = await fetch(`https://${serverIP}/api/verify-token/`, {
             method: 'GET',
             headers: {
                 'Authorization': 'Token ' + token
@@ -148,7 +149,7 @@ const checkIfConnected = async () => {
     }
     const username = localStorage.getItem('username');
     const serverIP = window.location.hostname;
-    var websocket = new WebSocket('ws://' + serverIP + ':8000/ws/connect');
+    var websocket = new WebSocket(`wss://${serverIP}/ws/connect`);
     websocket.onopen = () => {
         console.log("Connect WebSocket connection established");
         const message = JSON.stringify({ action: 'connect', username: username });

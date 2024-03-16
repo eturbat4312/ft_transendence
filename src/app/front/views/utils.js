@@ -92,7 +92,7 @@ const handleLogout = async () => {
     const token = localStorage.getItem('token');
     if (token) {
         try {
-            const response = await fetch('http://' + serverIP + ':8000/api/logout/', {
+            const response = await fetch('https://' + serverIP + ':8000/api/logout/', {
                 method: 'POST',
                 headers: {
                     'Authorization': 'Token ' + token

@@ -9,13 +9,10 @@ services:
             context: ./src/app/front
             dockerfile: Dockerfile
         container_name: front
-        restart: always
         ports:
             - "8080:8080"
         volumes:
             - ./src/app/front:/app/front
-        depends_on:
-            - django
         networks:
             - transcendence
     nginx:
@@ -26,8 +23,8 @@ services:
         restart: always
         ports:
             - "443:443"
-            #- "80:80"
         volumes:
+            - ./src/app/front/dist:/usr/share/nginx/html
             - ./src/app/nginx:/app/nginx
         depends_on:
             - django
@@ -59,5 +56,7 @@ services:
             - ./src/app/db:/var/lib/postgresql/data
         env_file:
             - .env
+        depends_on:
+            - front
         networks:
             - transcendence

@@ -67,9 +67,11 @@ MIDDLEWARE = [
 
 ROOT_URLCONF = "transcendence.urls"
 
-CORS_ORIGIN_ALLOW_ALL = True
-
 AUTH_USER_MODEL = "registration.User"
+
+CORS_ALLOWED_ORIGINS = [
+    "https://localhost",
+]
 
 
 TEMPLATES = [
