@@ -28,10 +28,9 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG")
 
-ALLOWED_HOSTS = ["*"]
-SECURE_SSL_REDIRECT = True
+ALLOWED_HOSTS = ["localhost"]
+SECURE_SSL_REDIRECT = False
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
-CORS_ORIGIN_ALLOW_ALL = True
 
 # Application definition
 
@@ -71,6 +70,7 @@ AUTH_USER_MODEL = "registration.User"
 
 CORS_ALLOWED_ORIGINS = [
     "https://localhost",
+    "http://localhost",
 ]
 
 
