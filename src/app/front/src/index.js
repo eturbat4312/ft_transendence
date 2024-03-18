@@ -155,7 +155,7 @@ const checkIfConnected = async () => {
     const userId = localStorage.getItem('userId');
     console.log("my userId: ", userId);
     const serverIP = window.location.hostname;
-    var websocket = new WebSocket(`wss://${serverIP}/ws/connect`);
+    var websocket = new WebSocket(`wss://${serverIP}/ws/connect/`);
     websocket.onopen = () => {
         console.log("Connect WebSocket connection established");
         const message = JSON.stringify({ action: 'connect', username: username, userId: userId });
