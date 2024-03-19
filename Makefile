@@ -17,6 +17,10 @@ front:
 	@echo "${GREEN}Starting front container.."
 	@docker compose -f $(DOCKERCOMPOSE) up -d --build front
 
+nginx:
+	@echo "${GREEN}Starting nginx container.."
+	@docker compose -f $(DOCKERCOMPOSE) up -d --build nginx
+
 django:
 	@echo "${GREEN}Starting django container.."
 	@docker compose -f $(DOCKERCOMPOSE) up -d --build django
