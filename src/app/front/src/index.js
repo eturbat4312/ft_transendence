@@ -2,7 +2,7 @@ import { getNav, getSocial, getChat, handleLogout } from '../views/utils.js';
 import { addTournamentEventListeners } from './script.js';
 import { addGameEventListeners } from '../views/Game.js';
 import { addChatEventListeners } from './utils.js';
-import { updateConnectedPlayer, removeDisconnectedPlayer } from './friendModal.js';
+import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, updateFriendRequestsModal } from './friendModal.js';
 import '../theme/base.css'
 import '../theme/game.css'
 import '../theme/index.css'
@@ -155,7 +155,7 @@ const checkIfConnected = async () => {
     const userId = localStorage.getItem('userId');
     console.log("my userId: ", userId);
     const serverIP = window.location.hostname;
-    var websocket = new WebSocket(`wss://${serverIP}/ws/connect/`);
+    var websocket = new WebSocket(`wss://${serverIP}/api/ws/connect/`);
     websocket.onopen = () => {
         console.log("Connect WebSocket connection established");
         const message = JSON.stringify({ action: 'connect', username: username, userId: userId });

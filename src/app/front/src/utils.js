@@ -10,7 +10,7 @@ export default class Chat {
         chatBox.style.display = "block";
         if (this.websocket === null || this.websocket.readyState !== WebSocket.OPEN) {
             const serverIP = window.location.hostname;
-            this.websocket = new WebSocket('ws://' + serverIP + ':8000/ws/chat');
+            this.websocket = new WebSocket(`wss://${serverIP}/api/ws/chat/`);
             this.websocket.onopen = () => {
                 console.log("Chat WebSocket connection established");
                 const message = JSON.stringify({
@@ -156,7 +156,7 @@ export async function getUserId() {
     }
 
     try {
-        const response = await fetch('http://' + serverIP + ':8000/api/get_user_id/', {
+        const response = await fetch('https://' + serverIP + ':8000/api/get_user_id/', {
             method: 'GET',
             headers: {
                 'Authorization': 'Token ' + token
