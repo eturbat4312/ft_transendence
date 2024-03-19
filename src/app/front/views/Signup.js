@@ -47,6 +47,10 @@ export default class extends AbstractView {
                                             <input type="email" class="form-control" name="email" aria-describedby="emailHelp" placeholder="Enter email">
                                         </div>
                                         <div class="form-group">
+                                            <label for="avatar">Avatar Image</label>
+                                            <input type="file" class="form-control-file" id="avatar" name="avatar">
+                                        </div>
+                                        <div class="form-group">
                                             <label for="password">Password</label>
                                             <input type="password" class="form-control" name="password" placeholder="Password">
                                         </div>
@@ -82,13 +86,22 @@ export default class extends AbstractView {
             console.log(input.name, ':', input.value);
         }
 
-        const formData = new FormData(form);
-        event.preventDefault();
+        // const formData = new FormData();
+        // event.preventDefault();
 
-        console.log("submitttt");
+        const formData = new FormData();
+        for (let input of inputs) {
+            if (input.type === 'file') {
+                // If the input is a file input (avatar), append the file
+                formData.append(input.name, input.files[0]);
+            } else {
+                // For other inputs, append their values
+                formData.append(input.name, input.value);
+            }
+        }
 
         const searchParams = new URLSearchParams(formData);
-        console.log(searchParams.get("username"));
+        // console.log(searchParams.get("username"));
 
         try {
             const response = await fetch('http://' + serverIP + ':8000/register/', {

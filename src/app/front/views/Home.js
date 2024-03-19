@@ -12,14 +12,15 @@ export default class extends AbstractView {
             <div class="card bg-dark text-light mx-auto" style="max-width: 800px;">
                 <button id="token">TOKEN</button>
                 <div id="username"></div>
+                <a href="/game" id="play">Play</a>
             </div>
         </div>
         `;
     }
 
-     async initialize() {
-         document.getElementById('token').addEventListener('click', this.tokentest);
-     }
+    async initialize() {
+        document.getElementById('token').addEventListener('click', this.tokentest);
+    }
 
     async tokentest() {
         const serverIP = window.location.hostname;
@@ -28,7 +29,7 @@ export default class extends AbstractView {
             console.log('Token not found');
             return;
         }
-    
+
         try {
             const response = await fetch('http://' + serverIP + ':8000/api/get_username/', {
                 method: 'GET',
@@ -36,15 +37,17 @@ export default class extends AbstractView {
                     'Authorization': 'Token ' + token
                 }
             });
-    
+
             if (response.ok) {
                 const data = await response.json();
                 const username = data.username;
                 document.getElementById('username').innerText = 'Username: ' + username;
+                // Store the username in local storage
+                localStorage.setItem('username', username);
             } else {
                 console.log('Failed to get username:', await response.text());
             }
-    
+
         } catch (error) {
             console.log('Error:', error);
         }

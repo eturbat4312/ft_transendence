@@ -25,6 +25,7 @@ export default class Game extends AbstractView {
         this.player1 = false;
         this.player2 = false;
         this.playerDisconnected = false;
+        this.username = localStorage.getItem("username");
         this.keysPressed = {
             ArrowUp: false,
             ArrowDown: false,
@@ -55,28 +56,31 @@ export default class Game extends AbstractView {
            <div class="end-game-container">
                 <div id="winner"></div>
                 <button class="btn btn-primary btn-reset" style="z-index: 1; display: none;">Reset</button>
-            </div>  
+            </div> 
+            <div id="username-container" style="position: absolute; top: 10px; left: 10px;"></div> 
         </div>   
      </div>
         `;
     }
 
     updateScore = (data) => {
-        const { player1Score, player2Score } = data;
+        const { player1Score, player2Score, player1Username, player2Username } = data;
         this.player1Score = player1Score;
         this.player2Score = player2Score;
         if (this.player1Score !== 0)
-		    this.scoreDisplay1.innerText = this.player1Score;
+            this.scoreDisplay1.innerText = `${player1Username}: ${this.player1Score}`;
         if (this.player2Score !== 0)
-		    this.scoreDisplay2.innerText = this.player2Score;
+            this.scoreDisplay2.innerText = `${player2Username}: ${this.player2Score}`;
         (this.player1Score === 3 || this.player2Score === 3) ? this.endGame() : this.resetBall();
-	}
+    }
 
     updateOfflineScore = () => {
-		this.scoreDisplay1.innerText = this.player1Score;
-		this.scoreDisplay2.innerText = this.player2Score;
+        const username = this.username;
+        this.scoreDisplay1.innerText = this.player1Score;
+        this.scoreDisplay2.innerText = this.player2Score;
+        // this.scoreDisplay2.style.textAlign = "right"; // Align player2 score to the right
         (this.player1Score === 3 || this.player2Score === 3) ? this.endGame() : this.resetBall();
-	}
+    }
 
 
     initWebSocket = () => {
@@ -84,7 +88,7 @@ export default class Game extends AbstractView {
 
         this.websocket.onopen = () => {
             console.log("WebSocket connection established");
-            };
+        };
         this.websocket.onclose = (event) => {
             console.log("WebSocket connection closed", event);
         };
@@ -139,7 +143,18 @@ export default class Game extends AbstractView {
             requestAnimationFrame(this.gameLoop);
     }
 
+    renderUsername = () => {
+        const usernameContainer = document.getElementById("username-container");
+        if (usernameContainer) {
+            const div = document.createElement('div');
+            div.innerText = this.username;
+            div.style.fontSize = "12px";
+            usernameContainer.appendChild(div);
+        }
+    };
+
     startGame = () => {
+        // this.renderUsername();
         this.resetBall();
         this.gameActive = true;
         this.gameLoop();
@@ -162,7 +177,7 @@ export default class Game extends AbstractView {
                 this.updatePaddlePosition();
         }
         if (this.player1) {
-		    this.sendPaddle1Position();
+            this.sendPaddle1Position();
         }
         else if (this.player2) {
             this.sendPaddle2Position();
@@ -198,36 +213,36 @@ export default class Game extends AbstractView {
     }
 
     updatePaddlePosition = () => {
-		if (this.keysPressed.ArrowUp) {
-			this.paddle2Y -= 3;
-		}
-		if (this.keysPressed.ArrowDown) {
-			this.paddle2Y += 3;
-		}
-		if (this.keysPressed.w) {
-			this.paddle1Y -= 3;
-		}
-		if (this.keysPressed.s) {
-			this.paddle1Y += 3;
-		}
-	
-		this.paddle1Y = Math.max(2, Math.min(this.paddle1Y, 338));
-		this.paddle2Y = Math.max(2, Math.min(this.paddle2Y, 338));
-	
-		this.paddle1.style.top = this.paddle1Y + "px";
-		this.paddle2.style.top = this.paddle2Y + "px";
-	}
+        if (this.keysPressed.ArrowUp) {
+            this.paddle2Y -= 3;
+        }
+        if (this.keysPressed.ArrowDown) {
+            this.paddle2Y += 3;
+        }
+        if (this.keysPressed.w) {
+            this.paddle1Y -= 3;
+        }
+        if (this.keysPressed.s) {
+            this.paddle1Y += 3;
+        }
+
+        this.paddle1Y = Math.max(2, Math.min(this.paddle1Y, 338));
+        this.paddle2Y = Math.max(2, Math.min(this.paddle2Y, 338));
+
+        this.paddle1.style.top = this.paddle1Y + "px";
+        this.paddle2.style.top = this.paddle2Y + "px";
+    }
 
     updatePaddle1Position = (data) => {
         const { paddle1 } = data;
         this.paddle1Y = paddle1;
-        this.paddle1Y = Math.max(2, Math.min(this.paddle1Y, 338));   
+        this.paddle1Y = Math.max(2, Math.min(this.paddle1Y, 338));
         this.paddle1.style.top = this.paddle1Y + "px";
     }
     updatePaddle2Position = (data) => {
         const { paddle2 } = data;
         this.paddle2Y = paddle2;
-        this.paddle2Y = Math.max(2, Math.min(this.paddle2Y, 338));   
+        this.paddle2Y = Math.max(2, Math.min(this.paddle2Y, 338));
         this.paddle2.style.top = this.paddle2Y + "px";
     }
 
@@ -252,7 +267,7 @@ export default class Game extends AbstractView {
                 }
             });
             this.websocket.send(message);
-            this.paddle1Y = Math.max(2, Math.min(this.paddle1Y, 338));   
+            this.paddle1Y = Math.max(2, Math.min(this.paddle1Y, 338));
             this.paddle1.style.top = this.paddle1Y + "px";
         }
     };
@@ -277,10 +292,10 @@ export default class Game extends AbstractView {
                     paddle2: this.paddle2Y,
                 }
             });
-            this.websocket.send(message);    
-            this.paddle2Y = Math.max(2, Math.min(this.paddle2Y, 338));   
+            this.websocket.send(message);
+            this.paddle2Y = Math.max(2, Math.min(this.paddle2Y, 338));
             this.paddle2.style.top = this.paddle2Y + "px";
-    }
+        }
     };
 
     sendBallData = () => {
@@ -300,7 +315,7 @@ export default class Game extends AbstractView {
         (player === 1) ? this.player1Score++ : this.player2Score++;
         if (!this.isOffline)
             this.sendScoreUpdate();
-        else 
+        else
             this.updateOfflineScore();
     }
 
@@ -313,7 +328,7 @@ export default class Game extends AbstractView {
             }
         });
         this.websocket.send(message);
-    //    (this.player1Score === 3 || this.player2Score === 3) ? this.endGame() : this.resetBall();
+        //    (this.player1Score === 3 || this.player2Score === 3) ? this.endGame() : this.resetBall();
     };
 
     resetBall = () => {
@@ -323,23 +338,46 @@ export default class Game extends AbstractView {
         this.ballSpeedY = 0;
         this.ball.style.display = "block";
 
-		let counter = 3;
-		const counterInterval = setInterval( () => {
+        let counter = 3;
+        const counterInterval = setInterval(() => {
             if (!document.getElementById("countdown") || !(document.getElementById("start-game").style.display === "none")) {
                 clearInterval(counterInterval);
                 return;
             }
-			document.getElementById("countdown").innerText = counter;
-			document.getElementById("countdown").style.display = "block";
-			counter--;
-			if (counter < 0) {
-				clearInterval(counterInterval);
-				document.getElementById("countdown").style.display = "none";
-				this.ballSpeedX = 2;
-				this.ballSpeedY = 2;
-			}
-		}, 1000);
+            document.getElementById("countdown").innerText = counter;
+            document.getElementById("countdown").style.display = "block";
+            counter--;
+            if (counter < 0) {
+                clearInterval(counterInterval);
+                document.getElementById("countdown").style.display = "none";
+                this.ballSpeedX = 2;
+                this.ballSpeedY = 2;
+            }
+        }, 1000);
     }
+
+    saveGameResult = () => {
+        const data = {
+            username: this.username,
+            score: this.player1Score,
+            opponentScore: this.player2Score,
+            won: this.player1Score > this.player2Score
+        };
+        const serverIP = window.location.hostname;
+
+        fetch('http://' + serverIP + ':8000/save_game_result/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log('Game result saved:', data);
+            });
+    }
+
 
     endGame = () => {
         this.ballSpeedX = 0;
@@ -354,12 +392,14 @@ export default class Game extends AbstractView {
         else {
             document.getElementById("winner").innerText = "Player 2 wins!";
         }
-       // saveScore(player1Score, player2Score);
+
+
         this.gameActive = false;
         if (!this.isOffline) {
             ("close websocket")
             this.websocket.close();
         }
+        this.saveGameResult();
         this.websocket = null;
         const resetButton = document.querySelector(".btn-reset");
         resetButton.style.display = "block";
@@ -380,7 +420,7 @@ export default class Game extends AbstractView {
         this.isMaster = false;
         this.player1 = false;
         this.player2 = false;
-    
+
         this.paddle1.style.top = "170px";
         this.paddle2.style.top = "170px";
         this.ball.style.display = "none";
@@ -426,7 +466,7 @@ export default class Game extends AbstractView {
                 this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
             };
             const self = this;
-            this.websocket.onmessage = function(event) {
+            this.websocket.onmessage = function (event) {
                 const data = JSON.parse(event.data);
                 if (data.action === "match_found") {
                     console.log("match found");
@@ -434,14 +474,14 @@ export default class Game extends AbstractView {
                     const gameId = data.game_id;
                     console.log("gameId = ", gameId);
                     self.websocket = new WebSocket('ws://' + serverIP + ':8000/ws/game');
-                    self.websocket.onopen = function() {
+                    self.websocket.onopen = function () {
                         if (!self.player1)
                             self.player2 = true;
                         console.log("Game WebSocket connection established");
                         self.websocket.send(JSON.stringify({ action: "start_game", game_id: gameId }));
                         self.startGame();
                     };
-                } 
+                }
                 if (data.action === "ball_master") {
                     if (data.is_master) {
                         self.isMaster = true;
@@ -465,7 +505,7 @@ export default class Game extends AbstractView {
 
             this.websocket.onclose = (event) => {
                 console.log("Matchmaking WebSocket connection closed", event);
-                clearInterval(intervalId); 
+                clearInterval(intervalId);
             };
             this.websocket.onerror = (error) => {
                 console.error("WebSocket error:", error);
@@ -473,7 +513,7 @@ export default class Game extends AbstractView {
             };
         } else {
             console.log("WebSocket connection is already open.");
-        //    this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
+            //    this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
         }
     };
 
@@ -488,15 +528,16 @@ export default class Game extends AbstractView {
     }
 }
 
+
 export function addGameEventListeners() {
     const gameView = new Game();
     document.querySelectorAll('.btn-start').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             gameView.startMatchmaking();
         });
     });
     document.querySelectorAll('.btn-start-offline').forEach(button => {
-        button.addEventListener('click', function() {
+        button.addEventListener('click', function () {
             gameView.initOfflineGame();
         })
     })

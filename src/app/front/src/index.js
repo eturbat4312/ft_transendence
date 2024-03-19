@@ -42,7 +42,7 @@ const isAuthenticated = async () => {
     }
 };
 
-const viewsNotRequiringAuthentication = ['Welcome', 'Login', 'Signup']; 
+const viewsNotRequiringAuthentication = ['Welcome', 'Login', 'Signup'];
 
 const viewRequiresAuthentication = (view) => {
     return !viewsNotRequiringAuthentication.includes(view);
@@ -63,7 +63,7 @@ const loadView = async (path) => {
     if (view) {
         import(`../views/${view}.js`).then(module => {
             const View = module.default;
-            const viewInstance = new View(); 
+            const viewInstance = new View();
             viewInstance.getHtml().then(html => {
                 document.querySelector('#app').innerHTML = html;
                 viewInstance.initialize();
@@ -84,7 +84,7 @@ const loadView = async (path) => {
     } else {
         import(`../views/NotFound.js`).then(module => {
             const View = module.default;
-            const viewInstance = new View(); 
+            const viewInstance = new View();
             viewInstance.getHtml().then(html => {
                 document.querySelector('#app').innerHTML = html;
                 viewInstance.initialize();
@@ -98,7 +98,7 @@ const loadView = async (path) => {
 
 const loadComponents = async () => {
     const currentPath = location.pathname;
-    const auth =  await isAuthenticated();
+    const auth = await isAuthenticated();
 
     if (auth) {
         const navHTML = await getNav(currentPath);
@@ -151,20 +151,20 @@ const checkIfConnected = async () => {
     console.log("username: ", username);
     const serverIP = window.location.hostname;
     var websocket = new WebSocket('ws://' + serverIP + ':8000/ws/connect');
-    websocket.onopen = function(event) {
+    websocket.onopen = function (event) {
         console.log('Connexion WebSocket établie');
-        websocket.send(JSON.stringify({ username: username}));
+        websocket.send(JSON.stringify({ username: username }));
     }
 
-    websocket.onclose = function(event) {
+    websocket.onclose = function (event) {
         console.log('Connexion WebSocket fermée');
     }
 
-    websocket.onmessage = function(event) {
+    websocket.onmessage = function (event) {
         var message = JSON.parse(event.data);
     }
 
-    websocket.onerror = function(event) {
+    websocket.onerror = function (event) {
         console.error('Erreur WebSocket:', event);
     }
 }
