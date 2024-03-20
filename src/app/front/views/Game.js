@@ -152,8 +152,19 @@ export default class Game extends AbstractView {
     handleBallCollision = () => {
         if (this.ballY < 5 || this.ballY > 395) this.ballSpeedY = -this.ballSpeedY;
 
-        if (this.ballX < 0) this.scorePoint(2);
-        else if (this.ballX > 600) this.scorePoint(1);
+        if (this.ballX < 0) {
+            this.scorePoint(2);
+            this.ballX = 300;
+            this.ballY = 200;
+            this.ballSpeedX = 0;
+            this.ballSpeedY = 0;
+        } else if (this.ballX > 600) {
+            this.scorePoint(1);
+            this.ballX = 300;
+            this.ballY = 200;
+            this.ballSpeedX = 0;
+            this.ballSpeedY = 0;
+        }
 
         if (this.isCollisionWithPaddle()) this.ballSpeedX = -this.ballSpeedX;
     }
