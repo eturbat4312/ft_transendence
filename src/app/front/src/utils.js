@@ -127,7 +127,7 @@ export async function getUsername() {
     }
     
     try {
-        const response = await fetch('http://' + serverIP + ':8000/api/get_username/', {
+        const response = await fetch(`https://${serverIP}/api/get_username/`, {
             method: 'GET',
             headers: {
                 'Authorization': 'Token ' + token
@@ -156,7 +156,7 @@ export async function getUserId() {
     }
 
     try {
-        const response = await fetch('https://' + serverIP + ':8000/api/get_user_id/', {
+        const response = await fetch(`https://${serverIP}/api/get_user_id/`, {
             method: 'GET',
             headers: {
                 'Authorization': 'Token ' + token

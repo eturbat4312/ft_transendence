@@ -30,6 +30,7 @@ function updateplayerModal(websocket) {
     listItem.addEventListener('click', async () => {
         const playerName = listItem.dataset.name;
         const userId = listItem.dataset.id;
+        console.log("typeof userID: " + typeof userId);
         const playerInfoContent = `<p>Name: ${playerName}</p><button id="addFriendBtn" data-user-id="${playerName}" class="btn btn-primary">Add to friends</button>`;
         document.getElementById('playerModalBody').innerHTML = playerInfoContent;
         const addFriendBtn = document.getElementById('addFriendBtn');
@@ -52,7 +53,7 @@ async function sendFriendRequest(id)
         return;
     }
     try {
-        const response = await fetch('http://' + serverIP + ':8000/api/send_friend_request/' + id + '/', {
+        const response = await fetch(`https://${serverIP}//api/send_friend_request/${id}/`, {
             method: 'GET',
             headers: {
                 'Authorization': 'Token ' + token
@@ -86,7 +87,7 @@ export function updateConnectedPlayer(username, userId, online, websocket) {
         connectedPlayers.push({ name: username, id: userId, online });
     }
     updateplayerModal(websocket);
-    getFriends();
+    getFriends(websocket);
 
 }
 
@@ -98,7 +99,7 @@ export function removeDisconnectedPlayer(playerName) {
     }
 }
 
-export function showToast(message) {
+export function showToast(message, websocket) {
     const toastContainer = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.className = 'toast';
@@ -115,7 +116,7 @@ export function showToast(message) {
 
     const bootstrapToast = new bootstrap.Toast(toast);
     bootstrapToast.show();
-    updateFriendRequestsModal();
+    updateFriendRequestsModal(websocket);
 }
 
 async function fetchFriendRequests() {
@@ -126,7 +127,7 @@ async function fetchFriendRequests() {
         return;
     }
     try {
-        const response = await fetch('http://' + serverIP + ':8000/api/friend_requests/', {
+        const response = await fetch(`https://${serverIP}/api/friend_requests/`, {
             method: 'GET',
             headers: {
                 'Authorization': 'Token ' + token
@@ -153,7 +154,7 @@ async function fetchUsernameFromId(userId) {
         return;
     }
     try {
-        const response = await fetch('http://' + serverIP + ':8000/api/get_username_from_id/' + userId + '/', {
+        const response = await fetch(`https://${serverIP}/api/get_username_from_id/${userId}/`, {
             method: 'GET',
             headers: {
                 'Authorization': 'Token ' + token
@@ -171,7 +172,7 @@ async function fetchUsernameFromId(userId) {
     }
 }
 
-async function respondFriendRequest(userId, bool)
+async function respondFriendRequest(userId, bool, websocket)
 {
     const serverIP = window.location.hostname;
     const token = localStorage.getItem('token');
@@ -180,7 +181,7 @@ async function respondFriendRequest(userId, bool)
         return;
     }
     try {
-        const response = await fetch('http://' + serverIP + ':8000/api/respond_friend_request/' + userId + '/', {
+        const response = await fetch(`https://${serverIP}/api/respond_friend_request/${userId}/`, {
             method: 'POST',
             headers: {
                 'Authorization': 'Token ' + token,
@@ -193,11 +194,15 @@ async function respondFriendRequest(userId, bool)
         if (response.ok) {
             const result = await response.json();
             if (bool) {
+                const uid = userId;
                 console.log(`Friend request accepted for user ${userId}`);
+                const message = JSON.stringify({ action: 'update_friends', toUserId: uid });
+                websocket.send(message);
             } else {
                 console.log(`Friend request rejected for user ${userId}`);
             }
-            updateFriendRequestsModal();
+            updateFriendRequestsModal(websocket);
+            getFriends(websocket);
         } else {
             console.error('Failed to handle friend request:', response.statusText);
         }
@@ -206,7 +211,7 @@ async function respondFriendRequest(userId, bool)
     }
 }
 
-export async function updateFriendRequestsModal() {
+export async function updateFriendRequestsModal(websocket) {
     const friendRequestsContainer = document.getElementById('friendRequestsModalBody');
 
     const friendRequests = await fetchFriendRequests();
@@ -223,17 +228,18 @@ export async function updateFriendRequestsModal() {
             const username = await fetchUsernameFromId(request.from_user);
             li.textContent = `${username} sent you a friend request`;
 
+            const friendId = request.from_user.toString();
             const acceptButton = document.createElement('button');
             acceptButton.classList.add('btn', 'btn-success', 'btn-sm', 'tickcross');
             //acceptButton.setAttribute('data-user-id', request.from_user);
             acceptButton.innerHTML = '<i class="fas fa-check"></i>';
-            acceptButton.addEventListener('click', () => respondFriendRequest(request.from_user, true));
+            acceptButton.addEventListener('click', () => respondFriendRequest(friendId, true, websocket));
 
             const rejectButton = document.createElement('button');
             rejectButton.classList.add('btn', 'btn-danger', 'btn-sm', 'tickcross');
             //rejectButton.setAttribute('data-user-id', request.from_user);
             rejectButton.innerHTML = '<i class="fas fa-times"></i>';
-            rejectButton.addEventListener('click', () => respondFriendRequest(request.from_user, false));
+            rejectButton.addEventListener('click', () => respondFriendRequest(friendId, false, websocket));
 
             li.appendChild(acceptButton);
             li.appendChild(rejectButton);
@@ -243,7 +249,7 @@ export async function updateFriendRequestsModal() {
     }
 }
 
-async function getFriends() {
+export async function getFriends(websocket) {
     const serverIP = window.location.hostname;
     const token = localStorage.getItem('token');
     if (!token) {
@@ -251,7 +257,7 @@ async function getFriends() {
         return;
     }
     try {
-        const response = await fetch('http://' + serverIP + ':8000/api/get_friends/', {
+        const response = await fetch(`https://${serverIP}/api/get_friends/`, {
             method: 'GET',
             headers: {
                 'Authorization': 'Token ' + token,
@@ -263,16 +269,76 @@ async function getFriends() {
             const data = await response.json();
             const friendsList = data.friends;
             const friendsElement = document.getElementById('friend-list');
-            friendsElement.innerHTML = '';
+            friendsElement.innerHTML = "";
             friendsList.forEach(friend => {
                 const friendElement = document.createElement('li');
-                friendElement.textContent = friend.username;
+                friendElement.classList.add("clickable");
+                friendElement.dataset.id = friend.id;
+                friendElement.dataset.name = friend.username;
+                const statusIcon = document.createElement("div");
+                statusIcon.classList.add("player-status");
+                if (isFriendOnline(friend.username)) {
+                    statusIcon.classList.add("online");
+                } else {
+                    statusIcon.classList.add("offline");
+                }
+                friendElement.appendChild(statusIcon);
+                const friendName = document.createElement("p");
+                friendName.textContent = friend.username;
+                friendName.classList.add("player-name");
+                friendElement.appendChild(friendName);
                 friendsElement.appendChild(friendElement);
+                friendElement.addEventListener('click', async () => {
+                    const friendName = friend.username;
+                    const friendId = friendElement.dataset.id;
+                    const friendInfoContent = `<p>Userame: ${friendName}</p><button id="removeFriendBtn" class="btn btn-danger" data-bs-dismiss="modal">Remove from friends</button>`;
+                    document.getElementById('friendModalBody').innerHTML = friendInfoContent;
+                    const removeFriendBtn = document.getElementById('removeFriendBtn');
+                    removeFriendBtn.addEventListener('click', async function() {
+                        await removeFriend(friend.id, websocket);
+                        const message = JSON.stringify({ action: 'update_friends', toUserId: friendId });
+                        websocket.send(message);
+                    });
+                    const modal = new bootstrap.Modal(document.getElementById('friendModal'));
+                    modal.show();
+                });
             });
         } else {
             console.error('Failed to fetch friends:', response.statusText);
         }
     } catch (error) {
         console.error('An error occurred while fetching friends:', error);
+    }
+}
+
+function isFriendOnline(username) {
+    return connectedPlayers.some(player => player.name === username && player.online);
+}
+
+async function removeFriend(friendId, websocket) {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+    try {
+        const response = await fetch(`https://${serverIP}/api/remove_friend/${friendId}/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Token ' + token,
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            console.log('Friend removed successfully:', data);
+            getFriends(websocket);
+        } else {
+            console.error('Failed to remove friend:', response.statusText);
+        }
+    } catch (error) {
+        console.error('An error occurred while removing friend:', error);
     }
 }

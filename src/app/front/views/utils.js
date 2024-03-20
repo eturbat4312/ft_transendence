@@ -41,11 +41,27 @@ const getNav = async () => {
 
 const getSocial = async () => {
     return `
+    <div class="modal fade" id="friendModal" tabindex="-1" aria-labelledby="friendModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5" id="friendModalLabel">Friend</h1>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body" id="friendModalBody">
+                    ...
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade" id="playerModal" tabindex="-1" aria-labelledby="playerModalLabel" aria-hidden="true">
         <div class="modal-dialog">
             <div class="modal-content">
                 <div class="modal-header">
-                    <h1 class="modal-title fs-5" id="playerModalLabel">Modal title</h1>
+                    <h1 class="modal-title fs-5" id="playerModalLabel">Player</h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body" id="playerModalBody">
@@ -66,14 +82,14 @@ const getSocial = async () => {
                 <ul id="player-list" class="player-list"></ul>
             </div>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#friendRequestsModal">
-            Friends
+            Friends Requests
         </button>
     </div>
     <div class="modal fade" id="friendRequestsModal" tabindex="-1" aria-labelledby="friendRequestsModalLabel" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h1 class="modal-title fs-5" id="friendRequestsModalLabel">Friend Requests</h1>
+                <h1 class="modal-title fs-5" id="friendRequestsModalLabel">Friends Requests</h1>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body" id="friendRequestsModalBody">
@@ -113,7 +129,7 @@ const handleLogout = async () => {
     const token = localStorage.getItem('token');
     if (token) {
         try {
-            const response = await fetch('https://' + serverIP + ':8000/api/logout/', {
+            const response = await fetch(`https://${serverIP}/api/logout/`, {
                 method: 'POST',
                 headers: {
                     'Authorization': 'Token ' + token

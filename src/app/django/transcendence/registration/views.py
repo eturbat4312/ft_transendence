@@ -82,14 +82,12 @@ class SendFriendRequestView(APIView):
 
     def get(self, request, to_user_id):
         to_user = get_object_or_404(UserModel, id=to_user_id)
-        friend_request, created = FriendRequest.objects.get_or_create(
-            from_user=request.user,
-            to_user=to_user
-        )
-        if created:
-            return Response({'status': 'success'})
-        else:
+        existing_request = FriendRequest.objects.filter(from_user=request.user, to_user=to_user).exists()
+        existing_request2 = FriendRequest.objects.filter(from_user=to_user, to_user=request.user).exists()
+        if existing_request or existing_request2:
             return Response({'status': 'error', 'message': 'Friend request already sent.'})
+        friend_request = FriendRequest.objects.create(from_user=request.user, to_user=to_user)
+        return Response({'status': 'success', 'friend_request_id': friend_request.id})
 
 class FriendRequestsView(APIView):
     authentication_classes = [TokenAuthentication]
@@ -123,6 +121,23 @@ class RespondFriendRequestView(APIView):
 
         else:
             return Response({'status': 'error', 'message': 'Invalid action.'}, status=status.HTTP_400_BAD_REQUEST)
+
+class RemoveFriendView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, friend_id):
+        current_user = request.user
+        
+        try:
+            friend = UserModel.objects.get(id=friend_id)
+        except UserModel.DoesNotExist:
+            return Response({'error': 'Friend not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        current_user.friends.remove(friend)
+        friend.friends.remove(current_user)
+        
+        return Response({'success': 'Friend removed successfully'}, status=status.HTTP_200_OK)
 
 class GetFriendsView(APIView):
     authentication_classes = [TokenAuthentication]

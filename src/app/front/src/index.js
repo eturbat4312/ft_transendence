@@ -2,7 +2,7 @@ import { getNav, getSocial, getChat, handleLogout } from '../views/utils.js';
 import { addTournamentEventListeners } from './script.js';
 import { addGameEventListeners } from '../views/Game.js';
 import { addChatEventListeners } from './utils.js';
-import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, updateFriendRequestsModal } from './friendModal.js';
+import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, updateFriendRequestsModal, getFriends } from './friendModal.js';
 import '../theme/base.css'
 import '../theme/game.css'
 import '../theme/index.css'
@@ -23,7 +23,6 @@ const routes = [
 ];
 
 const isAuthenticated = async () => {
-
     const serverIP = window.location.hostname;
     const token = localStorage.getItem('token');
     if (!token) {
@@ -31,7 +30,7 @@ const isAuthenticated = async () => {
     }
 
     try {
-        const response = await fetch(`https://${serverIP}/api/verify-token/`, {
+        const response = await fetch(`https://${serverIP}/api/verify_token/`, {
             method: 'GET',
             headers: {
                 'Authorization': 'Token ' + token
@@ -146,11 +145,8 @@ window.addEventListener('popstate', () => {
 
 const checkIfConnected = async () => {
     const auth = await isAuthenticated();
-    if (!auth) {
-        console.log("RETURN");
+    if (!auth)
         return;
-    }
-    updateFriendRequestsModal();
     const username = localStorage.getItem('username');
     const userId = localStorage.getItem('userId');
     console.log("my userId: ", userId);
@@ -161,7 +157,8 @@ const checkIfConnected = async () => {
         const message = JSON.stringify({ action: 'connect', username: username, userId: userId });
         websocket.send(message);
     }
-
+    updateFriendRequestsModal(websocket);
+    getFriends(websocket);
     websocket.onclose = function(event) {
         console.log('Connect WebSocket closed');
     }
@@ -182,12 +179,15 @@ const checkIfConnected = async () => {
             if (data.action === "disconnected") {
                 console.log(data.username, " is offline !");
                 removeDisconnectedPlayer(data.username);
+                getFriends(websocket);
             }
             if (data.action === "friend_request" && data.to_user_id === userId) {
-                showToast(data.username + " sent you a friend request !");
+                showToast(data.username + " sent you a friend request !", websocket);
                 console.log(data.username, " sent you a friend request");
             }
-
+            if (data.action === "update_friends" && data.to_user_id === userId) {
+                getFriends(websocket);
+            }
     }
 
     websocket.onerror = function(event) {
