@@ -65,7 +65,7 @@ async function sendFriendRequest(id, websocket)
         const data = await response.json();
     
         if (data.status === 'success') {
-            const message = JSON.stringify({ action: 'friend_request', toUserId: userId });
+            const message = JSON.stringify({ action: 'friend_request', toUserId: id });
             websocket.send(message);
             alert('Friend request sent successfully!');
         } else {

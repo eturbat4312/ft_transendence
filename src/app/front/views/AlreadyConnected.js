@@ -15,8 +15,7 @@ export default class extends AbstractView {
                 <div class="card-body">
                     <div class="d-flex flex-column align-items-center">
                         <p class="text-light">You are already connected from another window or browser.</p>
-                    </div> 
-                    <button id="logout" class="d-flex flex-column align-items-center btn btn-success">Logout</button>
+                    </div>
                 </div>
             </div>
         </div>

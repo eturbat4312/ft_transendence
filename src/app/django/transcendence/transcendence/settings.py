@@ -28,7 +28,7 @@ SECRET_KEY = os.getenv("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = os.getenv("DEBUG")
 
-ALLOWED_HOSTS = ["localhost"]
+ALLOWED_HOSTS = ["*"]
 SECURE_SSL_REDIRECT = False
 SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
 
@@ -68,11 +68,7 @@ ROOT_URLCONF = "transcendence.urls"
 
 AUTH_USER_MODEL = "registration.User"
 
-CORS_ALLOWED_ORIGINS = [
-    "https://localhost",
-    "http://localhost",
-]
-
+CORS_ORIGIN_ALLOW_ALL = True
 
 TEMPLATES = [
     {
