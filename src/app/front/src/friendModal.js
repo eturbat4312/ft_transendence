@@ -35,16 +35,14 @@ function updateplayerModal(websocket) {
         document.getElementById('playerModalBody').innerHTML = playerInfoContent;
         const addFriendBtn = document.getElementById('addFriendBtn');
         addFriendBtn.addEventListener('click', async function() {
-            await sendFriendRequest(userId);
-            const message = JSON.stringify({ action: 'friend_request', toUserId: userId });
-            websocket.send(message);
+            await sendFriendRequest(userId, websocket);
         });
         const playerModal = new bootstrap.Modal(document.getElementById('playerModal'));
         playerModal.show();
     });
 }
 
-async function sendFriendRequest(id)
+async function sendFriendRequest(id, websocket)
 {
     const serverIP = window.location.hostname;
     const token = localStorage.getItem('token');
@@ -67,6 +65,8 @@ async function sendFriendRequest(id)
         const data = await response.json();
     
         if (data.status === 'success') {
+            const message = JSON.stringify({ action: 'friend_request', toUserId: userId });
+            websocket.send(message);
             alert('Friend request sent successfully!');
         } else {
             alert('Error: ' + data.message + ' status: ' + data.status);
