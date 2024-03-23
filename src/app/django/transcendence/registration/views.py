@@ -5,9 +5,9 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, FriendRequestSerializer
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, FriendRequestSerializer, MessageSerializer
 from .models import User as UserModel
-from .models import FriendRequest
+from .models import FriendRequest, Message
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
@@ -73,7 +73,7 @@ class GetUsernameFromIdView(APIView):
             user = UserModel.objects.get(id=user_id)
             username = user.username
             return Response({'username': username})
-        except User.DoesNotExist:
+        except UserModel.DoesNotExist:
             return Response({'username': 'Unknown User'})
 
 class SendFriendRequestView(APIView):
@@ -148,6 +148,39 @@ class GetFriendsView(APIView):
         friends = current_user.friends.all()
         serializer = UserSerializer(friends, many=True)
         return Response({'friends': serializer.data})
+
+class GetMessageHistoryView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, other_user_id):
+        try:
+            current_user = request.user
+            other_user = get_object_or_404(UserModel, id=other_user_id)
+            messages_sent_by_current_user = Message.objects.filter(sender=current_user, receiver=other_user)
+            messages_received_by_current_user = Message.objects.filter(sender=other_user, receiver=current_user)
+            all_messages = messages_sent_by_current_user | messages_received_by_current_user
+            sorted_messages = all_messages.order_by('timestamp')
+            serializer = MessageSerializer(sorted_messages, many=True)
+
+            return Response({'messages': serializer.data})
+        except UserModel.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=404)
+
+class SendMessageView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, receiver_id):
+        try:
+            current_user = request.user
+            receiver_user = get_object_or_404(UserModel, id=receiver_id)
+            message_content = request.data.get('message', '')
+            message = Message.objects.create(sender=current_user, receiver=receiver_user, content=message_content)
+            serializer = MessageSerializer(message)
+            return Response({'message': serializer.data}, status=201)
+        except UserModel.DoesNotExist:
+            return Response({'error': 'User not found.'}, status=404)
 
 class VerifyTokenView(APIView):
     authentication_classes = [TokenAuthentication]

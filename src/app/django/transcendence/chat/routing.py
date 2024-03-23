@@ -5,6 +5,7 @@ from . import consumers
 
 websocket_urlpatterns = [
     path("api/ws/chat/", consumers.ChatConsumer.as_asgi()),
+    path("api/ws/prv/", consumers.PrvConsumer.as_asgi()),
 ]
 
 application = ProtocolTypeRouter({

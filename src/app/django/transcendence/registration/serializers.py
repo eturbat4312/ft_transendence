@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, FriendRequest
+from .models import User, FriendRequest, Message
 
 
 class RegisterSerializer(serializers.Serializer):
@@ -31,3 +31,8 @@ class FriendRequestSerializer(serializers.ModelSerializer):
     class Meta:
         model = FriendRequest
         fields = '__all__'
+
+class MessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Message
+        fields = ['id', 'sender', 'receiver', 'content', 'timestamp']

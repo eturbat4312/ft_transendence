@@ -1,6 +1,6 @@
 const getNav = async () => {
         return `
-        <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="z-index: 1;">
+        <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="z-index: 3;">
             <div class="container-fluid">
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" >
                     <span class="navbar-toggler-icon"></span>
@@ -118,7 +118,7 @@ const getChat = async () => {
             <div class="input-group mb-3" style="position: absolute; bottom: 0; left: 0; width: calc(100% - 20px);">
                 <input type="text" class="form-control" id="messageInput" placeholder="Type your message...">
                 <button class="btn btn-primary btn-chat-send" type="button" id="sendMessageBtn">Send</button>
-             </div>
+            </div>
         </div>
     </div>
     `;

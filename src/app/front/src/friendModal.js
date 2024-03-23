@@ -249,6 +249,145 @@ export async function updateFriendRequestsModal(websocket) {
     }
 }
 
+export async function getMessageHistory(otherUserId) {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+    try {
+        const response = await fetch(`https://${serverIP}/api/get_message_history/${otherUserId}/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Token ' + token,
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            const messages = data.messages;
+            displayMessageHistory(messages);
+        } else {
+            console.error('Failed to fetch message history:', response.statusText);
+        }
+    } catch (error) {
+        console.error('An error occurred while fetching message history:', error);
+    }
+}
+
+function displayMessageHistory(messages) {
+    messages.forEach(message => {
+        displayMessage(message.content);
+    });
+}
+
+function displayMessage(message) {
+    const messageElement = document.createElement('div');
+    messageElement.textContent = message;
+    const messageContainer = document.querySelector('.prv-chat-messages');
+    messageContainer.appendChild(messageElement);
+    const chatBox = document.querySelector(".prv-chat-window");
+    chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+async function sendMessage(messageInput, friendId, websocket) {
+    const message = messageInput.value.trim();
+    if (message !== '') {
+        const serverIP = window.location.hostname;
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.log('Token not found');
+            return;
+        }
+        try {
+            const response = await fetch(`https://${serverIP}/api/send_message/${friendId}/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Token ' + token,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ message: message })
+            });
+
+            if (response.ok) {
+                console.log('Message sent successfully');
+                const messageData = await response.json();
+            } else {
+                console.error('Failed to send message:', response.statusText);
+            }
+        } catch (error) {
+            console.error('An error occurred while sending message:', error);
+        }
+        websocket.send(JSON.stringify({ action: 'send_message', message: message }));
+        messageInput.value = '';
+    }
+}
+
+let chatWindow = null;
+let websocket = null;
+
+function startPrivateChat(friendId, friendName)
+{
+    if (chatWindow) {
+        document.getElementById('player-bar').removeChild(chatWindow);
+        chatWindow = null;
+        websocket.close();
+    }
+    chatWindow = document.createElement('div');
+    chatWindow.classList.add('prv-chat-window');
+    chatWindow.innerHTML = `
+        <div class="prv-chat-header">
+            <h4>Chat with ${friendName}</h4>
+            <button class="close-btn btn btn-danger">Close</button>
+        </div>
+        <div class="prv-chat-messages">
+        </div>
+        <div class="input-group mb-3" style="position: absolute; bottom: 0; left: 0; width: calc(100% - 20px);">
+            <input type="text" class="form-control" id="prvMessageInput" placeholder="Type your message...">
+            <button class="btn btn-primary send-btn" type="button" id="prvMessageBtn">Send</button>
+        </div>
+    `;
+    document.getElementById('player-bar').appendChild(chatWindow);
+    getMessageHistory(friendId);
+    const serverIP = window.location.hostname;
+    const userId = localStorage.getItem('userId');
+    websocket = new WebSocket(`wss://${serverIP}/api/ws/prv/`);
+    websocket.onopen = function(event) {
+        console.log('WebSocket connection opened');
+        const data = { action: 'join', user_id: userId, other_user_id: friendId };
+        websocket.send(JSON.stringify(data));
+    };
+    websocket.onmessage = function(event) {
+        const data = JSON.parse(event.data);
+        if (data.action === "chat_message")
+            displayMessage(data.message);
+    };
+    websocket.onerror = function(error) {
+        console.error('WebSocket error:', error);
+    };
+    websocket.onclose = function(event) {
+        console.log('WebSocket connection closed');
+    };
+    const closeBtn = chatWindow.querySelector('.close-btn');
+    closeBtn.addEventListener('click', () => {
+        chatWindow.parentNode.removeChild(chatWindow);
+        chatWindow = null;
+        websocket.close();
+    });
+    const sendMessageBtn = chatWindow.querySelector('#prvMessageBtn');
+    const messageInput = chatWindow.querySelector('#prvMessageInput');
+    sendMessageBtn.addEventListener('click', () => {
+        sendMessage(messageInput, friendId, websocket);
+    });
+    messageInput.addEventListener('keydown', (event) => {
+        if (event.key === 'Enter') {
+            sendMessage(messageInput, friendId, websocket);
+        }
+    });
+}
+
 export async function getFriends(websocket) {
     const serverIP = window.location.hostname;
     const token = localStorage.getItem('token');
@@ -287,6 +426,16 @@ export async function getFriends(websocket) {
                 friendName.textContent = friend.username;
                 friendName.classList.add("player-name");
                 friendElement.appendChild(friendName);
+                const chatButton = document.createElement('button');
+                chatButton.textContent = 'Chat';
+                chatButton.classList.add('chat-button', 'btn', 'btn-success', 'btn-sm');
+                friendElement.appendChild(chatButton);
+                chatButton.addEventListener('click', (event) => {
+                    event.stopPropagation();
+                    const friendId = friend.id;
+                    const friendName = friend.username;
+                    startPrivateChat(friendId, friendName);
+                });
                 friendsElement.appendChild(friendElement);
                 friendElement.addEventListener('click', async () => {
                     const friendName = friend.username;

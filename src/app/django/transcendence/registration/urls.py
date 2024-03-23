@@ -1,6 +1,8 @@
 from django.urls import path, include, re_path
 from . import views
-from .views import LoginView, LogoutView, GetUsernameView, GetUserIdView, GetUsernameFromIdView, VerifyTokenView, SendFriendRequestView, FriendRequestsView, RespondFriendRequestView, GetFriendsView, RemoveFriendView
+from .views import LoginView, LogoutView, GetUsernameView, GetUserIdView, GetUsernameFromIdView, VerifyTokenView
+from .views import SendFriendRequestView, FriendRequestsView, RespondFriendRequestView, GetFriendsView, RemoveFriendView
+from .views import GetMessageHistoryView, SendMessageView
 from rest_framework.routers import DefaultRouter
 
 # from .views import UserViewSet
@@ -23,4 +25,6 @@ urlpatterns = [
     path('api/respond_friend_request/<int:from_user_id>/', RespondFriendRequestView.as_view(), name='respond-friend-request'),
     path('api/remove_friend/<int:friend_id>/', RemoveFriendView.as_view(), name='remove-friend'),
     path('api/get_friends/', GetFriendsView.as_view(), name='get-friends'),
+    path('api/get_message_history/<int:other_user_id>/', GetMessageHistoryView.as_view(), name='get_message_history'),
+    path('api/send_message/<int:receiver_id>/', SendMessageView.as_view(), name='send_message'),
 ]

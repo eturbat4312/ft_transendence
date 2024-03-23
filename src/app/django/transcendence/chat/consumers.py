@@ -67,3 +67,47 @@ class ChatConsumer(AsyncWebsocketConsumer):
             'action': 'left_chat',
             'name_data': username
     }))
+
+class PrvConsumer(AsyncWebsocketConsumer):
+    room_group_name = None
+
+    async def connect(self):
+        await self.accept()
+
+    async def disconnect(self, close_code):
+        pass
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        action = data.get('action')
+        
+        if action == 'join':
+            user_id = int(data['user_id'])
+            other_user_id = int(data['other_user_id'])
+            self.room_group_name = f'private_chat_{min(user_id, other_user_id)}{max(user_id, other_user_id)}'
+
+            await self.channel_layer.group_add(
+                self.room_group_name,
+                self.channel_name
+            )
+            await self.send(text_data=json.dumps({
+                'group_name': self.room_group_name,
+                'join_message': 'You have joined the private chat.'
+            }))
+
+        elif action == 'send_message':
+            message = data.get('message')
+
+            await self.channel_layer.group_send(
+                self.room_group_name,
+                {
+                    'type': 'chat_message',
+                    'message': message
+                })
+    
+    async def chat_message(self, event):
+        message = event['message']
+        await self.send(text_data=json.dumps({
+            'action': 'chat_message',
+            'message': message
+        }))

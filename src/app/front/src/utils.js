@@ -98,6 +98,7 @@ export default class Chat {
 
 export function addChatEventListeners() {
     const chatBox = new Chat();
+    const offcanvas = document.getElementById('offcanvasChat');
     document.querySelectorAll('.btn-chat-connect').forEach(button => {
         button.addEventListener('click', function() {
             chatBox.startChat();
@@ -116,6 +117,17 @@ export function addChatEventListeners() {
             }
         });
     }
+    offcanvas.addEventListener('shown.bs.offcanvas', function () {
+        offcanvas.querySelectorAll('input, button').forEach(function(element) {
+            element.setAttribute('tabindex', '-1');
+        });
+    });
+    
+    offcanvas.addEventListener('hidden.bs.offcanvas', function () {
+        offcanvas.querySelectorAll('input, button').forEach(function(element) {
+            element.removeAttribute('tabindex');
+        });
+    });
 }
 
 export async function getUsername() {
