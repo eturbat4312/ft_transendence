@@ -1,8 +1,8 @@
 import { getNav, getSocial, getChat, handleLogout } from '../views/utils.js';
 import { addTournamentEventListeners } from './script.js';
-import { addGameEventListeners } from '../views/Game.js';
+import { addGameEventListeners, initPrivateGame } from '../views/Game.js';
 import { addChatEventListeners } from './utils.js';
-import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, updateFriendRequestsModal, getFriends } from './friendModal.js';
+import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, showGameInvitationNotification, updateFriendRequestsModal, getFriends } from './friendModal.js';
 import '../theme/base.css'
 import '../theme/game.css'
 import '../theme/index.css'
@@ -116,7 +116,7 @@ const loadComponents = async () => {
     addNavEventListeners();
 };
 
-const addNavEventListeners = () => {
+export const addNavEventListeners = () => {
     const navLinks = document.querySelectorAll('.nav__link');
     navLinks.forEach(link => {
         link.addEventListener('click', (event) => {
@@ -187,6 +187,21 @@ const checkIfConnected = async () => {
             }
             if (data.action === "update_friends" && data.to_user_id === userId) {
                 getFriends(websocket);
+            }
+            if (data.action === "invite_play" && data.to_user_id === userId) {
+                showGameInvitationNotification(data.user_id, websocket);
+            }
+            if (data.action === "invite_play" && data.user_id === userId) {
+                showToast(data.to_user_id + " has received your invitation", websocket);
+            }
+            if (data.action === "accept_invite" && data.user_id === userId) {
+                const prvBtn = document.getElementById('btn-start-private');
+                prvBtn.disabled = false;
+                console.log("test");
+                prvBtn.addEventListener('click', () => { initPrivateGame(userId, data.inv_user_id) });
+            }
+            if (data.action === "refuse_invite" && data.user_id === userId) {
+                console.log("refuse");
             }
     }
 

@@ -54,6 +54,7 @@ export default class Game extends AbstractView {
            </div>
            <div class="end-game-container">
                 <div id="winner"></div>
+                <button id="btn-start-private" class="btn btn-success btn-prv" style="z-index: 1;" disabled>Start Private Game</button>
                 <button class="btn btn-primary btn-reset" style="z-index: 1; display: none;">Reset</button>
             </div>  
         </div>   
@@ -125,6 +126,7 @@ export default class Game extends AbstractView {
         this.gameLoop();
         this.ball.style.display = "block";
         document.getElementById("start-game").style.display = "none";
+        document.getElementById("btn-start-private").style.display = "none";
     };
 
     update = () => {
@@ -379,6 +381,7 @@ export default class Game extends AbstractView {
         this.scoreDisplay2.innerText = "0";
         document.getElementById("winner").innerText = "";
         document.getElementById("start-game").style.display = "block";
+        document.getElementById("btn-start-private").style.display = "block";
         document.getElementById("countdown").style.display = "none";
         document.querySelector(".btn-reset").style.display = "none";
     };
@@ -477,6 +480,49 @@ export default class Game extends AbstractView {
         this.isMaster = true;
         this.startGame();
     }
+
+    startPrivateGame(userId, opponentUserId, gameId, GM) {
+        const serverIP = window.location.hostname;
+        if (GM){
+            this.isMaster = true;
+            this.player1 = true;
+        } else {
+            this.player2 = true;
+        }
+        if (this.websocket === null || this.websocket.readyState !== WebSocket.OPEN) {
+            this.websocket = new WebSocket(`wss://${serverIP}/api/ws/game/`);
+            this.websocket.onopen = () => {
+                console.log("Private WebSocket connection established");
+                this.websocket.send(JSON.stringify({ action: "private", game_id: gameId }));
+            }
+            const self = this;
+            this.websocket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                if (data.action === "start_game")
+                    self.startGame();
+            }
+            const checkPageChange = () => {
+                if (!document.getElementById("game")) {
+                    console.log("change page");
+                    this.websocket.close();
+                    this.websocket = null;
+                    clearInterval(intervalId);
+                }
+            }
+            const intervalId = setInterval(checkPageChange, 1000);
+
+            this.websocket.onclose = (event) => {
+                console.log("Private WebSocket connection closed", event);
+                clearInterval(intervalId); 
+            };
+            this.websocket.onerror = (error) => {
+                console.error("WebSocket error:", error);
+                clearInterval(intervalId);
+            };
+        } else {
+            console.log("WebSocket connection is already open.");
+        }
+    }
 }
 
 export function addGameEventListeners() {
@@ -491,4 +537,17 @@ export function addGameEventListeners() {
             gameView.initOfflineGame();
         })
     })
+}
+
+export function initPrivateGame(userId, opponentUserId) {
+    const smallerId = Math.min(userId, opponentUserId);
+    const largerId = Math.max(userId, opponentUserId);
+    const gameId = `${smallerId}${largerId}`;
+    const gameView = new Game();
+    let GM;
+    console.log("userId: " + userId + " small: " + smallerId);
+    if (parseInt(userId) === smallerId) GM = true;
+    else GM = false;
+    console.log(GM);
+    gameView.startPrivateGame(userId, opponentUserId, gameId, GM);
 }

@@ -1,3 +1,6 @@
+import { addNavEventListeners } from "./index.js";
+import { initPrivateGame } from "../views/Game.js";
+
 let connectedPlayers = [];
 
 function updateplayerModal(websocket) {
@@ -91,6 +94,71 @@ export function updateConnectedPlayer(username, userId, online, websocket) {
 
 }
 
+export function showGameInvitationNotification(inviterUserId, websocket) {
+    const userId = localStorage.getItem("userId");
+    const message = `Do you want to join ${inviterUserId} for a 1vs1 ?`;
+    showToastWithButtons(message, 
+        'Yes !', 
+        function() {
+            const yesMessage = JSON.stringify({ action: 'accept_invite', userId: inviterUserId });
+            websocket.send(yesMessage);
+            closeToast();
+            setTimeout(() => {
+                const prvBtn = document.getElementById('btn-start-private');
+                prvBtn.disabled = false;
+                prvBtn.addEventListener('click', () => { initPrivateGame(userId, inviterUserId) });
+            }, 200);
+        },
+        'No...',
+        function() {
+            const noMessage = JSON.stringify({ action: 'refuse_invite', userId: inviterUserId });
+            websocket.send(noMessage);
+            closeToast();
+        }
+    );
+}
+
+function showToastWithButtons(message, acceptLabel, acceptCallback, refuseLabel, refuseCallback) {
+    const toastContainer = document.getElementById('toast-container');
+    const toast = document.createElement('div');
+    toast.className = 'toast';
+    toast.innerHTML = `
+        <div class="toast-header">
+            <strong class="me-auto">Notification</strong>
+            <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body">
+            ${message}
+        </div>
+        <div class="toast-footer">
+            <a href="/game" id="accept-game-button" class="nav__link btn btn-success active" data-link>${acceptLabel}</a>
+            <button class="btn btn-danger" id="refuse-game-button">${refuseLabel}</button>
+        </div>
+    `;
+    toastContainer.appendChild(toast);
+
+    const acceptGameButton = toast.querySelector('#accept-game-button');
+    acceptGameButton.addEventListener('click', acceptCallback);
+
+    const refuseGameButton = toast.querySelector('#refuse-game-button');
+    refuseGameButton.addEventListener('click', refuseCallback);
+
+    const bootstrapToast = new bootstrap.Toast(toast);
+    bootstrapToast.show();
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
+    addNavEventListeners();
+}
+
+function closeToast() {
+    const toastContainer = document.getElementById('toast-container');
+    const toast = toastContainer.querySelector('.toast');
+    const bootstrapToast = bootstrap.Toast.getInstance(toast);
+    bootstrapToast.hide();
+    toast.remove();
+}
+
 export function removeDisconnectedPlayer(playerName) {
     connectedPlayers = connectedPlayers.filter(player => player.name !== playerName);
     const playerElementToRemove = document.querySelector(`.player-item[data-name="${playerName}"]`);
@@ -105,7 +173,7 @@ export function showToast(message, websocket) {
     toast.className = 'toast';
     toast.innerHTML = `
         <div class="toast-header">
-            <strong class="me-auto">Friend Request</strong>
+            <strong class="me-auto">Notification</strong>
             <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
         </div>
         <div class="toast-body">
@@ -116,6 +184,9 @@ export function showToast(message, websocket) {
 
     const bootstrapToast = new bootstrap.Toast(toast);
     bootstrapToast.show();
+    toast.addEventListener('hidden.bs.toast', () => {
+        toast.remove();
+    });
     updateFriendRequestsModal(websocket);
 }
 
@@ -288,8 +359,7 @@ function displayMessage(message) {
     messageElement.textContent = message;
     const messageContainer = document.querySelector('.prv-chat-messages');
     messageContainer.appendChild(messageElement);
-    const chatBox = document.querySelector(".prv-chat-window");
-    chatBox.scrollTop = chatBox.scrollHeight;
+    messageContainer.scrollTop = messageContainer.scrollHeight;
 }
 
 async function sendMessage(messageInput, friendId, websocket) {
@@ -390,6 +460,7 @@ function startPrivateChat(friendId, friendName)
 
 export async function getFriends(websocket) {
     const serverIP = window.location.hostname;
+    const userId = localStorage.getItem("userId");
     const token = localStorage.getItem('token');
     if (!token) {
         console.log('Token not found');
@@ -440,13 +511,28 @@ export async function getFriends(websocket) {
                 friendElement.addEventListener('click', async () => {
                     const friendName = friend.username;
                     const friendId = friendElement.dataset.id;
-                    const friendInfoContent = `<p>Userame: ${friendName}</p><button id="removeFriendBtn" class="btn btn-danger" data-bs-dismiss="modal">Remove from friends</button>`;
+                    const friendInfoContent = ` <p>Userame: ${friendName}</p>
+                                                <button id="removeFriendBtn" class="btn btn-danger" data-bs-dismiss="modal">Remove from friends</button>
+                                                <button id="inviteGameBtn"  class="btn btn-success" data-bs-dismiss="modal">Invite to play 1v1</button>`;
                     document.getElementById('friendModalBody').innerHTML = friendInfoContent;
                     const removeFriendBtn = document.getElementById('removeFriendBtn');
                     removeFriendBtn.addEventListener('click', async function() {
                         await removeFriend(friend.id, websocket);
                         const message = JSON.stringify({ action: 'update_friends', toUserId: friendId });
                         websocket.send(message);
+                    });
+                    const inviteGame = document.getElementById('inviteGameBtn');
+                    inviteGame.addEventListener('click', async function() {
+                        if (location.pathname === '/game') {
+                            if (isFriendOnline(friendName)) {
+                                const message = JSON.stringify({ action: 'invite_play', userId: userId, toUserId: friendId });
+                                websocket.send(message);
+                            } else {
+                                alert("This player is not online");
+                            }
+                        } else {
+                            alert("YOU HAVE TO BE ON GAME PAGE TO INVITE SOMEONE");
+                        }
                     });
                     const modal = new bootstrap.Modal(document.getElementById('friendModal'));
                     modal.show();

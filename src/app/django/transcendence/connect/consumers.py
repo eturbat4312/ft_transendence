@@ -75,6 +75,38 @@ class ConnectConsumer(AsyncWebsocketConsumer):
                     'to_user_id': to_user_id,
                 }
             )
+        elif action == 'invite_play':
+            to_user_id = text_data_json['toUserId']
+            user_id = text_data_json['userId']
+            await self.channel_layer.group_send(
+                "connected_users",
+                {
+                    'type': 'invite_play',
+                    'user_id': user_id,
+                    'to_user_id': to_user_id,
+                }
+            )
+        elif action == 'accept_invite':
+            user_id = text_data_json['userId']
+            await self.channel_layer.group_send(
+                "connected_users",
+                {
+                    'type': 'accept_invite',
+                    'inv_user_id': self.user_id,
+                    'user_id': user_id,
+                }
+            )
+        elif action == 'refuse_invite':
+            user_id = text_data_json['userId']
+            await self.channel_layer.group_send(
+                "connected_users",
+                {
+                    'type': 'refuse_invite',
+                    'username': self.username,
+                    'user_id': user_id,
+                }
+            )
+        
             
 
     async def user_connected(self, event):
@@ -109,4 +141,25 @@ class ConnectConsumer(AsyncWebsocketConsumer):
             "username": event["username"],
             "to_user_id": event["to_user_id"],
             "action": "update_friends",
+        }))
+    
+    async def invite_play(self, event):
+        await self.send(text_data=json.dumps({
+            "user_id": event["user_id"],
+            "to_user_id": event["to_user_id"],
+            "action": "invite_play",
+        }))
+
+    async def accept_invite(self, event):
+        await self.send(text_data=json.dumps({
+            "inv_user_id": event["inv_user_id"],
+            "user_id": event["user_id"],
+            "action": "accept_invite",
+        }))
+    
+    async def refuse_invite(self, event):
+        await self.send(text_data=json.dumps({
+            "username": event["username"],
+            "user_id": event["user_id"],
+            "action": "refuse_invite",
         }))

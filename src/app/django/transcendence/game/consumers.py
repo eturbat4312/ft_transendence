@@ -26,6 +26,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                     'ball_data': text_data_json['ball_data']
                 }
             )
+
         if action == 'start_game':
             game_id = text_data_json['game_id']
             logging.info(game_id)
@@ -35,7 +36,18 @@ class GameConsumer(AsyncWebsocketConsumer):
             else:
                 logging.error("No game_id provided. Closing connection.")
                 await self.close()
-            await self.startGame()
+            await self.start_game()
+
+        if action == "private":
+            game_id = text_data_json['game_id']
+            if game_id:
+                self.game_group_name = f'game_{game_id}'
+                await self.channel_layer.group_add(self.game_group_name, self.channel_name)
+                groups = self.channel_layer.groups
+                num_players = len(groups.get(self.game_group_name, []))
+                if num_players == 2:
+                    await self.channel_layer.group_send(self.game_group_name, { 'type': 'private_game' })
+
         if action == "update_score":
             await self.channel_layer.group_send(
                 self.game_group_name,
@@ -44,6 +56,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                     'score_data': text_data_json['score_data']
                 }
             )
+
         if action == "update_paddle1_position":
             await self.channel_layer.group_send(
                 self.game_group_name,
@@ -52,6 +65,7 @@ class GameConsumer(AsyncWebsocketConsumer):
                     'paddle_data': text_data_json['paddle_data']
                 }
             )
+
         if action == "update_paddle2_position":
             await self.channel_layer.group_send(
                 self.game_group_name,
@@ -61,9 +75,11 @@ class GameConsumer(AsyncWebsocketConsumer):
                 }
             )
 
-    async def startGame(self):
+    async def start_game(self):
         await self.send(text_data=json.dumps({"action": "start_game"}))
 
+    async def private_game(self, event):
+        await self.send(text_data=json.dumps({"action": "start_game"}))
 
     async def update_score(self, event):
         score_data = event['score_data']

@@ -132,6 +132,11 @@ body {
     margin-top: 100px;
 }
 
+.btn-prv {
+    margin-top: 20px;
+}
+
+
 #play-button {
     position: absolute;
     top: 50%;
