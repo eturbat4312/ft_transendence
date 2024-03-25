@@ -29,3 +29,11 @@ class Message(models.Model):
 
     def __str__(self):
         return f"From {self.sender} to {self.receiver}: {self.content}"
+
+class Tournament(models.Model):
+    creator = models.ForeignKey(User, on_delete=models.CASCADE)
+    is_active = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Tournament created by {self.creator.username}"

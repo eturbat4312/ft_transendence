@@ -217,7 +217,7 @@ async function fetchFriendRequests() {
     }
 }
 
-async function fetchUsernameFromId(userId) {
+export async function fetchUsernameFromId(userId) {
     const serverIP = window.location.hostname;
     const token = localStorage.getItem('token');
     if (!token) {

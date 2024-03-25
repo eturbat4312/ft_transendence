@@ -244,23 +244,23 @@ export function addTournamentEventListeners() {
     // else {
     //     console.log("NO");
     // }
-    document.querySelectorAll('.btn-4players').forEach(button => {
-        button.addEventListener('click', function() {
-            selectTournament(4);
-        });
-    });
+    // document.querySelectorAll('.btn-4players').forEach(button => {
+    //     button.addEventListener('click', function() {
+    //         selectTournament(4);
+    //     });
+    // });
 
-    document.querySelectorAll('.btn-8players').forEach(button => {
-        button.addEventListener('click', function() {
-            selectTournament(8);
-        });
-    });
+    // document.querySelectorAll('.btn-8players').forEach(button => {
+    //     button.addEventListener('click', function() {
+    //         selectTournament(8);
+    //     });
+    // });
 
-    document.querySelectorAll('.btn-matchmaking').forEach(button => {
-        button.addEventListener('click', function() {
-            joinMatchmaking();
-        });
-    });
+    // document.querySelectorAll('.btn-matchmaking').forEach(button => {
+    //     button.addEventListener('click', function() {
+    //         joinMatchmaking();
+    //     });
+    // });
 }
 
 

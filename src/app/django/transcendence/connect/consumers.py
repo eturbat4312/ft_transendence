@@ -106,6 +106,15 @@ class ConnectConsumer(AsyncWebsocketConsumer):
                     'user_id': user_id,
                 }
             )
+        elif action == "start_tournament":
+            await self.channel_layer.group_send(
+                "connected_users",
+                {
+                    'type': 'start_tournament',
+                    'username': self.username,
+                }
+            )
+
         
             
 
@@ -162,4 +171,10 @@ class ConnectConsumer(AsyncWebsocketConsumer):
             "username": event["username"],
             "user_id": event["user_id"],
             "action": "refuse_invite",
+        }))
+
+    async def start_tournament(self, event):
+        await self.send(text_data=json.dumps({
+            "username": event["username"],
+            "action": "start_tournament",
         }))

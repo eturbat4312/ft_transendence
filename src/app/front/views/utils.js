@@ -15,7 +15,7 @@ const getNav = async () => {
                             <a href="/game" class="nav__link nav-link active" data-link>Game</a>
                         </li>
                         <li class="nav-item">
-                            <a href="/tournament" class="nav__link nav-link active" data-link>Tournament</a>
+                            <a href="/tournament" id="tournament" class="nav__link nav-link active" data-link>Tournament</a>
                         </li>
                         <li class="nav-item">
                             <a href="/about" class="nav__link nav-link active" data-link>About</a>

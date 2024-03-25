@@ -7,7 +7,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, FriendRequestSerializer, MessageSerializer
 from .models import User as UserModel
-from .models import FriendRequest, Message
+from .models import FriendRequest, Message, Tournament
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
@@ -181,6 +181,33 @@ class SendMessageView(APIView):
             return Response({'message': serializer.data}, status=201)
         except UserModel.DoesNotExist:
             return Response({'error': 'User not found.'}, status=404)
+
+class CreateTournamentView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            creator = request.user
+            tournament = Tournament.objects.create(creator=creator)
+            return Response({'message': 'Tournament created successfully', 'tournament_id': tournament.id})
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)
+
+class CheckTournamentView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        try:
+            tournament = Tournament.objects.first()
+            if tournament:
+                creator_id = tournament.creator.username
+                return Response({'tournament_exists': True, 'creator_id': creator_id})
+            else:
+                return Response({'tournament_exists': False})
+        except Exception as e:
+            return Response({'error': str(e)}, status=400)
 
 class VerifyTokenView(APIView):
     authentication_classes = [TokenAuthentication]

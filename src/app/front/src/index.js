@@ -1,8 +1,8 @@
 import { getNav, getSocial, getChat, handleLogout } from '../views/utils.js';
-import { addTournamentEventListeners } from './script.js';
+import { addTournamentEventListeners, tournamentCreated, checkTournamentExists } from '../views/Tournament.js';
 import { addGameEventListeners, initPrivateGame } from '../views/Game.js';
 import { addChatEventListeners } from './utils.js';
-import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, showGameInvitationNotification, updateFriendRequestsModal, getFriends } from './friendModal.js';
+import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, showGameInvitationNotification, updateFriendRequestsModal, getFriends, fetchUsernameFromId } from './friendModal.js';
 import '../theme/base.css'
 import '../theme/game.css'
 import '../theme/index.css'
@@ -68,9 +68,6 @@ const loadView = async (path) => {
             viewInstance.getHtml().then(html => {
                 document.querySelector('#app').innerHTML = html;
                 viewInstance.initialize();
-                if (path === '/tournament') {
-                    addTournamentEventListeners();
-                }
                 if (path === '/game') {
                     addGameEventListeners();
                 }
@@ -162,7 +159,29 @@ const checkIfConnected = async () => {
     websocket.onclose = function(event) {
         console.log('Connect WebSocket closed');
     }
-
+    const isTournament = await checkTournamentExists();
+    console.log(isTournament + ": " + window.location);
+    if (isTournament && location.pathname === "/tournament") {
+        console.log("/tournamenttttt");
+        tournamentCreated(isTournament);
+    } else if (isTournament && location.pathname != "/tournament") {
+        const tournament = document.getElementById("tournament");
+        tournament.addEventListener('click', () => {
+            setTimeout(() => {
+                tournamentCreated(isTournament);
+            }, 100);
+        });
+    }
+    if (document.getElementById("start-tournament"))
+        addTournamentEventListeners(websocket);
+    const tournament = document.getElementById("tournament");
+    tournament.addEventListener('click', () => {
+        setTimeout(() => {
+            if (isTournament)
+                tournamentCreated(isTournament)
+            else addTournamentEventListeners(websocket);
+        }, 100);
+    });
     websocket.onmessage = function(event) {
         const data = JSON.parse(event.data);
             if (data.action === 'error') {
@@ -202,6 +221,19 @@ const checkIfConnected = async () => {
             }
             if (data.action === "refuse_invite" && data.user_id === userId) {
                 console.log("refuse");
+            }
+            if (data.action === "start_tournament" && username != data.username) {
+                const creatorUsername = fetchUsernameFromId(data.username);
+                showToast(creatorUsername + " started a tournament ! Go on tournament page if you want to join");
+                if (document.getElementById("start-tournament")) {
+                    tournamentCreated(creatorUsername);
+                }
+                const tournament = document.getElementById("tournament");
+                tournament.addEventListener('click', () => {
+                    setTimeout(() => {
+                        tournamentCreated(creatorUsername);
+                    }, 100);
+                });
             }
     }
 
