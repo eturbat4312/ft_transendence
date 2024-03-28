@@ -35,15 +35,18 @@ def register(request):
         serializer.save()
 
         return Response({"user": serializer.data})
-    print("serializer not valid")
+    print("serializer not valid", serializer.errors, serializer.data)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(["GET"])
 def get_username(request):
     if request.user.is_authenticated:
+        user = request.user
         username = request.user.username
-        return Response({"username": username})
+        serializer = UserSerializer(user, fields=["username", "avatar"])
+        print("user serialized")
+        return Response(serializer.data)
     else:
         return Response(
             {"error": "User is not authenticated"}, status=status.HTTP_401_UNAUTHORIZED
@@ -79,8 +82,10 @@ class GetUsernameView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        user = request.user
         username = request.user.username
-        return Response({"username": username})
+        serializer = UserSerializer(user, context={"request": request})
+        return Response(serializer.data)
 
 
 class VerifyTokenView(APIView):

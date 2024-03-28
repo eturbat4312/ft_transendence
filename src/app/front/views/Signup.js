@@ -90,26 +90,26 @@ export default class extends AbstractView {
         // event.preventDefault();
 
         const formData = new FormData();
+        event.preventDefault();
+
         for (let input of inputs) {
-            if (input.type === 'file') {
-                // If the input is a file input (avatar), append the file
-                formData.append(input.name, input.files[0]);
+            if (input.type === 'file' && input.files.length > 0) {
+                // If the input is a file input (avatar) and it has a file selected
+                formData.append(input.name, input.files[0], input.files[0].name);
             } else {
-                // For other inputs, append their values
                 formData.append(input.name, input.value);
             }
         }
-
         const searchParams = new URLSearchParams(formData);
         // console.log(searchParams.get("username"));
 
         try {
             const response = await fetch('http://' + serverIP + ':8000/register/', {
                 method: 'POST',
-                body: searchParams,
-                headers: {
-                    'Content-Type': 'application/x-www-form-urlencoded',
-                },
+                body: formData,
+                // headers: {
+                //     'Content-Type': 'application/x-www-form-urlencoded',
+                // },
             });
 
             if (!response.ok) {
