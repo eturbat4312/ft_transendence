@@ -209,6 +209,17 @@ class CheckTournamentView(APIView):
         except Exception as e:
             return Response({'error': str(e)}, status=400)
 
+class DeleteTournamentView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        try:
+            Tournament.objects.all().delete()
+            return Response({'message': 'Tournaments deleted successfully'}, status=200)
+        except Exception as e:
+            return Response({'error': str(e)}, status=500)
+
 class VerifyTokenView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]

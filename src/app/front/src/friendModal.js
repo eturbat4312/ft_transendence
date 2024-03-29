@@ -3,6 +3,15 @@ import { initPrivateGame } from "../views/Game.js";
 
 let connectedPlayers = [];
 
+
+export function removeDisconnectedPlayer(playerName) {
+    connectedPlayers = connectedPlayers.filter(player => player.name !== playerName);
+    const playerElementToRemove = document.querySelector(`.player-item[data-name="${playerName}"]`);
+    if (playerElementToRemove) {
+        playerElementToRemove.remove();
+    }
+}
+
 function updateplayerModal(websocket) {
     const playerList = document.getElementById("player-list");
 
@@ -159,14 +168,6 @@ function closeToast() {
     toast.remove();
 }
 
-export function removeDisconnectedPlayer(playerName) {
-    connectedPlayers = connectedPlayers.filter(player => player.name !== playerName);
-    const playerElementToRemove = document.querySelector(`.player-item[data-name="${playerName}"]`);
-    if (playerElementToRemove) {
-        playerElementToRemove.remove();
-    }
-}
-
 export function showToast(message, websocket) {
     const toastContainer = document.getElementById('toast-container');
     const toast = document.createElement('div');
@@ -209,7 +210,6 @@ async function fetchFriendRequests() {
         }
 
         const data = await response.json();
-        console.log(data);
         return data;
     } catch (error) {
         console.error('Error fetching friend requests:', error);

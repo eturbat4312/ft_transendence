@@ -2,7 +2,7 @@ from django.urls import path, include, re_path
 from . import views
 from .views import LoginView, LogoutView, GetUsernameView, GetUserIdView, GetUsernameFromIdView, VerifyTokenView
 from .views import SendFriendRequestView, FriendRequestsView, RespondFriendRequestView, GetFriendsView, RemoveFriendView
-from .views import GetMessageHistoryView, SendMessageView, CreateTournamentView, CheckTournamentView
+from .views import GetMessageHistoryView, SendMessageView, CreateTournamentView, CheckTournamentView, DeleteTournamentView
 from rest_framework.routers import DefaultRouter
 
 # from .views import UserViewSet
@@ -29,4 +29,5 @@ urlpatterns = [
     path('api/send_message/<int:receiver_id>/', SendMessageView.as_view(), name='send-message'),
     path('api/create_tournament/', CreateTournamentView.as_view(), name='create-tournament'),
     path('api/check_tournament/', CheckTournamentView.as_view(), name='check-tournament'),
+    path('api/delete_tournament/', DeleteTournamentView.as_view(), name='delete-tournament'),
 ]

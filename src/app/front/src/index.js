@@ -1,5 +1,5 @@
 import { getNav, getSocial, getChat, handleLogout } from '../views/utils.js';
-import { addTournamentEventListeners, tournamentCreated, checkTournamentExists } from '../views/Tournament.js';
+import { eventDelete, addTournamentEventListeners, tournamentCreated, checkTournamentExists } from '../views/Tournament.js';
 import { addGameEventListeners, initPrivateGame } from '../views/Game.js';
 import { addChatEventListeners } from './utils.js';
 import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, showGameInvitationNotification, updateFriendRequestsModal, getFriends, fetchUsernameFromId } from './friendModal.js';
@@ -70,6 +70,9 @@ const loadView = async (path) => {
                 viewInstance.initialize();
                 if (path === '/game') {
                     addGameEventListeners();
+                }
+                if (path === '/tournament') {
+                    eventDelete();
                 }
                 if (!requiresAuthentication) {
                     addNavEventListeners();
@@ -159,29 +162,6 @@ const checkIfConnected = async () => {
     websocket.onclose = function(event) {
         console.log('Connect WebSocket closed');
     }
-    const isTournament = await checkTournamentExists();
-    console.log(isTournament + ": " + window.location);
-    if (isTournament && location.pathname === "/tournament") {
-        console.log("/tournamenttttt");
-        tournamentCreated(isTournament);
-    } else if (isTournament && location.pathname != "/tournament") {
-        const tournament = document.getElementById("tournament");
-        tournament.addEventListener('click', () => {
-            setTimeout(() => {
-                tournamentCreated(isTournament);
-            }, 100);
-        });
-    }
-    if (document.getElementById("start-tournament"))
-        addTournamentEventListeners(websocket);
-    const tournament = document.getElementById("tournament");
-    tournament.addEventListener('click', () => {
-        setTimeout(() => {
-            if (isTournament)
-                tournamentCreated(isTournament)
-            else addTournamentEventListeners(websocket);
-        }, 100);
-    });
     websocket.onmessage = function(event) {
         const data = JSON.parse(event.data);
             if (data.action === 'error') {
@@ -223,20 +203,40 @@ const checkIfConnected = async () => {
                 console.log("refuse");
             }
             if (data.action === "start_tournament" && username != data.username) {
-                const creatorUsername = fetchUsernameFromId(data.username);
-                showToast(creatorUsername + " started a tournament ! Go on tournament page if you want to join");
+                showToast(data.username + " started a tournament ! Go on tournament page if you want to join");
                 if (document.getElementById("start-tournament")) {
-                    tournamentCreated(creatorUsername);
+                    tournamentCreated(data.username);
                 }
                 const tournament = document.getElementById("tournament");
                 tournament.addEventListener('click', () => {
                     setTimeout(() => {
-                        tournamentCreated(creatorUsername);
+                        console.log("happen after tournament button in nav");
+                        tournamentCreated(data.username);
                     }, 100);
                 });
             }
     }
-
+    const isTournament = await checkTournamentExists();
+    if (isTournament && location.pathname === "/tournament") {
+        tournamentCreated(isTournament);
+    }// else if (isTournament && location.pathname != "/tournament") {
+    //     const tournament = document.getElementById("tournament");
+    //     tournament.addEventListener('click', () => {
+    //         setTimeout(() => {
+    //             tournamentCreated(isTournament);
+    //         }, 100);
+    //     });
+    // }
+    if (document.getElementById("start-tournament"))
+        addTournamentEventListeners(websocket);
+    const tournament = document.getElementById("tournament");
+    tournament.addEventListener('click', () => {
+        setTimeout(() => {
+            if (isTournament)
+                tournamentCreated(isTournament)
+            else addTournamentEventListeners(websocket);
+        }, 100);
+    });
     websocket.onerror = function(event) {
         console.error('Erreur WebSocket:', event);
     }

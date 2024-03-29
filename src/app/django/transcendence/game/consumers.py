@@ -187,3 +187,86 @@ class MatchmakingConsumer(AsyncWebsocketConsumer):
             await self.channel_layer.group_add(game_group_name, self.channel_name)
         else:
             logging.error("Aucun game_id trouvé dans l'événement match_found.")
+
+class TournamentConsumer(AsyncWebsocketConsumer):
+    tournament_users = {}
+    username = None
+    user_id = None
+
+    async def connect(self):
+        if len(self.tournament_users) >= 4:
+            await self.accept()
+            await self.send(text_data=json.dumps({
+                    'action': 'tournament_full',
+                }))
+            await self.close()
+        else:
+            await self.accept()
+            await self.send(text_data=json.dumps({
+                    'action': 'not_full',
+                }))
+            for existing_user_id, user_info in self.tournament_users.items():
+            #  if existing_user_id != self.user_id:
+                await self.send(text_data=json.dumps({
+                    'action': 'player_list',
+                    'username': user_info['username'],
+                    'userId': existing_user_id,
+                }))
+
+    async def disconnect(self, close_code):
+        if self.username:
+            print(self.username + " disconnected")
+            del self.tournament_users[self.user_id]
+            await self.channel_layer.group_discard("tournament_users", self.channel_name)
+            await self.channel_layer.group_send(
+                "tournament_users",
+                {
+                    'type': 'tournament_leave',
+                    'username': self.username,
+                }
+            )
+
+    async def receive(self, text_data):
+        text_data_json = json.loads(text_data)
+        action = text_data_json['action']
+
+        if action == 'join':
+            self.username = text_data_json['username']
+            self.user_id = text_data_json['userId']
+            await self.channel_layer.group_add("tournament_users", self.channel_name)
+            self.tournament_users[self.user_id] = {'username': self.username}
+            await self.channel_layer.group_send(
+                "tournament_users",
+                {
+                    'type': 'tournament_join',
+                    'username': self.username,
+                    'userId': self.user_id,
+                }
+            )
+            if len(self.tournament_users) == 4:
+                await self.channel_layer.group_send(
+                "tournament_users",
+                {
+                    'type': 'tournament_ready',
+                }
+            )
+
+
+    async def tournament_join(self, event):
+       # if self.username != event["username"]:
+            await self.send(text_data=json.dumps({
+                "username": event["username"],
+                "action": "player_list",
+                "userId": event["userId"],
+            }))
+    
+    async def tournament_leave(self, event):
+        await self.send(text_data=json.dumps({
+            "username": event["username"],
+            "action": "leave",
+        }))
+
+    async def tournament_ready(self, event):
+        await self.send(text_data=json.dumps({
+            "action": "ready",
+        }))

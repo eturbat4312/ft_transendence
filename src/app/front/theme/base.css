@@ -211,3 +211,17 @@
  .friend-request {
    margin-top: 5px;
  }
+
+ .queue-container {
+   display: flex;
+}
+
+.player-slot {
+   width: 150px; /* Largeur du rectangle */
+   height: 50px; /* Hauteur du rectangle */
+   border: 2px solid #333; /* Bordure */
+   margin-right: 20px; /* Marge entre les rectangles */
+   display: flex; /* Pour aligner le texte au centre */
+   align-items: center; /* Pour aligner le texte au centre */
+   justify-content: center; /* Pour aligner le texte au centre */
+}
