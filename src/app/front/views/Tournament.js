@@ -6,11 +6,13 @@ export default class Tournament extends AbstractView {
         this.setTitle("Tournament");
         this.websocketT = null;
         this.websocketG = null;
-        this.player1 = null;
-        this.player2 = null;
-        this.player3 = null;
-        this.player4 = null;
-        this.players = 0;
+        this.tournamentMaster = null;
+        this.players = {
+            player1: false,
+            player2: false,
+            player3: false,
+            player4: false
+        };
     }
 
     async getHtml() {
@@ -44,28 +46,84 @@ export default class Tournament extends AbstractView {
             </div>
         </div>
     </div>
+    <div id="game" class="container-fluid centered d-none">
+        <div class="game-container">
+           <div id="center-line"></div>
+           <div class="ball"></div>
+           <div class="paddle" id="paddle1"></div>
+           <div class="paddle" id="paddle2"></div>
+           <div id="countdown" class="countdown-display" style="display: none;"></div>
+           <div id="score">
+              <span id="player1-score" class="score">0</span>
+              <div id="player1-name" class="d-none"></div>
+              <span id="player2-score" class="score">0</span>
+              <div id="player2-name" class="d-none"></div>
+            </div>
+            <button id="ready-player-one" class="btn btn-secondary d-none">Ready</button>
+            <button id="ready-player-two" class="btn btn-secondary d-none">Ready</button>
+           <div class="end-game-container">
+                <div id="winner"></div>
+            </div>  
+        </div>   
+     </div>
         `;
     }
 
+    assignPlayer(i) {
+        i++;
+        let playerKey = "player" + i;
+        this.players[playerKey] = true;
+        if (i < 4) {
+            i++;
+            playerKey = "player" + i;
+            this.players[playerKey] = false;
+        }
+    }
+
     addPlayerToHTML(playerName, playerId) {
+        const username = localStorage.getItem("username");
         const playerSlot = document.querySelectorAll(".player-slot");
         for (let i = 0; i < playerSlot.length; i++) {
             if (!playerSlot[i].textContent) {
                 playerSlot[i].textContent = playerName;
                 playerSlot[i].dataset.name = playerName;
                 playerSlot[i].dataset.id = playerId;
+                if (playerName === username)
+                    this.assignPlayer(i);
                 break;
             }
         }
     }
 
     removeDisconnectedPlayer(playerName) {
-        const playerElementToRemove = document.querySelector(`.player-slot[data-name="${playerName}"]`);
-        if (playerElementToRemove) {
-            playerElementToRemove.textContent = null;
-            playerElementToRemove.dataset.name = null;
-            playerElementToRemove.dataset.id = null;
+        const playerElements = document.querySelectorAll(".player-slot");
+        const username = localStorage.getItem("username");
+        let playerIndex = -1;
+        
+        for (let i = 0; i < playerElements.length; i++) {
+            if (playerElements[i].textContent === playerName) {
+                playerIndex = i;
+                break;
+            }
         }
+    
+        if (playerIndex !== -1) {
+            playerElements[playerIndex].textContent = null;
+            playerElements[playerIndex].dataset.name = null;
+            playerElements[playerIndex].dataset.id = null;
+            for (let i = playerIndex + 1; i < playerElements.length; i++) {
+                playerElements[i - 1].textContent = playerElements[i].textContent;
+                playerElements[i - 1].dataset.name = playerElements[i].dataset.name;
+                playerElements[i - 1].dataset.id = playerElements[i].dataset.id;
+                if (playerElements[i - 1].dataset.name === username)
+                    this.assignPlayer(i - 1);
+            }
+            const lastIndex = playerElements.length - 1;
+            playerElements[lastIndex].textContent = null;
+            playerElements[lastIndex].dataset.name = null;
+            playerElements[lastIndex].dataset.id = null;
+        }
+        console.log(this.players);
     }
 
     initTournament(bool) {
@@ -80,21 +138,61 @@ export default class Tournament extends AbstractView {
         spinnerContainer.classList.remove("d-none");
         playerQueue.classList.remove("d-none");
         if (!bool) {
-            this.player1 = true;
+            this.tournamentMaster = true;
             this.enterTournament();
+        }
+    }
+
+    sendStartMessage() {
+        const message = JSON.stringify({ action: "start_tournament"});
+        this.websocketT.send(message);
+    }
+
+    sendReadyMessage() {
+        const message = JSON.stringify({ action: "game_ready"});
+        this.websocketT.send(message);
+    }
+
+    startTournament() {
+        const tournamentContainer = document.getElementById("tournament-container");
+        tournamentContainer.classList.add("d-none");
+        const gameContainer = document.getElementById("game");
+        gameContainer.classList.remove("d-none");
+        const player1Name = document.getElementById("player1").dataset.name;
+        const player2Name = document.getElementById("player2").dataset.name;
+        const player1Display = document.getElementById("player1-name");
+        const player2Display = document.getElementById("player2-name");
+        player1Display.textContent = player1Name;
+        player2Display.textContent = player2Name;
+        player1Display.classList.remove("d-none");
+        player2Display.classList.remove("d-none");
+        if (this.players['player1']) {
+            const ready1 = document.getElementById("ready-player-one");
+            ready1.classList.remove("d-none");
+            ready1.addEventListener('click', () => { this.sendReadyMessage(); });
+        } else if (this.players['player2']) {
+            const ready2 = document.getElementById("ready-player-two");
+            ready2.classList.remove("d-none");
+            ready2.addEventListener('click', () => { this.sendReadyMessage(); });
         }
     }
 
     readyTournament() {
         const button = document.getElementById("queue-btn");
-        if (this.player1)
-            button.disabled = false;
         button.classList.add("btn-success");
         const spinner = document.getElementById("queue-spinner");
         spinner.classList.remove('spinner-border');
         spinner.classList.remove('spinner-border-sm');
         const btnText = document.getElementById("queue-btn-text");
         btnText.textContent = 'Start the tournament';
+        if (this.tournamentMaster) {
+            button.disabled = false;
+            button.addEventListener('click', () => { this.sendStartMessage(); });
+        }
+    }
+
+    gameReady() {
+        console.log("FONCTIONNE");
     }
 
     enterTournament() {
@@ -131,6 +229,12 @@ export default class Tournament extends AbstractView {
                 }
                 if (data.action === "ready") {
                     self.readyTournament();
+                }
+                if (data.action === "start_tournament") {
+                    self.startTournament();
+                }
+                if (data.action === "game_ready") {
+                    self.gameReady();
                 }
             };
             const checkPageChange = () => {

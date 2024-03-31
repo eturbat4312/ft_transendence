@@ -250,6 +250,20 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     'type': 'tournament_ready',
                 }
             )
+        elif action == 'start_tournament':
+                await self.channel_layer.group_send(
+                "tournament_users",
+                {
+                    'type': 'start_tournament',
+                }
+            )
+        elif action == 'game_ready':
+                await self.channel_layer.group_send(
+                "tournament_users",
+                {
+                    'type': 'game_ready',
+                }
+            )
 
 
     async def tournament_join(self, event):
@@ -269,4 +283,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def tournament_ready(self, event):
         await self.send(text_data=json.dumps({
             "action": "ready",
+        }))
+    
+    async def start_tournament(self, event):
+        await self.send(text_data=json.dumps({
+            "action": "start_tournament",
+        }))
+
+    async def game_ready(self, event):
+        await self.send(text_data=json.dumps({
+            "action": "game_ready",
         }))
