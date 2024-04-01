@@ -25,6 +25,7 @@ urlpatterns = [
     path("api/get_username/", GetUsernameView.as_view(), name="get-username"),
     path("save_game_result/", save_game_result, name="save-game-result"),
     path("", include(router.urls)),
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

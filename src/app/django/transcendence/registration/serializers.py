@@ -2,16 +2,24 @@ from rest_framework import serializers
 from .models import User
 
 
-class RegisterSerializer(serializers.Serializer):
-    id = serializers.IntegerField(read_only=True)
-    username = serializers.CharField(max_length=150)
-    # email = serializers.EmailField()
+
+
+
+class RegisterSerializer(serializers.ModelSerializer):
+    print("create function serializer")
     password = serializers.CharField(write_only=True)
-    avatar = serializers.ImageField(required=False)
+    avatar = serializers.ImageField(required=False, allow_null=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'password', 'avatar']
 
     def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
+        print("create function serializer !!!")
+        avatar = validated_data.pop('avatar', 'default.png')  # Default avatar if not provided
+        user = User.objects.create_user(avatar=avatar, **validated_data)
         return user
+
 
 
 class LoginSerializer(serializers.ModelSerializer):
