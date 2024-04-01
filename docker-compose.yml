@@ -13,6 +13,8 @@ services:
             - "8080:8080"
         volumes:
             - ./src/app/front:/app/front
+        depends_on:
+            - nginx
         networks:
             - transcendence
     nginx:
@@ -56,7 +58,5 @@ services:
             - ./src/app/db:/var/lib/postgresql/data
         env_file:
             - .env
-        depends_on:
-            - front
         networks:
             - transcendence
