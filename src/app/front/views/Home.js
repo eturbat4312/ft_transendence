@@ -12,7 +12,7 @@ export default class extends AbstractView {
             <div class="card bg-dark text-light mx-auto" style="max-width: 800px;">
                 <button id="token">TOKEN</button>
                 <div id="username"></div>
-                <img id="avatar" src="" alt="Avatar" style="max-width: 200px;">
+                <img id="avatar" src="" alt="Avatar" style="max-width: 100px;">
                 <a href="/game" id="play">Play</a>
             </div>
         </div>
@@ -47,9 +47,12 @@ export default class extends AbstractView {
 
                 // Check if avatar URL is present in the response data
                 const avatarUrl = data.avatar;
+                // const fullUrl = 'http://localhost:8000' + avatarUrl;
                 if (avatarUrl) {
                     console.log("avatarUrl found");
-                    document.getElementById('avatar').src = avatarUrl;
+                    // document.getElementById('avatar').src = 'http://' + serverIP + ':8000${avatarUrl}';
+                    document.getElementById('avatar').src = `http://${serverIP}:8000${avatarUrl}`;
+
                 } else {
                     console.log('Avatar URL not found');
                 }
