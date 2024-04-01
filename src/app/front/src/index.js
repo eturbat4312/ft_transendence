@@ -17,7 +17,6 @@ const routes = [
     { path: "/game", view: "Game" },
     { path: "/tournament", view: "Tournament" },
     { path: "/about", view: "About" },
-    { path: "/profile", view: "Profile" },
     { path: "/settings", view: "Settings" },
     { path: "/already-connected", view: "AlreadyConnected"}
 ];
@@ -43,7 +42,7 @@ const isAuthenticated = async () => {
     }
 };
 
-const viewsNotRequiringAuthentication = ['Welcome', 'Login', 'Signup']; 
+const viewsNotRequiringAuthentication = ['Welcome', 'Login', 'Signup'];
 
 const viewRequiresAuthentication = (view) => {
     return !viewsNotRequiringAuthentication.includes(view);
@@ -64,7 +63,7 @@ const loadView = async (path) => {
     if (view) {
         import(`../views/${view}.js`).then(module => {
             const View = module.default;
-            const viewInstance = new View(); 
+            const viewInstance = new View();
             viewInstance.getHtml().then(html => {
                 document.querySelector('#app').innerHTML = html;
                 viewInstance.initialize();
@@ -85,7 +84,7 @@ const loadView = async (path) => {
     } else {
         import(`../views/NotFound.js`).then(module => {
             const View = module.default;
-            const viewInstance = new View(); 
+            const viewInstance = new View();
             viewInstance.getHtml().then(html => {
                 document.querySelector('#app').innerHTML = html;
                 viewInstance.initialize();
@@ -164,57 +163,57 @@ const checkIfConnected = async () => {
     }
     websocket.onmessage = function(event) {
         const data = JSON.parse(event.data);
-            if (data.action === 'error') {
-                window.location = "/already-connected";
-                websocket.close();
+        if (data.action === 'error') {
+            window.location = "/already-connected";
+            websocket.close();
+        }
+        if (data.action === "connected") {
+            console.log(data.username, " is online !");
+            updateConnectedPlayer(data.username, data.userId, true, websocket);
+            //console.log("username: ", data.username, " userid: ", data.userId);
+            // const message = JSON.stringify({ action: 'connected_player', username: username });
+            // websocket.send(message);
+        }
+        if (data.action === "disconnected") {
+            console.log(data.username, " is offline !");
+            removeDisconnectedPlayer(data.username);
+            getFriends(websocket);
+        }
+        if (data.action === "friend_request" && data.to_user_id === userId) {
+            showToast(data.username + " sent you a friend request !", websocket);
+            console.log(data.username, " sent you a friend request");
+        }
+        if (data.action === "update_friends" && data.to_user_id === userId) {
+            getFriends(websocket);
+        }
+        if (data.action === "invite_play" && data.to_user_id === userId) {
+            showGameInvitationNotification(data.user_id, websocket);
+        }
+        if (data.action === "invite_play" && data.user_id === userId) {
+            showToast(data.to_user_id + " has received your invitation", websocket);
+        }
+        if (data.action === "accept_invite" && data.user_id === userId) {
+            const prvBtn = document.getElementById('btn-start-private');
+            prvBtn.disabled = false;
+            console.log("test");
+            prvBtn.addEventListener('click', () => { initPrivateGame(userId, data.inv_user_id) });
+        }
+        if (data.action === "refuse_invite" && data.user_id === userId) {
+            console.log("refuse");
+        }
+        if (data.action === "start_tournament" && username != data.username) {
+            showToast(data.username + " started a tournament ! Go on tournament page if you want to join");
+            if (document.getElementById("start-tournament")) {
+                tournamentCreated(data.username);
             }
-            if (data.action === "connected") {
-                console.log(data.username, " is online !");
-                updateConnectedPlayer(data.username, data.userId, true, websocket);
-                //console.log("username: ", data.username, " userid: ", data.userId);
-                // const message = JSON.stringify({ action: 'connected_player', username: username });
-                // websocket.send(message);
-            }
-            if (data.action === "disconnected") {
-                console.log(data.username, " is offline !");
-                removeDisconnectedPlayer(data.username);
-                getFriends(websocket);
-            }
-            if (data.action === "friend_request" && data.to_user_id === userId) {
-                showToast(data.username + " sent you a friend request !", websocket);
-                console.log(data.username, " sent you a friend request");
-            }
-            if (data.action === "update_friends" && data.to_user_id === userId) {
-                getFriends(websocket);
-            }
-            if (data.action === "invite_play" && data.to_user_id === userId) {
-                showGameInvitationNotification(data.user_id, websocket);
-            }
-            if (data.action === "invite_play" && data.user_id === userId) {
-                showToast(data.to_user_id + " has received your invitation", websocket);
-            }
-            if (data.action === "accept_invite" && data.user_id === userId) {
-                const prvBtn = document.getElementById('btn-start-private');
-                prvBtn.disabled = false;
-                console.log("test");
-                prvBtn.addEventListener('click', () => { initPrivateGame(userId, data.inv_user_id) });
-            }
-            if (data.action === "refuse_invite" && data.user_id === userId) {
-                console.log("refuse");
-            }
-            if (data.action === "start_tournament" && username != data.username) {
-                showToast(data.username + " started a tournament ! Go on tournament page if you want to join");
-                if (document.getElementById("start-tournament")) {
+            const tournament = document.getElementById("tournament");
+            tournament.addEventListener('click', () => {
+                setTimeout(() => {
+                    console.log("happen after tournament button in nav");
                     tournamentCreated(data.username);
-                }
-                const tournament = document.getElementById("tournament");
-                tournament.addEventListener('click', () => {
-                    setTimeout(() => {
-                        console.log("happen after tournament button in nav");
-                        tournamentCreated(data.username);
-                    }, 100);
-                });
-            }
+                }, 100);
+            });
+        }
     }
     const isTournament = await checkTournamentExists();
     if (isTournament && location.pathname === "/tournament") {

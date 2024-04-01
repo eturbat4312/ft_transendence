@@ -1,4 +1,37 @@
+const getProfilePicUrl = async () => {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+
+    try {
+        const response = await fetch(`https://${serverIP}/api/get_profile_pic/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Token ' + token
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            return data.profile_pic_url;
+        } else {
+            console.log('Failed to get profile pic:', await response.text());
+            return null;
+        }
+
+    } catch (error) {
+        console.log('Error:', error);
+        return null;
+    }
+};
+
+
 const getNav = async () => {
+    const profilePicUrl = await getProfilePicUrl();
+    const profilePic = profilePicUrl ? `<img src="${profilePicUrl}" alt="Profile pic" class="rounded-circle" style="width: 30px; height: 30px;">` : 'PP';
         return `
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="z-index: 3;">
             <div class="container-fluid">
@@ -24,10 +57,10 @@ const getNav = async () => {
                     <ul class="navbar-nav col-lg-3 justify-content-lg-end">
                         <li class="nav-item dropdown">
                             <a class="dropdown-toggle nav-link" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                            PP
+                             ${profilePic}
                             </a>
                             <ul class="dropdown-menu" style>
-                            <li><a href="/profile" class="nav__link dropdown-item" data-link>View my profile</a></li>
+                            <li><a href="/home" class="nav__link dropdown-item" data-link>View my Profile </a></li>
                             <li><a href="/settings" class="nav__link dropdown-item" data-link>Settings</a></li>
                             <li><a href="#" id="logout" class="dropdown-item" data-link>Logout</a></li>
                             </ul>
