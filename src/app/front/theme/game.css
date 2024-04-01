@@ -232,7 +232,7 @@ body {
     color: #fff;
     text-align: center;
     top: calc(100% + 10px);
-    left: 65px;
+    right: 65px;
 }
 
 #player2-name {
@@ -242,5 +242,5 @@ body {
     color: #fff;
     text-align: center;
     top: calc(100% + 10px);
-    right: 65px;
+    left: 65px;
 }

@@ -262,6 +262,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                 "tournament_users",
                 {
                     'type': 'game_ready',
+                    'player': text_data_json['player'],
                 }
             )
 
@@ -293,4 +294,5 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def game_ready(self, event):
         await self.send(text_data=json.dumps({
             "action": "game_ready",
+            "player": event["player"],
         }))

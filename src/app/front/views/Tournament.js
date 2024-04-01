@@ -1,12 +1,15 @@
 import AbstractView from "./AbstractView.js";
+import { startTournamentGame } from "./Game.js";
 
 export default class Tournament extends AbstractView {
     constructor(params) {
         super(params);
         this.setTitle("Tournament");
         this.websocketT = null;
-        this.websocketG = null;
         this.tournamentMaster = null;
+        this.playing = false;
+        this.ready1 = false;
+        this.ready2 = false;
         this.players = {
             player1: false,
             player2: false,
@@ -123,7 +126,6 @@ export default class Tournament extends AbstractView {
             playerElements[lastIndex].dataset.name = null;
             playerElements[lastIndex].dataset.id = null;
         }
-        console.log(this.players);
     }
 
     initTournament(bool) {
@@ -148,9 +150,35 @@ export default class Tournament extends AbstractView {
         this.websocketT.send(message);
     }
 
-    sendReadyMessage() {
-        const message = JSON.stringify({ action: "game_ready"});
+    sendReadyMessage(player) {
+        let message = null;
+        console.log('player: ' + player);
+        if (player === 1)
+            message = JSON.stringify({ action: "game_ready", player: "1"});
+        else if (player === 2)
+            message = JSON.stringify({ action: "game_ready", player: "2"});
+        console.log(message);
         this.websocketT.send(message);
+    }
+
+    initFirstGame() {
+        if (this.players['player1']) {
+            this.playing = true;
+            const ready1 = document.getElementById("ready-player-one");
+            ready1.classList.remove("d-none");
+            ready1.addEventListener('click', () => { 
+                ready1.disabled = true;
+                this.sendReadyMessage(1);
+            });
+        } else if (this.players['player2']) {
+            this.playing = true;
+            const ready2 = document.getElementById("ready-player-two");
+            ready2.classList.remove("d-none");
+            ready2.addEventListener('click', () => { 
+                ready2.disabled = true;
+                this.sendReadyMessage(2);
+            });
+        }
     }
 
     startTournament() {
@@ -166,15 +194,7 @@ export default class Tournament extends AbstractView {
         player2Display.textContent = player2Name;
         player1Display.classList.remove("d-none");
         player2Display.classList.remove("d-none");
-        if (this.players['player1']) {
-            const ready1 = document.getElementById("ready-player-one");
-            ready1.classList.remove("d-none");
-            ready1.addEventListener('click', () => { this.sendReadyMessage(); });
-        } else if (this.players['player2']) {
-            const ready2 = document.getElementById("ready-player-two");
-            ready2.classList.remove("d-none");
-            ready2.addEventListener('click', () => { this.sendReadyMessage(); });
-        }
+        this.initFirstGame();
     }
 
     readyTournament() {
@@ -191,8 +211,26 @@ export default class Tournament extends AbstractView {
         }
     }
 
-    gameReady() {
-        console.log("FONCTIONNE");
+    getGameId() {
+        const player1Id = document.getElementById("player1").dataset.id;
+        const player2Id = document.getElementById("player2").dataset.id;
+        const smallerId = Math.min(player1Id, player2Id);
+        const largerId = Math.max(player1Id, player2Id);
+        const gameId = `${smallerId}${largerId}`;
+        console.log("getGameId: " + gameId);
+        return (gameId);
+    }
+
+    gameReady(playerData) {
+        console.log("game is ready to start");
+        if (playerData === "1")
+            this.ready1 = true;
+        if (playerData === "2")
+            this.ready2 = true;
+        if (this.ready1 && this.ready2 && this.players["player1"])
+            startTournamentGame(this.playing, true, this.getGameId());
+        else if (this.ready1 && this.ready2 && !this.players["player1"])
+            startTournamentGame(this.playing, false, this.getGameId());
     }
 
     enterTournament() {
@@ -234,7 +272,7 @@ export default class Tournament extends AbstractView {
                     self.startTournament();
                 }
                 if (data.action === "game_ready") {
-                    self.gameReady();
+                    self.gameReady(data.player);
                 }
             };
             const checkPageChange = () => {

@@ -1,5 +1,4 @@
 import AbstractView from "./AbstractView.js";
-import { serverIP } from "../src/index.js";
 
 export default class Game extends AbstractView {
     constructor(params) {
@@ -24,6 +23,8 @@ export default class Game extends AbstractView {
         this.isMaster = false;
         this.player1 = false;
         this.player2 = false;
+        this.spectator = false;
+        this.tournament = false;
         this.playerDisconnected = false;
         this.keysPressed = {
             ArrowUp: false,
@@ -80,7 +81,11 @@ export default class Game extends AbstractView {
 	}
 
     gameLoop = () => {
-        const checkIfGamePage = document.getElementById("game");
+        let checkIfGamePage = null;
+        if (location.pathname === "/game")
+            checkIfGamePage = document.getElementById("game");
+        if (location.pathname === "/tournament")
+            checkIfGamePage = document.getElementById("tournament-container");
         if (!checkIfGamePage) {
             this.gameActive = false;
             if (!this.isOffline) {
@@ -92,18 +97,18 @@ export default class Game extends AbstractView {
         if (!this.isOffline && this.gameActive) {
             this.websocket.onmessage = (event) => {
                 const data = JSON.parse(event.data);
-                if (data.action === "update_ball_position" && this.player2) {
+                if (data.action === "update_ball_position" && (this.player2 || this.spectator)) {
                     this.updateBallPosition(data.ball_data);
                 }
                 if (data.action === "update_score") {
                     this.updateScore(data.score_data);
                 }
-                if (this.player1) {
+                if (this.player1 || this.spectator) {
                     if (data.action === "update_paddle2_position") {
                         this.updatePaddle2Position(data.paddle_data);
                     }
                 }
-                if (this.player2) {
+                if (this.player2 || this.spectator) {
                     if (data.action === "update_paddle1_position") {
                         this.updatePaddle1Position(data.paddle_data);
                     }
@@ -125,8 +130,10 @@ export default class Game extends AbstractView {
         this.gameActive = true;
         this.gameLoop();
         this.ball.style.display = "block";
-        document.getElementById("start-game").style.display = "none";
-        document.getElementById("btn-start-private").style.display = "none";
+        if (!this.tournament) {
+            document.getElementById("start-game").style.display = "none";
+            document.getElementById("btn-start-private").style.display = "none";
+        }
     };
 
     update = () => {
@@ -318,7 +325,7 @@ export default class Game extends AbstractView {
 
 		let counter = 3;
 		const counterInterval = setInterval( () => {
-            if (!document.getElementById("countdown") || !(document.getElementById("start-game").style.display === "none")) {
+            if (!document.getElementById("countdown")/* || !(document.getElementById("start-game").style.display === "none")*/) {
                 clearInterval(counterInterval);
                 return;
             }
@@ -342,10 +349,16 @@ export default class Game extends AbstractView {
             document.getElementById("winner").innerText = "Opponent disconnected...";
         }
         else if (this.player1Score > this.player2Score) {
-            document.getElementById("winner").innerText = "Player 1 wins!";
+            let player1Name = "Player 1";
+            if (tournament)
+                player1Name = document.getElementById("player1").dataset.name;
+            document.getElementById("winner").innerText = `${player1Name} wins!`;
         }
         else {
-            document.getElementById("winner").innerText = "Player 2 wins!";
+            let player2Name = "Player 2";
+            if (tournament)
+                player2Name = document.getElementById("player2").dataset.name;
+            document.getElementById("winner").innerText = `${player2Name} wins!`;
         }
        // saveScore(player1Score, player2Score);
         this.gameActive = false;
@@ -354,9 +367,11 @@ export default class Game extends AbstractView {
             this.websocket.close();
         }
         this.websocket = null;
-        const resetButton = document.querySelector(".btn-reset");
-        resetButton.style.display = "block";
-        resetButton.addEventListener("click", this.resetGame);
+        if (!this.tournament) {
+            const resetButton = document.querySelector(".btn-reset");
+            resetButton.style.display = "block";
+            resetButton.addEventListener("click", this.resetGame);
+        }
     }
 
     resetGame = () => {
@@ -380,10 +395,12 @@ export default class Game extends AbstractView {
         this.scoreDisplay1.innerText = "0";
         this.scoreDisplay2.innerText = "0";
         document.getElementById("winner").innerText = "";
-        document.getElementById("start-game").style.display = "block";
-        document.getElementById("btn-start-private").style.display = "block";
         document.getElementById("countdown").style.display = "none";
-        document.querySelector(".btn-reset").style.display = "none";
+        if (!this.tournament) {
+            document.getElementById("start-game").style.display = "block";
+            document.getElementById("btn-start-private").style.display = "block";
+            document.querySelector(".btn-reset").style.display = "none";
+        }
     };
 
     handleKeyDown = (event) => {
@@ -523,6 +540,60 @@ export default class Game extends AbstractView {
             console.log("WebSocket connection is already open.");
         }
     }
+
+    initTournament(playing, gameMaster) {
+        this.tournament = true;
+        if (!playing) {
+            this.spectator = true;
+            return;
+        }
+        if (gameMaster) {
+            document.getElementById("ready-player-one").classList.add("d-none");
+            this.isMaster = true;
+            this.player1 = true;
+        } else {
+            document.getElementById("ready-player-two").classList.add("d-none");
+            this.player2 = true;
+        }
+    }
+
+    startTournament(playing, gameMaster, gameId) {
+        this.initTournament(playing, gameMaster);
+
+        const serverIP = window.location.hostname;
+        if (this.websocket === null || this.websocket.readyState !== WebSocket.OPEN) {
+            this.websocket = new WebSocket(`wss://${serverIP}/api/ws/game/`);
+            this.websocket.onopen = () => {
+                console.log("Tournament Game WebSocket connection established");
+                this.websocket.send(JSON.stringify({ action: "start_game", game_id: gameId }));
+                this.startGame(); 
+            }
+            const self = this;
+            this.websocket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+            }
+            const checkPageChange = () => {
+                if (!document.getElementById("tournament-container")) {
+                    console.log("change page");
+                    this.websocket.close();
+                    this.websocket = null;
+                    clearInterval(intervalId);
+                }
+            }
+            const intervalId = setInterval(checkPageChange, 1000);
+
+            this.websocket.onclose = (event) => {
+                console.log("Private WebSocket connection closed", event);
+                clearInterval(intervalId); 
+            };
+            this.websocket.onerror = (error) => {
+                console.error("WebSocket error:", error);
+                clearInterval(intervalId);
+            };
+        } else {
+            console.log("WebSocket connection is already open.");
+        }
+    }
 }
 
 export function addGameEventListeners() {
@@ -550,4 +621,9 @@ export function initPrivateGame(userId, opponentUserId) {
     else GM = false;
     console.log(GM);
     gameView.startPrivateGame(userId, opponentUserId, gameId, GM);
+}
+
+export function startTournamentGame(playing, gameMaster, gameId) {
+    const gameView = new Game();
+    gameView.startTournament(playing, gameMaster, gameId);
 }
