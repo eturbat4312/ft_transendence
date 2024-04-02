@@ -10,6 +10,10 @@ export default class Tournament extends AbstractView {
         this.playing = false;
         this.ready1 = false;
         this.ready2 = false;
+        this.round = 1;
+        this.demiwinner = false;
+        this.round1winner = null;
+        this.round2winner = null;
         this.players = {
             player1: false,
             player2: false,
@@ -28,7 +32,7 @@ export default class Tournament extends AbstractView {
             </div>
             <div class="card-body">
                 <div class="text-center mb-4">
-                    <h4>Choose Tournament Type</h4>
+                    <h4 id="tournament-message">Choose Tournament Type</h4>
                     <div id="btn-group" class="container" aria-label="Tournament Type">
                         <button id="start-tournament" type="button" class="btn btn-primary btn-4players">Start 4 Players Tournament</button>
                     </div>
@@ -181,20 +185,86 @@ export default class Tournament extends AbstractView {
         }
     }
 
+    initSecondGame() {
+        console.log("initSecondGame");
+        if (this.players['player3']) {
+            this.playing = true;
+            const ready1 = document.getElementById("ready-player-one");
+            ready1.classList.remove("d-none");
+            ready1.addEventListener('click', () => { 
+                ready1.disabled = true;
+                this.sendReadyMessage(1);
+            });
+        } else if (this.players['player4']) {
+            this.playing = true;
+            const ready2 = document.getElementById("ready-player-two");
+            ready2.classList.remove("d-none");
+            ready2.addEventListener('click', () => { 
+                ready2.disabled = true;
+                this.sendReadyMessage(2);
+            });
+        }
+    }
+
+    initFinal() {
+        if (this.demiwinner && (this.players['player1'] || this.players['player2'])) {
+            this.playing = true;
+            const ready1 = document.getElementById("ready-player-one");
+            ready1.classList.remove("d-none");
+            ready1.addEventListener('click', () => { 
+                ready1.disabled = true;
+                this.sendReadyMessage(1);
+            });
+        } else if (this.demiwinner && (this.players['player3'] || this.players['player4'])) {
+            this.playing = true;
+            const ready2 = document.getElementById("ready-player-two");
+            ready2.classList.remove("d-none");
+            ready2.addEventListener('click', () => { 
+                ready2.disabled = true;
+                this.sendReadyMessage(2);
+            });
+        }
+    }
+
     startTournament() {
         const tournamentContainer = document.getElementById("tournament-container");
         tournamentContainer.classList.add("d-none");
         const gameContainer = document.getElementById("game");
         gameContainer.classList.remove("d-none");
-        const player1Name = document.getElementById("player1").dataset.name;
-        const player2Name = document.getElementById("player2").dataset.name;
-        const player1Display = document.getElementById("player1-name");
-        const player2Display = document.getElementById("player2-name");
-        player1Display.textContent = player1Name;
-        player2Display.textContent = player2Name;
-        player1Display.classList.remove("d-none");
-        player2Display.classList.remove("d-none");
-        this.initFirstGame();
+        console.log("round = " + this.round);
+        if (this.round === 1) {
+            const player1Name = document.getElementById("player1").dataset.name;
+            const player2Name = document.getElementById("player2").dataset.name;
+            const player1Display = document.getElementById("player1-name");
+            const player2Display = document.getElementById("player2-name");
+            player1Display.textContent = player1Name;
+            player2Display.textContent = player2Name;
+            player1Display.dataset.name = player1Name;
+            player2Display.dataset.name = player2Name;
+            player1Display.classList.remove("d-none");
+            player2Display.classList.remove("d-none");
+            this.initFirstGame();
+            console.log("startTournameny(initFirstGame)");
+        } else if (this.round === 2) {
+            console.log("startTournameny(initsecondeGame)");
+            const player1Name = document.getElementById("player3").dataset.name;
+            const player2Name = document.getElementById("player4").dataset.name;
+            const player1Display = document.getElementById("player1-name");
+            const player2Display = document.getElementById("player2-name");
+            player1Display.textContent = player1Name;
+            player2Display.textContent = player2Name;
+            player1Display.dataset.name = player1Name;
+            player2Display.dataset.name = player2Name;
+            this.initSecondGame();
+        } else if (this.round === 3) {
+            const player1Display = document.getElementById("player1-name");
+            const player2Display = document.getElementById("player2-name");
+            player1Display.textContent = this.round1winner;
+            player2Display.textContent = this.round2winner;
+            player1Display.dataset.name = this.round1winner;
+            player2Display.dataset.name = this.round2winner;
+            this.initFinal();
+        }
     }
 
     readyTournament() {
@@ -227,10 +297,76 @@ export default class Tournament extends AbstractView {
             this.ready1 = true;
         if (playerData === "2")
             this.ready2 = true;
-        if (this.ready1 && this.ready2 && this.players["player1"])
-            startTournamentGame(this.playing, true, this.getGameId());
-        else if (this.ready1 && this.ready2 && !this.players["player1"])
-            startTournamentGame(this.playing, false, this.getGameId());
+        if (this.round === 1) {
+            if (this.ready1 && this.ready2 && this.players["player1"])
+                startTournamentGame(this.playing, true, this.getGameId(), this.websocketT);
+            else if (this.ready1 && this.ready2 && !this.players["player1"])
+                startTournamentGame(this.playing, false, this.getGameId(), this.websocketT);
+        } else if (this.round === 2){
+            if (this.ready1 && this.ready2 && this.players["player3"])
+                startTournamentGame(this.playing, true, this.getGameId(), this.websocketT);
+            else if (this.ready1 && this.ready2 && !this.players["player3"])
+                startTournamentGame(this.playing, false, this.getGameId(), this.websocketT);
+        } else if (this.round === 3){
+            if (this.ready1 && this.ready2 && (this.players["player1"] || this.players["player2"]))
+                startTournamentGame(this.playing, true, this.getGameId(), this.websocketT);
+            else if (this.ready1 && this.ready2 && (!this.players["player1"] || !this.players["player2"]))
+                startTournamentGame(this.playing, false, this.getGameId(), this.websocketT);
+        }
+    }
+
+    strikeNames(winner) {
+        if (this.round === 2) {
+            const player1 = document.getElementById("player1");
+            const player2 = document.getElementById("player2");
+            if (player1.dataset.name === winner)
+                player2.classList.add("strike");
+            else
+                player1.classList.add("strike");
+        } else if (this.round === 3) {
+            const player3 = document.getElementById("player3");
+            const player4 = document.getElementById("player4");
+            if (player3.dataset.name === winner)
+                player4.classList.add("strike");
+            else
+                player3.classList.add("strike");
+        }
+    }
+
+    finishTournament(winner) {
+        document.getElementById("game").classList.add("d-none");
+        document.getElementById("player-queue").classList.add("d-none");
+        document.getElementById("spinner-container").classList.add("d-none");
+        const tournamentMessage = document.getElementById("tournament-message");
+        tournamentMessage.textContent = `${winner} is the tournament great winner !`;
+        document.getElementById("tournament-container").classList.remove("d-none");
+    }
+
+    printResults(winner) {
+        if (this.round === 3) {
+            this.finishTournament(winner);
+            return;
+        }
+        if (localStorage.getItem("username") === winner)
+            this.demiwinner = true;
+        this.playing = false;
+        this.ready1 = false;
+        this.ready2 = false;
+        this.round++;
+        document.getElementById("game").classList.add("d-none");
+        document.getElementById("tournament-container").classList.remove("d-none");
+        this.strikeNames(winner);
+        const btnText = document.getElementById("queue-btn-text");
+        const tournamentMessage = document.getElementById("tournament-message");
+        if (this.round === 2) {
+            this.round1winner = winner;
+            btnText.textContent = 'Start the second game';
+            tournamentMessage.textContent = `${winner} won the first round !`;
+        } else if (this.round === 3) {
+            this.round2winner = winner;
+            btnText.textContent = 'Start the FINAL !';
+            tournamentMessage.textContent = `${winner} won the second round !`;
+        }
     }
 
     enterTournament() {
@@ -273,6 +409,11 @@ export default class Tournament extends AbstractView {
                 }
                 if (data.action === "game_ready") {
                     self.gameReady(data.player);
+                }
+                if (data.action === "result") {
+                    setTimeout(() => {
+                        self.printResults(data.winner);
+                    }, 3000);
                 }
             };
             const checkPageChange = () => {

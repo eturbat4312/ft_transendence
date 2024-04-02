@@ -244,3 +244,7 @@ body {
     top: calc(100% + 10px);
     left: 65px;
 }
+
+.strike {
+    text-decoration: line-through;
+}

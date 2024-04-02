@@ -265,6 +265,14 @@ class TournamentConsumer(AsyncWebsocketConsumer):
                     'player': text_data_json['player'],
                 }
             )
+        elif action == 'result':
+            await self.channel_layer.group_send(
+                "tournament_users",
+                {
+                    'type': 'result',
+                    'winner': text_data_json['winner'],
+                }
+            )
 
 
     async def tournament_join(self, event):
@@ -295,4 +303,10 @@ class TournamentConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "action": "game_ready",
             "player": event["player"],
+        }))
+    
+    async def result(self, event):
+        await self.send(text_data=json.dumps({
+            "action": "result",
+            "winner": event["winner"],
         }))

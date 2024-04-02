@@ -10,6 +10,7 @@ export default class Game extends AbstractView {
         this.scoreDisplay1 = document.getElementById("player1-score");
         this.scoreDisplay2 = document.getElementById("player2-score");
         this.websocket = null;
+        this.tournamentWS = null;
         this.paddle1Y = 170;
         this.paddle2Y = 170;
         this.ballX = 300;
@@ -23,6 +24,7 @@ export default class Game extends AbstractView {
         this.isMaster = false;
         this.player1 = false;
         this.player2 = false;
+        this.winner = null;
         this.spectator = false;
         this.tournament = false;
         this.playerDisconnected = false;
@@ -341,6 +343,11 @@ export default class Game extends AbstractView {
 		}, 1000);
     }
 
+    sendTournamentResults() {
+        const message = JSON.stringify({ action: "result", winner: this.winner});
+        this.tournamentWS.send(message);
+    }
+
     endGame = () => {
         this.ballSpeedX = 0;
         this.ballSpeedY = 0;
@@ -350,14 +357,18 @@ export default class Game extends AbstractView {
         }
         else if (this.player1Score > this.player2Score) {
             let player1Name = "Player 1";
-            if (tournament)
-                player1Name = document.getElementById("player1").dataset.name;
+            if (tournament) {
+                player1Name = document.getElementById("player1-name").dataset.name;
+                this.winner = player1Name;
+            }
             document.getElementById("winner").innerText = `${player1Name} wins!`;
         }
         else {
             let player2Name = "Player 2";
-            if (tournament)
-                player2Name = document.getElementById("player2").dataset.name;
+            if (tournament) {
+                player2Name = document.getElementById("player2-name").dataset.name;
+                this.winner = player2Name;
+            }
             document.getElementById("winner").innerText = `${player2Name} wins!`;
         }
        // saveScore(player1Score, player2Score);
@@ -371,6 +382,12 @@ export default class Game extends AbstractView {
             const resetButton = document.querySelector(".btn-reset");
             resetButton.style.display = "block";
             resetButton.addEventListener("click", this.resetGame);
+        } else {
+            if (this.isMaster)
+                this.sendTournamentResults();
+            setTimeout(() => {
+                this.resetGame();
+            }, 3000);
         }
     }
 
@@ -541,8 +558,9 @@ export default class Game extends AbstractView {
         }
     }
 
-    initTournament(playing, gameMaster) {
+    initTournament(playing, gameMaster, websocketT) {
         this.tournament = true;
+        this.tournamentWS = websocketT;
         if (!playing) {
             this.spectator = true;
             return;
@@ -557,8 +575,8 @@ export default class Game extends AbstractView {
         }
     }
 
-    startTournament(playing, gameMaster, gameId) {
-        this.initTournament(playing, gameMaster);
+    startTournament(playing, gameMaster, gameId, websocketT) {
+        this.initTournament(playing, gameMaster, websocketT);
 
         const serverIP = window.location.hostname;
         if (this.websocket === null || this.websocket.readyState !== WebSocket.OPEN) {
@@ -583,7 +601,7 @@ export default class Game extends AbstractView {
             const intervalId = setInterval(checkPageChange, 1000);
 
             this.websocket.onclose = (event) => {
-                console.log("Private WebSocket connection closed", event);
+                console.log("Tournament Game WebSocket connection closed", event);
                 clearInterval(intervalId); 
             };
             this.websocket.onerror = (error) => {
@@ -623,7 +641,7 @@ export function initPrivateGame(userId, opponentUserId) {
     gameView.startPrivateGame(userId, opponentUserId, gameId, GM);
 }
 
-export function startTournamentGame(playing, gameMaster, gameId) {
+export function startTournamentGame(playing, gameMaster, gameId, websocketT) {
     const gameView = new Game();
-    gameView.startTournament(playing, gameMaster, gameId);
+    gameView.startTournament(playing, gameMaster, gameId, websocketT);
 }
