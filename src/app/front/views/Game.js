@@ -40,28 +40,72 @@ export default class Game extends AbstractView {
 
     async getHtml() {
         return `
-        <div id="game" class="container-fluid centered">
-        <div class="game-container">
-           <div id="center-line"></div>
-           <div class="ball"></div>
-           <div class="paddle" id="paddle1"></div>
-           <div class="paddle" id="paddle2"></div>
-           <div id="countdown" class="countdown-display" style="display: none;"></div>
-           <div id="start-game" class="btn-group" role="group">
-              <button class="btn btn-secondary btn-start-offline" style="z-index: 1;">Offline</button>   
-              <button class="btn btn-primary btn-start" style="z-index: 1;">Online</button>
-           </div>
-           <div id="score">
-              <span id="player1-score" class="score">0</span>
-              <span id="player2-score" class="score">0</span>
-           </div>
-           <div class="end-game-container">
-                <div id="winner"></div>
-                <button id="btn-start-private" class="btn btn-success btn-prv" style="z-index: 1;" disabled>Start Private Game</button>
-                <button class="btn btn-primary btn-reset" style="z-index: 1; display: none;">Reset</button>
-            </div>  
-        </div>   
-     </div>
+        <div id="choose-game" class="container mt-3 centered">
+            <div class="card bg-dark text-light mx-auto" style="max-width: 800px;">
+                <div class="card-header text-center">
+                    <h2>Choose the game !</h2>
+                    <div id="choose-game-btn" class="btn-group" role="group">
+                        <button id="choose-pong" class="btn btn-success">PONG</button>   
+                        <button id="choose-tic" class="btn btn-light">Tic-tac-toe</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="game" class="container-fluid centered d-none">
+            <div class="game-container">
+                <div id="center-line"></div>
+                <div class="ball"></div>
+                <div class="paddle" id="paddle1"></div>
+                <div class="paddle" id="paddle2"></div>
+                <div id="countdown" class="countdown-display" style="display: none;"></div>
+                <div id="start-game" class="btn-group" role="group">
+                    <button class="btn btn-secondary btn-start-offline" style="z-index: 1;">Offline</button>   
+                    <button class="btn btn-primary btn-start" style="z-index: 1;">Online</button>
+                </div>
+                <div id="score">
+                    <span id="player1-score" class="score">0</span>
+                    <span id="player2-score" class="score">0</span>
+                </div>
+                <div class="end-game-container">
+                    <div id="winner"></div>
+                    <button id="btn-start-private" class="btn btn-success btn-prv" style="z-index: 1;" disabled>Start Private Game</button>
+                    <button class="btn btn-primary btn-reset" style="z-index: 1; display: none;">Reset</button>
+                </div>  
+            </div>   
+        </div>
+        <div id="game-tic" class="container-fluid d-none centered">
+            <div id="tic-card" class="card bg-dark text-light mx-auto" style="max-width: 800px;">
+                <div class="card-header text-center">
+                    <h2>TIC-TAC-TOE</h2>
+                </div>
+                <div class="card-body">
+                    <div class="text-center mb-4">
+                        <h4 id="tournament-message">Select game mode</h4>
+                        <div id="tic-group" class="btn-group" role="group" style="font-family: 'Press Start 2P', cursive;">
+                            <button class="btn btn-secondary btn-tic-offline" style="z-index: 1;">Offline</button>   
+                            <button class="btn btn-primary btn-tic" style="z-index: 1;">Online</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="tic-tac-toe" class="tic-container d-none">
+                <div id="board" class="board rounded text-dark">
+                    <div class="cell rounded" id="cell-0-0"></div>
+                    <div class="cell rounded" id="cell-0-1"></div>
+                    <div class="cell rounded" id="cell-0-2"></div>
+                    <div class="cell rounded" id="cell-1-0"></div>
+                    <div class="cell rounded" id="cell-1-1"></div>
+                    <div class="cell rounded" id="cell-1-2"></div>
+                    <div class="cell rounded" id="cell-2-0"></div>
+                    <div class="cell rounded" id="cell-2-1"></div>
+                    <div class="cell rounded" id="cell-2-2"></div>
+                </div>
+                <div class="end-game-container">
+                    <div id="winner-tic"></div>
+                    <button class="btn btn-primary btn-reset" style="z-index: 1; display: none;">Reset</button>
+                </div>  
+            </div>
+        </div>
         `;
     }
 
@@ -117,8 +161,11 @@ export default class Game extends AbstractView {
                 }
                 if (this.gameActive) {
                     if (data.action === "player_disconnected") {
-                        this.playerDisconnected = true;
-                        this.endGame();
+                        if (!this.tournament) {
+                            this.playerDisconnected = true;
+                            this.endGame();
+                        } else
+                            this.tournamentDisconnection(data.username);
                     }
                 }
             };
@@ -348,6 +395,39 @@ export default class Game extends AbstractView {
         this.tournamentWS.send(message);
     }
 
+    tournamentDisconnection = (disconnectedPlayer) => {
+        const username = localStorage.getItem("username");
+        const player1Name = document.getElementById("player1-name").dataset.name;
+        const player2Name = document.getElementById("player2-name").dataset.name;
+        console.log("tournament disconnection before return");
+        console.log(username + " --- " + player1Name + " --- " + player2Name);
+        if (disconnectedPlayer != player1Name && disconnectedPlayer != player2Name)
+            return;
+        console.log("tournament disconnection after return");
+        this.ballSpeedX = 0;
+        this.ballSpeedY = 0;
+        this.ball.style.display = "none";
+        let message;
+        if (disconnectedPlayer === player1Name) {
+            this.winner = player2Name;
+            message = `${player1Name} leaved the tournament. ${player2Name} won by default !`
+        } else if (disconnectedPlayer === player2Name) {
+            this.winner = player1Name;
+            message = `${player2Name} leaved the tournament. ${player1Name} won by default !`
+        }
+        document.getElementById("winner").innerText = message;
+        this.gameActive = false;
+        if (!this.isOffline) {
+            this.websocket.close();
+        }
+        this.websocket = null;
+        if (username === this.winner)
+                this.sendTournamentResults();
+            setTimeout(() => {
+                this.resetGame();
+            }, 3000);
+    }
+
     endGame = () => {
         this.ballSpeedX = 0;
         this.ballSpeedY = 0;
@@ -357,7 +437,7 @@ export default class Game extends AbstractView {
         }
         else if (this.player1Score > this.player2Score) {
             let player1Name = "Player 1";
-            if (tournament) {
+            if (this.tournament) {
                 player1Name = document.getElementById("player1-name").dataset.name;
                 this.winner = player1Name;
             }
@@ -365,7 +445,7 @@ export default class Game extends AbstractView {
         }
         else {
             let player2Name = "Player 2";
-            if (tournament) {
+            if (this.tournament) {
                 player2Name = document.getElementById("player2-name").dataset.name;
                 this.winner = player2Name;
             }
@@ -374,7 +454,6 @@ export default class Game extends AbstractView {
        // saveScore(player1Score, player2Score);
         this.gameActive = false;
         if (!this.isOffline) {
-            ("close websocket")
             this.websocket.close();
         }
         this.websocket = null;
@@ -446,6 +525,7 @@ export default class Game extends AbstractView {
     }
 
     startMatchmaking = () => {
+        const username = localStorage.getItem("username");
         const serverIP = window.location.hostname;
         if (this.websocket === null || this.websocket.readyState !== WebSocket.OPEN) {
             this.websocket = new WebSocket(`wss://${serverIP}/api/ws/matchmaking/`);
@@ -466,7 +546,7 @@ export default class Game extends AbstractView {
                         if (!self.player1)
                             self.player2 = true;
                         console.log("Game WebSocket connection established");
-                        self.websocket.send(JSON.stringify({ action: "start_game", game_id: gameId }));
+                        self.websocket.send(JSON.stringify({ action: "start_game", game_id: gameId, username: username }));
                         self.startGame();
                     };
                 } 
@@ -489,7 +569,7 @@ export default class Game extends AbstractView {
                     clearInterval(intervalId);
                 }
             }
-            const intervalId = setInterval(checkPageChange, 1000);
+            const intervalId = setInterval(checkPageChange, 500);
 
             this.websocket.onclose = (event) => {
                 console.log("Matchmaking WebSocket connection closed", event);
@@ -577,13 +657,13 @@ export default class Game extends AbstractView {
 
     startTournament(playing, gameMaster, gameId, websocketT) {
         this.initTournament(playing, gameMaster, websocketT);
-
+        const username = localStorage.getItem("username");
         const serverIP = window.location.hostname;
         if (this.websocket === null || this.websocket.readyState !== WebSocket.OPEN) {
             this.websocket = new WebSocket(`wss://${serverIP}/api/ws/game/`);
             this.websocket.onopen = () => {
                 console.log("Tournament Game WebSocket connection established");
-                this.websocket.send(JSON.stringify({ action: "start_game", game_id: gameId }));
+                this.websocket.send(JSON.stringify({ action: "start_game", game_id: gameId, username: username }));
                 this.startGame(); 
             }
             const self = this;
@@ -614,19 +694,268 @@ export default class Game extends AbstractView {
     }
 }
 
+class Tic extends AbstractView {
+    constructor(params) {
+        super(params);
+        this.websocket = null;
+        this.isOffline = false;
+        this.board = Array(9).fill('');
+        this.cells = document.querySelectorAll('.cell');
+        this.player1 = false;
+        this.player2 = false;
+        this.currentOfflinePlayer = 'X';
+        this.playerDisconnected = false;
+        this.isTurn = false;
+        this.player1Name = null;
+        this.player2Name = null;
+        this.winner = null;
+        this.winnerDisplay = document.getElementById('winner-tic');
+        this.myName = localStorage.getItem("username");
+    }
+
+    startMatchmaking = () => {
+        const serverIP = window.location.hostname;
+        if (this.websocket === null || this.websocket.readyState !== WebSocket.OPEN) {
+            this.websocket = new WebSocket(`wss://${serverIP}/api/ws/matchmaking2/`);
+            this.websocket.onopen = () => {
+                console.log("Matchmaking WebSocket connection established");
+                this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
+            };
+            const self = this;
+            this.websocket.onmessage = function(event) {
+                const data = JSON.parse(event.data);
+                if (data.action === "match_found") {
+                    console.log("match found");
+                    self.websocket.close();
+                    const gameId = data.game_id;
+                    console.log("gameId = ", gameId);
+                    self.websocket = new WebSocket(`wss://${serverIP}/api/ws/game2/`);
+                    self.websocket.onopen = function() {
+                        if (!self.player1) {
+                            self.player2 = true;
+                            self.player2Name = self.myName;
+                        }
+                        console.log("Game WebSocket connection established");
+                        self.websocket.send(JSON.stringify({ action: "start_game", game_id: gameId, username: self.myName }));
+                        self.startGame();
+                    };
+                } 
+                if (data.action === "player") {
+                    if (data.player1) {
+                        self.player1 = true;
+                        self.player1Name = self.myName;
+                        self.isTurn = true;
+                        console.log("You are player 1!");
+                    }
+                }
+            };
+            const checkPageChange = () => {
+                if (!document.getElementById("game")) {
+                    console.log("change page");
+                    this.websocket.close();
+                    this.websocket = null;
+                    clearInterval(intervalId);
+                }
+            }
+            const intervalId = setInterval(checkPageChange, 500);
+
+            this.websocket.onclose = (event) => {
+                console.log("Matchmaking WebSocket connection closed", event);
+                clearInterval(intervalId); 
+            };
+            this.websocket.onerror = (error) => {
+                console.error("WebSocket error:", error);
+                clearInterval(intervalId);
+            };
+        } else {
+            console.log("WebSocket connection is already open.");
+        }
+    }
+
+    startGame = () => {
+        document.getElementById("tic-card").classList.add("d-none");
+        document.getElementById("tic-tac-toe").classList.remove("d-none");
+        this.websocket.send(JSON.stringify({
+            action: "send_username",
+            username: this.myName
+        }));
+        const self = this;
+        this.websocket.onmessage = function(event) {
+            const data = JSON.parse(event.data);
+            if (data.action === 'update_board') {
+                console.log("updateBoard");
+                console.log(data);
+                self.updateGameBoard(data);
+            } else if (data.action === 'player_move' && self.myName != data.player_id) {
+                self.isTurn = true;
+                self.websocket.send(JSON.stringify({
+                    action: "move",
+                    x: data.x,
+                    y: data.y,
+                    player_id: data.player_id,
+                }));
+            } else if (data.action === 'player_move' && self.myName === data.player_id) {
+                self.isTurn = false;
+            } else if (data.action === 'send_username') {
+                console.log(data.username);
+                if (self.player1) {
+                    if (data.username != self.myName)
+                        self.player2Name = data.username;
+                } else if (self.player2) {
+                    if (data.username != self.myName)
+                        self.player1Name = data.username;
+                }
+                console.log("player1Name = " + self.player1Name);
+                console.log("player2Name = " + self.player2Name);
+            }
+
+        };
+        const cells = document.querySelectorAll(".cell");
+        cells.forEach(cell => {
+            cell.addEventListener("click", () => {
+                console.log(this.isTurn);
+                if (!this.isOffline && (this.player1 || this.player2) && this.isTurn) {
+                    const cellId = cell.getAttribute("id").split("-").slice(1).map(Number);
+                    this.websocket.send(JSON.stringify({
+                        action: "move",
+                        x: cellId[0],
+                        y: cellId[1],
+                        player_id: this.myName,
+                    }));
+                    this.websocket.send(JSON.stringify({
+                        action: "send_move",
+                        x: cellId[0],
+                        y: cellId[1],
+                        player_id: this.myName,
+                    }));
+                }
+            });
+        });
+    };
+
+    updateGameBoard = (data) => {
+        const board = data.board;
+        const game_over = data.game_over;
+        const winner = data.winner;
+
+        for (let i = 0; i < board.length; i++) {
+            for (let j = 0; j < board[i].length; j++) {
+                const cell = document.getElementById(`cell-${i}-${j}`);
+                if (board[i][j] === this.player1Name) {
+                    cell.textContent = 'X';
+                } else if (board[i][j] === this.player2Name) {
+                    cell.textContent = 'O';
+                } else {
+                    cell.textContent = '';
+                }
+            }
+        }
+        if (game_over) {
+            let message;
+            if (winner === "draw")
+                message = `It's a draw...`;
+            else if (winner)
+                message = `${winner} won the game !`;
+            document.getElementById("winner-tic").innerText = message;
+        }
+    }
+
+    handleClick = (cell) => {
+        const index = Array.from(this.cells).indexOf(cell);
+        if (this.board[index] === '' && !this.winner) {
+            this.board[index] = this.currentOfflinePlayer;
+            cell.textContent = this.currentOfflinePlayer;
+            this.checkWinner();
+            this.togglePlayer();
+        }
+    }
+
+    togglePlayer() {
+        this.currentOfflinePlayer = this.currentOfflinePlayer === 'X' ? 'O' : 'X';
+    }
+
+    checkWinner() {
+        const winningCombinations = [
+            [0, 1, 2], [3, 4, 5], [6, 7, 8],
+            [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [0, 4, 8], [2, 4, 6]
+        ];
+
+        for (const combination of winningCombinations) {
+            const [a, b, c] = combination;
+            if (this.board[a] !== '' && this.board[a] === this.board[b] && this.board[a] === this.board[c]) {
+                this.winner = this.board[a];
+                this.winnerDisplay.textContent = `Player ${this.winner} wins!`;
+                this.resetButton.style.display = 'block';
+                return;
+            }
+        }
+        if (!this.board.includes('')) {
+            this.winnerDisplay.textContent = 'It\'s a draw!';
+            this.resetButton.style.display = 'block';
+        }
+    }
+
+    startOfflineGame = () => {
+        document.getElementById("tic-card").classList.add("d-none");
+        document.getElementById("tic-tac-toe").classList.remove("d-none");
+        this.cells.forEach(cell => {
+            cell.addEventListener('click', () => this.handleClick(cell));
+        });
+    }
+
+    initOfflineGame = () => {
+        if (this.websocket)
+            this.websocket.close();
+        this.player1 = false;
+        this.player2 = false;
+        this.isOffline = true;
+        this.startOfflineGame();
+    }
+}
+
 export function addGameEventListeners() {
+    const choosePong = document.getElementById("choose-pong");
+    const chooseTic = document.getElementById("choose-tic");
+    let games = 0;
+    choosePong.addEventListener('click', () => {
+        document.getElementById("choose-game").classList.add("d-none");
+        document.getElementById("game").classList.remove("d-none");
+        games = 1;
+    });
+    chooseTic.addEventListener('click', () => {
+        document.getElementById("choose-game").classList.add("d-none");
+        document.getElementById("game-tic").classList.remove("d-none");
+        games = 2;
+    });
     const gameView = new Game();
     document.querySelectorAll('.btn-start').forEach(button => {
         button.addEventListener('click', function() {
-            gameView.startMatchmaking();
+            if (games === 1)
+                gameView.startMatchmaking();
         });
     });
     document.querySelectorAll('.btn-start-offline').forEach(button => {
         button.addEventListener('click', function() {
-            gameView.initOfflineGame();
+            if (games === 1)
+                gameView.initOfflineGame();
+        })
+    })
+    const ticView = new Tic();
+    document.querySelectorAll('.btn-tic').forEach(button => {
+        button.addEventListener('click', function() {
+            if (games === 2)
+                ticView.startMatchmaking();
+        });
+    });
+    document.querySelectorAll('.btn-tic-offline').forEach(button => {
+        button.addEventListener('click', function() {
+            if (games === 2)
+                ticView.initOfflineGame();
         })
     })
 }
+
 
 export function initPrivateGame(userId, opponentUserId) {
     const smallerId = Math.min(userId, opponentUserId);

@@ -11,6 +11,7 @@ export default class Tournament extends AbstractView {
         this.ready1 = false;
         this.ready2 = false;
         this.round = 1;
+        this.started = false;
         this.demiwinner = false;
         this.round1winner = null;
         this.round2winner = null;
@@ -20,6 +21,7 @@ export default class Tournament extends AbstractView {
             player3: false,
             player4: false
         };
+        this.disconnected = [];
     }
 
     async getHtml() {
@@ -53,7 +55,7 @@ export default class Tournament extends AbstractView {
             </div>
         </div>
     </div>
-    <div id="game" class="container-fluid centered d-none">
+    <div id="gameT" class="container-fluid centered d-none">
         <div class="game-container">
            <div id="center-line"></div>
            <div class="ball"></div>
@@ -102,7 +104,7 @@ export default class Tournament extends AbstractView {
         }
     }
 
-    removeDisconnectedPlayer(playerName) {
+    removeDisconnectedQueue(playerName) {
         const playerElements = document.querySelectorAll(".player-slot");
         const username = localStorage.getItem("username");
         let playerIndex = -1;
@@ -132,10 +134,100 @@ export default class Tournament extends AbstractView {
         }
     }
 
+    handleFirstRound(player1Name, player2Name, player1, player2) {
+        if (this.round != 1)
+            return;
+        let message;
+        let winner;
+        if (player1 && player2) {
+            winner = "No one";
+            message = `${player1Name} and ${player2Name} leaved the tournament.`;
+        } else if (player1 && !player2) {
+            winner = player2Name;
+            message = `${player1Name} leaved the tournament. ${player2Name} won by default !`;
+        } else if (!player1 && player2){
+            winner = player1Name;
+            message = `${player2Name} leaved the tournament. ${player1Name} won by default !`
+        }
+        document.getElementById("winner").innerText = message;
+        setTimeout(() => {
+            this.printResults(winner);
+        }, 3000);
+    }
+
+    handleSecoundRound(player1Name, player2Name, player1, player2) {
+        if (this.round != 2)
+            return;
+        let message;
+        let winner;
+        if (player1 && player2) {
+            winner = "No one";
+            message = `${player1Name} and ${player2Name} leaved the tournament.`;
+        } else if (player1 && !player2) {
+            winner = player2Name;
+            message = `${player1Name} leaved the tournament. ${player2Name} won by default !`;
+        } else if (!player1 && player2){
+            winner = player1Name;
+            message = `${player2Name} leaved the tournament. ${player1Name} won by default !`
+        }
+        document.getElementById("winner").innerText = message;
+        setTimeout(() => {
+            this.printResults(winner);
+        }, 3000);
+    }
+
+    handleFinal(player1Name, player2Name, player1, player2) {
+        if (this.round != 3)
+            return;
+        let message;
+        let winner;
+        if (player1 && player2) {
+            winner = "No one";
+            message = `${player1Name} and ${player2Name} leaved the tournament. There is no winner...`;
+        } else if (player2Name === "No one") {
+            winner = player1Name;
+            message = `There is no player except ${player1Name}, he won the tournament by default !`;
+        } else if (player1 && !player2) {
+            winner = player2Name;
+            message = `${player1Name} leaved the tournament. ${player2Name} won the tournament by default !`;
+        } else if (!player1 && player2){
+            winner = player1Name;
+            message = `${player2Name} leaved the tournament. ${player1Name} won the tournament by default !`
+        }
+        document.getElementById("winner").innerText = message;
+        setTimeout(() => {
+            this.finishTournament(winner);
+        }, 3000);
+    }
+
+    playerDisconnected(playerName) {
+        this.disconnected.push(playerName);
+    }
+
+    checkIfDisconnected(player1Name, player2Name) {
+        let player1 = false;
+        let player2 = false;
+
+        for (let i = 0; i < this.disconnected.length; i++) {
+            if (player1Name === this.disconnected[i] || player1Name === "No one")
+                player1 = true;
+            if (player2Name === this.disconnected[i] || player2Name === "No one")
+                player2 = true;
+        }
+        if (!player1 && !player2)
+            return (false);
+        this.handleFirstRound(player1Name, player2Name, player1, player2);
+        this.handleSecoundRound(player1Name, player2Name, player1, player2);
+        this.handleFinal(player1Name, player2Name, player1, player2);
+        if (player1 || player2)
+            return (true);
+    }
+
     initTournament(bool) {
         if (bool) {
             const joinBtn = document.getElementById("join-tournament");
-            joinBtn.remove();
+            if (joinBtn)
+                joinBtn.remove();
         }
         const startTournamentBtn = document.getElementById("start-tournament");
         const playerQueue = document.getElementById("player-queue");
@@ -169,6 +261,7 @@ export default class Tournament extends AbstractView {
         if (this.players['player1']) {
             this.playing = true;
             const ready1 = document.getElementById("ready-player-one");
+            ready1.disabled = false;
             ready1.classList.remove("d-none");
             ready1.addEventListener('click', () => { 
                 ready1.disabled = true;
@@ -177,6 +270,7 @@ export default class Tournament extends AbstractView {
         } else if (this.players['player2']) {
             this.playing = true;
             const ready2 = document.getElementById("ready-player-two");
+            ready2.disabled = false;
             ready2.classList.remove("d-none");
             ready2.addEventListener('click', () => { 
                 ready2.disabled = true;
@@ -190,6 +284,7 @@ export default class Tournament extends AbstractView {
         if (this.players['player3']) {
             this.playing = true;
             const ready1 = document.getElementById("ready-player-one");
+            ready1.disabled = false;
             ready1.classList.remove("d-none");
             ready1.addEventListener('click', () => { 
                 ready1.disabled = true;
@@ -198,6 +293,7 @@ export default class Tournament extends AbstractView {
         } else if (this.players['player4']) {
             this.playing = true;
             const ready2 = document.getElementById("ready-player-two");
+            ready2.disabled = false;
             ready2.classList.remove("d-none");
             ready2.addEventListener('click', () => { 
                 ready2.disabled = true;
@@ -210,6 +306,7 @@ export default class Tournament extends AbstractView {
         if (this.demiwinner && (this.players['player1'] || this.players['player2'])) {
             this.playing = true;
             const ready1 = document.getElementById("ready-player-one");
+            ready1.disabled = false;
             ready1.classList.remove("d-none");
             ready1.addEventListener('click', () => { 
                 ready1.disabled = true;
@@ -218,6 +315,7 @@ export default class Tournament extends AbstractView {
         } else if (this.demiwinner && (this.players['player3'] || this.players['player4'])) {
             this.playing = true;
             const ready2 = document.getElementById("ready-player-two");
+            ready2.disabled = false;
             ready2.classList.remove("d-none");
             ready2.addEventListener('click', () => { 
                 ready2.disabled = true;
@@ -229,12 +327,14 @@ export default class Tournament extends AbstractView {
     startTournament() {
         const tournamentContainer = document.getElementById("tournament-container");
         tournamentContainer.classList.add("d-none");
-        const gameContainer = document.getElementById("game");
+        const gameContainer = document.getElementById("gameT");
         gameContainer.classList.remove("d-none");
         console.log("round = " + this.round);
         if (this.round === 1) {
             const player1Name = document.getElementById("player1").dataset.name;
             const player2Name = document.getElementById("player2").dataset.name;
+            if (this.checkIfDisconnected(player1Name, player2Name))
+                return;
             const player1Display = document.getElementById("player1-name");
             const player2Display = document.getElementById("player2-name");
             player1Display.textContent = player1Name;
@@ -244,11 +344,12 @@ export default class Tournament extends AbstractView {
             player1Display.classList.remove("d-none");
             player2Display.classList.remove("d-none");
             this.initFirstGame();
-            console.log("startTournameny(initFirstGame)");
         } else if (this.round === 2) {
             console.log("startTournameny(initsecondeGame)");
             const player1Name = document.getElementById("player3").dataset.name;
             const player2Name = document.getElementById("player4").dataset.name;
+            if (this.checkIfDisconnected(player1Name, player2Name))
+                return;
             const player1Display = document.getElementById("player1-name");
             const player2Display = document.getElementById("player2-name");
             player1Display.textContent = player1Name;
@@ -259,6 +360,8 @@ export default class Tournament extends AbstractView {
         } else if (this.round === 3) {
             const player1Display = document.getElementById("player1-name");
             const player2Display = document.getElementById("player2-name");
+            if (this.checkIfDisconnected(this.round1winner, this.round2winner))
+                return;
             player1Display.textContent = this.round1winner;
             player2Display.textContent = this.round2winner;
             player1Display.dataset.name = this.round1winner;
@@ -334,7 +437,7 @@ export default class Tournament extends AbstractView {
     }
 
     finishTournament(winner) {
-        document.getElementById("game").classList.add("d-none");
+        document.getElementById("gameT").classList.add("d-none");
         document.getElementById("player-queue").classList.add("d-none");
         document.getElementById("spinner-container").classList.add("d-none");
         const tournamentMessage = document.getElementById("tournament-message");
@@ -353,7 +456,8 @@ export default class Tournament extends AbstractView {
         this.ready1 = false;
         this.ready2 = false;
         this.round++;
-        document.getElementById("game").classList.add("d-none");
+        document.getElementById("winner").innerText = "";
+        document.getElementById("gameT").classList.add("d-none");
         document.getElementById("tournament-container").classList.remove("d-none");
         this.strikeNames(winner);
         const btnText = document.getElementById("queue-btn-text");
@@ -399,12 +503,23 @@ export default class Tournament extends AbstractView {
                 }
                 if (data.action === "leave") {
                     console.log(data.username, " disconnected from tournament !");
-                    self.removeDisconnectedPlayer(data.username);
+                    if (!self.started)
+                        self.removeDisconnectedQueue(data.username);
+                    else
+                        self.playerDisconnected(data.username);
                 }
                 if (data.action === "ready") {
                     self.readyTournament();
                 }
+                if (data.action === "not_ready") {
+                    if (self.tournamentMaster && !self.started) {
+                        const button = document.getElementById("queue-btn");
+                        button.disabled = true;
+                        button.removeEventListener('click', () => { self.sendStartMessage(); });
+                    }
+                }
                 if (data.action === "start_tournament") {
+                    self.started = true;
                     self.startTournament();
                 }
                 if (data.action === "game_ready") {

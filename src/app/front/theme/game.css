@@ -194,6 +194,17 @@ body {
     -webkit-text-stroke: #000;
 }
 
+#winner-tic {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 18px;
+    color: #cccaca;
+    text-shadow: 2px 2px 2px #000;
+    -webkit-text-stroke: #000;
+}
+
 #score-history {
     position: absolute;
     top: 60px;
@@ -247,4 +258,47 @@ body {
 
 .strike {
     text-decoration: line-through;
+}
+
+.tic-container {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-family: 'Press Start 2P', cursive;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.board {
+    background-color: #b9b4b4;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 5px;
+    width: 350px;
+    margin: auto;
+    position: relative;
+}
+
+.cell {
+    width: 100px;
+    height: 100px;
+    border: 1px solid #000;
+    font-size: 3em;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.cell:hover {
+    background-color: #ddd; /* Couleur de fond au survol */
+}
+
+.cell:active {
+    background-color: #ccc; /* Couleur de fond au clic */
 }

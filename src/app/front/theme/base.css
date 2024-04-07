@@ -187,7 +187,7 @@
    filter: blur(50px);
    transition: transform 0.5s ease-in-out;
  }
- 
+
  .pink {
    background-color: rgba(255, 0, 255, 0.5);
  }
@@ -217,11 +217,11 @@
 }
 
 .player-slot {
-   width: 150px; /* Largeur du rectangle */
-   height: 50px; /* Hauteur du rectangle */
-   border: 2px solid #333; /* Bordure */
-   margin-right: 20px; /* Marge entre les rectangles */
-   display: flex; /* Pour aligner le texte au centre */
-   align-items: center; /* Pour aligner le texte au centre */
-   justify-content: center; /* Pour aligner le texte au centre */
+   width: 150px;
+   height: 50px;
+   border: 2px solid #333;
+   margin-right: 20px;
+   display: flex;
+   align-items: center;
+   justify-content: center;
 }
