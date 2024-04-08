@@ -3,6 +3,7 @@ from . import views
 from .views import LoginView, LogoutView, GetUsernameView, GetUserIdView, GetUsernameFromIdView, VerifyTokenView
 from .views import SendFriendRequestView, FriendRequestsView, RespondFriendRequestView, GetFriendsView, RemoveFriendView
 from .views import GetMessageHistoryView, SendMessageView, CreateTournamentView, CheckTournamentView, DeleteTournamentView
+from .views import BlockUserView, RemoveBlockedUserView, GetBlockedUserView
 from rest_framework.routers import DefaultRouter
 
 # from .views import UserViewSet
@@ -30,4 +31,7 @@ urlpatterns = [
     path('api/create_tournament/', CreateTournamentView.as_view(), name='create-tournament'),
     path('api/check_tournament/', CheckTournamentView.as_view(), name='check-tournament'),
     path('api/delete_tournament/', DeleteTournamentView.as_view(), name='delete-tournament'),
+    path('api/block_user/<int:user_id>/', BlockUserView.as_view(), name='block-user'),
+    path('api/remove_blocked/<int:blocked_id>/', RemoveBlockedUserView.as_view(), name='remove-blocked'),
+    path('api/get_blocked/', GetBlockedUserView.as_view(), name='get-blocked'),
 ]

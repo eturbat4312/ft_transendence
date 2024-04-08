@@ -43,11 +43,17 @@ function updateplayerModal(websocket) {
         const playerName = listItem.dataset.name;
         const userId = listItem.dataset.id;
         console.log("typeof userID: " + typeof userId);
-        const playerInfoContent = `<p>Name: ${playerName}</p><button id="addFriendBtn" data-user-id="${playerName}" class="btn btn-primary">Add to friends</button>`;
+        const playerInfoContent = `
+        <p>Name: ${playerName}</p><button id="addFriendBtn" data-user-id="${playerName}" class="btn btn-primary">Add to friends</button>
+        <button id="blockBtn" data-user-id="${playerName}" class="btn btn-danger">Block player</button>`;
         document.getElementById('playerModalBody').innerHTML = playerInfoContent;
         const addFriendBtn = document.getElementById('addFriendBtn');
+        const blockBtn = document.getElementById('blockBtn');
         addFriendBtn.addEventListener('click', async function() {
             await sendFriendRequest(userId, websocket);
+        });
+        blockBtn.addEventListener('click', async function() {
+            await blockRequest(userId, playerName, websocket);
         });
         const playerModal = new bootstrap.Modal(document.getElementById('playerModal'));
         playerModal.show();
@@ -63,7 +69,7 @@ async function sendFriendRequest(id, websocket)
         return;
     }
     try {
-        const response = await fetch(`https://${serverIP}//api/send_friend_request/${id}/`, {
+        const response = await fetch(`https://${serverIP}/api/send_friend_request/${id}/`, {
             method: 'GET',
             headers: {
                 'Authorization': 'Token ' + token
@@ -90,9 +96,18 @@ async function sendFriendRequest(id, websocket)
     }
 }
 
-export function updateConnectedPlayer(username, userId, online, websocket) {
+export async function updateConnectedPlayer(username, userId, online, websocket) {
     let playerIndex = connectedPlayers.findIndex(player => player.name === username);
 
+    const data = await fetchBlockedList();
+    const blockedList = data.blocked;
+    for (let i = 0; i < blockedList.length; i++) {
+        console.log(blockedList[i]);
+        if (username === blockedList[i].username) {
+            removeDisconnectedPlayer(username);
+            return;
+        }
+    }
     if (playerIndex !== -1) {
         connectedPlayers[playerIndex].online = online;
     } else {
@@ -168,7 +183,14 @@ function closeToast() {
     toast.remove();
 }
 
-export function showToast(message, websocket) {
+export async function showToast(message, websocket, username) {
+    const data = await fetchBlockedList();
+    const blockedList = data.blocked;
+    for (let i = 0; i < blockedList.length; i++) {
+        if (username === blockedList[i].username) {
+            return;
+        }
+    }
     const toastContainer = document.getElementById('toast-container');
     const toast = document.createElement('div');
     toast.className = 'toast';
@@ -286,36 +308,46 @@ export async function updateFriendRequestsModal(websocket) {
     const friendRequestsContainer = document.getElementById('friendRequestsModalBody');
 
     const friendRequests = await fetchFriendRequests();
-
+    const data = await fetchBlockedList();
+    const blockedList = data.blocked;
     friendRequestsContainer.innerHTML = '';
 
     if (friendRequests.length === 0) {
         friendRequestsContainer.innerHTML = '<p>No friend requests</p>';
     } else {
         const ul = document.createElement('ul');
-        friendRequests.forEach(async (request) => {
+        for (const request of friendRequests) {
+            const username = await fetchUsernameFromId(request.from_user);
+    
+            let isBlocked = false;
+            for (const blockedUser of blockedList) {
+                if (username === blockedUser.username) {
+                    isBlocked = true;
+                    break;
+                }
+            }
+            if (isBlocked) {
+                continue;
+            }
             const li = document.createElement('li');
             li.classList.add('friend-request');
-            const username = await fetchUsernameFromId(request.from_user);
             li.textContent = `${username} sent you a friend request`;
-
+    
             const friendId = request.from_user.toString();
             const acceptButton = document.createElement('button');
             acceptButton.classList.add('btn', 'btn-success', 'btn-sm', 'tickcross');
-            //acceptButton.setAttribute('data-user-id', request.from_user);
             acceptButton.innerHTML = '<i class="fas fa-check"></i>';
             acceptButton.addEventListener('click', () => respondFriendRequest(friendId, true, websocket));
-
+    
             const rejectButton = document.createElement('button');
             rejectButton.classList.add('btn', 'btn-danger', 'btn-sm', 'tickcross');
-            //rejectButton.setAttribute('data-user-id', request.from_user);
             rejectButton.innerHTML = '<i class="fas fa-times"></i>';
             rejectButton.addEventListener('click', () => respondFriendRequest(friendId, false, websocket));
-
+    
             li.appendChild(acceptButton);
             li.appendChild(rejectButton);
             ul.appendChild(li);
-        });
+        }
         friendRequestsContainer.appendChild(ul);
     }
 }
@@ -457,6 +489,127 @@ function startPrivateChat(friendId, friendName)
         }
     });
 }
+
+async function blockRequest(id, playerName, websocket)
+{
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+    try {
+        const response = await fetch(`https://${serverIP}/api/block_user/${id}/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Token ' + token,
+                'Content-Type': 'application/json',
+            }
+        });
+    
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        const data = await response.json();
+        if (data.status === 'success') {
+            alert('User blocked successfully!');
+            await removeFriend(id, websocket);
+            updateBlockedModal(websocket);
+            updateConnectedPlayer(playerName, id, true, websocket);
+        } else {
+            alert('Error: ' + data.message + ' status: ' + data.status);
+            console.log(data);
+        }
+    
+    } catch (error) {
+        alert('Error with block request: ' + error.message);
+    }
+}
+
+async function fetchBlockedList() {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+    try {
+        const response = await fetch(`https://${serverIP}/api/get_blocked/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Token ' + token
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch friend requests');
+        }
+
+        const data = await response.json();
+        return data;
+    } catch (error) {
+        console.error('Error fetching friend requests:', error);
+        return [];
+    }
+}
+
+export async function updateBlockedModal(websocket) {
+    const blockedContainer = document.getElementById('blockedModalBody');
+
+    const data = await fetchBlockedList();
+    const blockedList = data.blocked;
+    console.log(blockedList);
+
+    blockedContainer.innerHTML = '';
+
+    if (blockedList.length === 0) {
+        blockedContainer.innerHTML = '<p>No blocked users</p>';
+    } else {
+        const ul = document.createElement('ul');
+        blockedList.forEach(async (blocked) => {
+            const li = document.createElement('li');
+            li.classList.add('blocked-user');
+            const username = blocked.username;
+            li.textContent = `${username}`;
+            const unblockButton = document.createElement('button');
+            unblockButton.classList.add('btn', 'btn-danger', 'btn-sm');
+            unblockButton.innerText = "Unblock";
+            unblockButton.addEventListener('click', async () => await removeBlockedUser(blocked.id, blocked.username, websocket));
+            li.appendChild(unblockButton);
+            ul.appendChild(li);
+        });
+        blockedContainer.appendChild(ul);
+    }
+}
+
+async function removeBlockedUser(blockedId, blockedUsername, websocket) {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+    try {
+        const response = await fetch(`https://${serverIP}/api/remove_blocked/${blockedId}/`, {
+            method: 'POST',
+            headers: {
+                'Authorization': 'Token ' + token,
+                'Content-Type': 'application/json',
+            }
+        });
+
+        if (response.ok) {
+            alert('Blocked user removed successfully');
+            await updateBlockedModal(websocket);
+            websocket.send(JSON.stringify({ action: "ping", to_user: blockedUsername }));
+        } else {
+            console.error('Failed to remove blocked user:', response.statusText);
+        }
+    } catch (error) {
+        console.error('An error occurred while removing friend:', error);
+    }
+}
+
+
 
 export async function getFriends(websocket) {
     const serverIP = window.location.hostname;

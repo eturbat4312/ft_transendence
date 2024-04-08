@@ -114,6 +114,25 @@ class ConnectConsumer(AsyncWebsocketConsumer):
                     'username': self.username,
                 }
             )
+        elif action == "ping":
+            await self.channel_layer.group_send(
+                "connected_users",
+                {
+                    'type': 'ping',
+                    'username': self.username,
+                    'to_user': text_data_json['to_user'],
+                }
+            )
+        elif action == "pong":
+            await self.channel_layer.group_send(
+                "connected_users",
+                {
+                    'type': 'pong',
+                    'username': self.username,
+                    'user_id': self.user_id,
+                    'to_user': text_data_json['to_user'],
+                }
+            )
 
         
             
@@ -177,4 +196,19 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "username": event["username"],
             "action": "start_tournament",
+        }))
+    
+    async def ping(self, event):
+        await self.send(text_data=json.dumps({
+            "username": event["username"],
+            "to_user": event["to_user"],
+            "action": "ping",
+        }))
+
+    async def pong(self, event):
+        await self.send(text_data=json.dumps({
+            "username": event["username"],
+            "user_id": event["user_id"],
+            "to_user": event["to_user"],
+            "action": "pong",
         }))

@@ -2,7 +2,7 @@ import { getNav, getSocial, getChat, handleLogout } from '../views/utils.js';
 import { eventDelete, addTournamentEventListeners, tournamentCreated, checkTournamentExists } from '../views/Tournament.js';
 import { addGameEventListeners, initPrivateGame } from '../views/Game.js';
 import { addChatEventListeners } from './utils.js';
-import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, showGameInvitationNotification, updateFriendRequestsModal, getFriends, fetchUsernameFromId } from './friendModal.js';
+import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, showGameInvitationNotification, updateFriendRequestsModal, getFriends, updateBlockedModal } from './friendModal.js';
 import '../theme/base.css'
 import '../theme/game.css'
 import '../theme/index.css'
@@ -158,6 +158,7 @@ const checkIfConnected = async () => {
     }
     updateFriendRequestsModal(websocket);
     getFriends(websocket);
+    updateBlockedModal();
     websocket.onclose = function(event) {
         console.log('Connect WebSocket closed');
     }
@@ -168,20 +169,17 @@ const checkIfConnected = async () => {
             websocket.close();
         }
         if (data.action === "connected") {
-            console.log(data.username, " is online !");
             updateConnectedPlayer(data.username, data.userId, true, websocket);
             //console.log("username: ", data.username, " userid: ", data.userId);
             // const message = JSON.stringify({ action: 'connected_player', username: username });
             // websocket.send(message);
         }
         if (data.action === "disconnected") {
-            console.log(data.username, " is offline !");
             removeDisconnectedPlayer(data.username);
             getFriends(websocket);
         }
         if (data.action === "friend_request" && data.to_user_id === userId) {
-            showToast(data.username + " sent you a friend request !", websocket);
-            console.log(data.username, " sent you a friend request");
+            showToast(data.username + " sent you a friend request !", websocket, data.username);
         }
         if (data.action === "update_friends" && data.to_user_id === userId) {
             getFriends(websocket);
@@ -191,6 +189,12 @@ const checkIfConnected = async () => {
         }
         if (data.action === "invite_play" && data.user_id === userId) {
             showToast(data.to_user_id + " has received your invitation", websocket);
+        }
+        if (data.action === "ping" && data.to_user === username) {
+            websocket.send(JSON.stringify({ action: "pong", to_user: data.username }));
+        }
+        if (data.action === "pong" && data.to_user === username) {
+            updateConnectedPlayer(data.username, data.user_id, true, websocket);
         }
         if (data.action === "accept_invite" && data.user_id === userId) {
             const prvBtn = document.getElementById('btn-start-private');
@@ -202,7 +206,7 @@ const checkIfConnected = async () => {
             console.log("refuse");
         }
         if (data.action === "start_tournament" && username != data.username) {
-            showToast(data.username + " started a tournament ! Go on tournament page if you want to join");
+            showToast(data.username + " started a tournament ! Go on tournament page if you want to join", websocket, data.username);
             if (document.getElementById("start-tournament")) {
                 tournamentCreated(data.username);
             }

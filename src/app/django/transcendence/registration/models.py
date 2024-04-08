@@ -5,6 +5,7 @@ from django.db import models
 
 class User(AbstractUser):
     friends = models.ManyToManyField('self', symmetrical=False, related_name='friends_list')
+    blocked = models.ManyToManyField('self', symmetrical=False, related_name='blocked_list')
     custom_field = models.CharField(max_length=255)
     
 

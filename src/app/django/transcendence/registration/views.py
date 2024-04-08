@@ -149,6 +149,41 @@ class GetFriendsView(APIView):
         serializer = UserSerializer(friends, many=True)
         return Response({'friends': serializer.data})
 
+class BlockUserView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, user_id):
+        b_user = get_object_or_404(UserModel, id=user_id)
+        request.user.blocked.add(b_user)
+        return Response({'status': 'success', 'message': 'User added to blocked list.'})
+
+class RemoveBlockedUserView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, blocked_id):
+        current_user = request.user
+        
+        try:
+            block = UserModel.objects.get(id=blocked_id)
+        except UserModel.DoesNotExist:
+            return Response({'error': 'Blocked not found'}, status=status.HTTP_404_NOT_FOUND)
+        
+        current_user.blocked.remove(block)
+        
+        return Response({'success': 'Friend removed successfully'}, status=status.HTTP_200_OK)
+
+class GetBlockedUserView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        current_user = request.user
+        blocked = current_user.blocked.all()
+        serializer = UserSerializer(blocked, many=True)
+        return Response({'blocked': serializer.data})
+
 class GetMessageHistoryView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
