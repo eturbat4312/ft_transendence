@@ -1,1 +1,0 @@
-"use strict";(self.webpackChunktranscendence=self.webpackChunktranscendence||[]).push([[213],{213:(e,n,t)=>{t.r(n),t.d(n,{default:()=>a});var s=t(397);class a extends s.default{constructor(e){super(e),this.setTitle("404 - Page not found")}async getHtml(){return"\n            <h1>404</h1>\n            <p>Page not found.</p>\n        "}}}}]);

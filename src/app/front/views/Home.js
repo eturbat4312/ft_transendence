@@ -18,9 +18,6 @@ export default class extends AbstractView {
                 <p class="card-text">
                    <span id="username"></span>
                 </p>
-                 <p class="card-text">
-                   <span id="nickname"></span>
-                </p>
                 <p class="card-text">
                   <span id="email"></span>
                 </p>
@@ -81,26 +78,6 @@ export default class extends AbstractView {
                 document.getElementById('username').innerText = 'Username: ' + username;
             } else {
                 console.log('Failed to get username:', await responseUsername.text());
-            }
-
-        } catch (error) {
-            console.log('Error:', error);
-        }
-
-        try {
-            const responseNickname = await fetch(`https://${serverIP}/api/get_nickname/`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Token ' + token
-                }
-            });
-
-            if (responseNickname.ok) {
-                const userData = await responseNickname.json();
-                const username = userData.username;
-                document.getElementById('nickname').innerText = 'Nickname: ' + username;
-            } else {
-                console.log('Failed to get Nickname:', await responseNickname.text());
             }
 
         } catch (error) {
@@ -188,7 +165,7 @@ export default class extends AbstractView {
 
             if (response.ok) {
                 const data = await response.json();
-                document.getElementById('profilePic').src = data.profile_pic_url;
+                document.getElementById('profilePic').src = data.profile_pic;
             } else {
                 console.log('Failed to get profile pic:', await response.text());
             }

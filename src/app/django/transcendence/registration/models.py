@@ -7,6 +7,7 @@ class User(AbstractUser):
     friends = models.ManyToManyField('self', symmetrical=False, related_name='friends_list')
     blocked = models.ManyToManyField('self', symmetrical=False, related_name='blocked_list')
     custom_field = models.CharField(max_length=255)
+    profil_pic = models.ImageField(upload_to="profil_pic", null=True, blank=True)
     elo = models.IntegerField(default=0, blank=True, null=True)
     
 

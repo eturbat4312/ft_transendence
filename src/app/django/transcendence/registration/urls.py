@@ -3,21 +3,21 @@ from . import views
 from .views import LoginView, LogoutView, GetUsernameView, GetUserIdView, GetUsernameFromIdView, VerifyTokenView
 from .views import SendFriendRequestView, FriendRequestsView, RespondFriendRequestView, GetFriendsView, RemoveFriendView
 from .views import GetMessageHistoryView, SendMessageView, CreateTournamentView, CheckTournamentView, DeleteTournamentView
-from .views import BlockUserView, RemoveBlockedUserView, GetBlockedUserView, GetEloView, UpdateEloView
+from .views import BlockUserView, RemoveBlockedUserView, GetBlockedUserView, GetEloView, UpdateEloView, GetProfilePicView
 from rest_framework.routers import DefaultRouter
+from django.conf import settings
+from django.conf.urls.static import static
 
-# from .views import UserViewSet
 
 router = DefaultRouter()
-# router.register(r"users", UserViewSet)
 
 urlpatterns = [
-    # path("", views.home, name="home"),
     path('api/login/', LoginView.as_view(), name='user-login'),
     path('api/logout/', LogoutView.as_view(), name='user-logout'),
     path('api/verify_token/', VerifyTokenView.as_view(), name='verify-token'),
     re_path('api/register/', views.register),
     path('api/get_username/', GetUsernameView.as_view(), name='get-username'),
+	path('/api/get_profile_pic/',GetProfilePicView.as_view(), name='get-profilePic'), 
     path('api/get_user_id/', GetUserIdView.as_view(), name='get-user-id'),
     path('api/get_username_from_id/<int:user_id>/', GetUsernameFromIdView.as_view(), name='get-user-from-id'),
     path("", include(router.urls)),
@@ -36,4 +36,7 @@ urlpatterns = [
     path('api/get_blocked/', GetBlockedUserView.as_view(), name='get-blocked'),
     path('api/get_elo/', GetEloView.as_view(), name='get-elo'),
     path('api/update_elo/', UpdateEloView.as_view(), name='update-elo'),
-]
+]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+
+
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

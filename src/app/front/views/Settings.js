@@ -59,8 +59,8 @@ export default class Settings extends AbstractView {
                     <span id="username"></span>
                 </div>
                  <div class="form-group">
-                    <label class="form-label">Nickname</label>
-                    <input id="Nickname" type="text" class="form-control mb-1" value="">
+                    <label class="form-label">Username</label>
+                    <input id="Username" type="text" class="form-control mb-1" value="">
                 </div>
                 <div class="form-group">
                     <label class="form-label">E-mail</label>

@@ -56,6 +56,14 @@ class GetUsernameView(APIView):
         username = request.user.username
         return Response({'username': username})
 
+class GetProfilePicView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        profil_pic = request.user.profil_pic
+        return Response({'profil_pic': profil_pic})
+    
 class GetUserIdView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
