@@ -11,12 +11,13 @@ export default class Game extends AbstractView {
         this.scoreDisplay2 = document.getElementById("player2-score");
         this.websocket = null;
         this.tournamentWS = null;
+        this.loopTime = 33;
         this.paddle1Y = 170;
         this.paddle2Y = 170;
         this.ballX = 300;
         this.ballY = 200;
-        this.ballSpeedX = 2;
-        this.ballSpeedY = 2;
+        this.ballSpeedX = 4;
+        this.ballSpeedY = 4;
         this.player1Score = 0;
         this.player2Score = 0;
         this.gameActive = true;
@@ -139,6 +140,9 @@ export default class Game extends AbstractView {
                 this.websocket = null;
             }
         }
+        startTime = new Date().getTime();
+        endTime = new Date().getTime();
+        executionTime = endTime - startTime;
         this.update();
         if (!this.isOffline && this.gameActive) {
             this.websocket.onmessage = (event) => {
@@ -170,8 +174,13 @@ export default class Game extends AbstractView {
                 }
             };
         }
-        if (this.gameActive)
-            requestAnimationFrame(this.gameLoop);
+        if (this.gameActive) {
+            if(executionTime < this.loopTime) { 
+                setTimeout(function(){ this.gameLoop(); }, this.loopTime - executionTime);
+            }else{
+                setTimeout(function(){ this.gameLoop(); }, 0);
+            }
+        }
     }
 
     startGame = () => {
@@ -384,8 +393,8 @@ export default class Game extends AbstractView {
 			if (counter < 0) {
 				clearInterval(counterInterval);
 				document.getElementById("countdown").style.display = "none";
-				this.ballSpeedX = 2;
-				this.ballSpeedY = 2;
+				this.ballSpeedX = 4;
+				this.ballSpeedY = 4;
 			}
 		}, 1000);
     }
@@ -835,10 +844,12 @@ class Tic extends AbstractView {
     startGame = () => {
         document.getElementById("tic-card").classList.add("d-none");
         document.getElementById("tic-tac-toe").classList.remove("d-none");
-        this.websocket.send(JSON.stringify({
-            action: "send_username",
-            username: this.myName
-        }));
+        setTimeout(() => {
+            this.websocket.send(JSON.stringify({
+                action: "send_username",
+                username: this.myName
+            }));
+        }, 500);
         const self = this;
         this.websocket.onmessage = function(event) {
             const data = JSON.parse(event.data);
