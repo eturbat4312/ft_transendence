@@ -12,13 +12,13 @@ export default class Game extends AbstractView {
         this.scoreDisplay2 = document.getElementById("player2-score");
         this.websocket = null;
         this.tournamentWS = null;
-        this.loopTime = 33;
+        this.loopTime = 23;
         this.paddle1Y = 170;
         this.paddle2Y = 170;
         this.ballX = 300;
         this.ballY = 200;
-        this.ballSpeedX = 4;
-        this.ballSpeedY = 4;
+        this.ballSpeedX = 6;
+        this.ballSpeedY = 6;
         this.player1Score = 0;
         this.player2Score = 0;
         this.gameActive = true;
@@ -141,9 +141,9 @@ export default class Game extends AbstractView {
                 this.websocket = null;
             }
         }
-        startTime = new Date().getTime();
-        endTime = new Date().getTime();
-        executionTime = endTime - startTime;
+        let startTime = new Date().getTime();
+        let endTime = new Date().getTime();
+        let executionTime = endTime - startTime;
         this.update();
         if (!this.isOffline && this.gameActive) {
             this.websocket.onmessage = (event) => {
@@ -175,11 +175,12 @@ export default class Game extends AbstractView {
                 }
             };
         }
+        var self = this;
         if (this.gameActive) {
             if(executionTime < this.loopTime) { 
-                setTimeout(function(){ this.gameLoop(); }, this.loopTime - executionTime);
+                setTimeout(function(){ self.gameLoop(); }, this.loopTime - executionTime);
             }else{
-                setTimeout(function(){ this.gameLoop(); }, 0);
+                setTimeout(function(){ self.gameLoop(); }, 0);
             }
         }
     }
@@ -264,16 +265,16 @@ export default class Game extends AbstractView {
 
     updatePaddlePosition = () => {
 		if (this.keysPressed.ArrowUp) {
-			this.paddle2Y -= 3;
+			this.paddle2Y -= 6;
 		}
 		if (this.keysPressed.ArrowDown) {
-			this.paddle2Y += 3;
+			this.paddle2Y += 6;
 		}
 		if (this.keysPressed.w) {
-			this.paddle1Y -= 3;
+			this.paddle1Y -= 6;
 		}
 		if (this.keysPressed.s) {
-			this.paddle1Y += 3;
+			this.paddle1Y += 6;
 		}
 	
 		this.paddle1Y = Math.max(2, Math.min(this.paddle1Y, 338));
@@ -299,16 +300,16 @@ export default class Game extends AbstractView {
     sendPaddle1Position = () => {
         if (this.gameActive && this.websocket) {
             if (this.keysPressed.ArrowUp) {
-                this.paddle1Y -= 3;
+                this.paddle1Y -= 6;
             }
             if (this.keysPressed.ArrowDown) {
-                this.paddle1Y += 3;
+                this.paddle1Y += 6;
             }
             if (this.keysPressed.w) {
-                this.paddle1Y -= 3;
+                this.paddle1Y -= 6;
             }
             if (this.keysPressed.s) {
-                this.paddle1Y += 3;
+                this.paddle1Y += 6;
             }
             const message = JSON.stringify({
                 action: 'update_paddle1_position',
@@ -325,16 +326,16 @@ export default class Game extends AbstractView {
     sendPaddle2Position = () => {
         if (this.gameActive && this.websocket) {
             if (this.keysPressed.ArrowUp) {
-                this.paddle2Y -= 3;
+                this.paddle2Y -= 6;
             }
             if (this.keysPressed.ArrowDown) {
-                this.paddle2Y += 3;
+                this.paddle2Y += 6;
             }
             if (this.keysPressed.w) {
-                this.paddle2Y -= 3;
+                this.paddle2Y -= 6;
             }
             if (this.keysPressed.s) {
-                this.paddle2Y += 3;
+                this.paddle2Y += 6;
             }
             const message = JSON.stringify({
                 action: 'update_paddle2_position',
@@ -400,8 +401,8 @@ export default class Game extends AbstractView {
 			if (counter < 0) {
 				clearInterval(counterInterval);
 				document.getElementById("countdown").style.display = "none";
-				this.ballSpeedX = 4;
-				this.ballSpeedY = 4;
+				this.ballSpeedX = 6;
+				this.ballSpeedY = 6;
 			}
 		}, 1000);
     }
