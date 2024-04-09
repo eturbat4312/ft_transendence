@@ -17,6 +17,9 @@
   DB_USER=postgres
   DEBUG=False
 
+docker exec postgres apt-get update && apt-get install -y postgresql-13-pg-prometheus  
+
+
   # Catch if ctrl+c is pressed
   trap ctrl_c INT
   function ctrl_c() {

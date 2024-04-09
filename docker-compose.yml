@@ -3,6 +3,7 @@ version: '3.9'
 networks:
     transcendence:
         driver: bridge
+
 services:
     front:
         build:
@@ -17,6 +18,7 @@ services:
             - nginx
         networks:
             - transcendence
+
     nginx:
         build:
             context: ./src/app/nginx
@@ -25,6 +27,7 @@ services:
         restart: always
         ports:
             - "443:443"
+            - "9113:9113"
         volumes:
             - ./src/app/front/dist:/usr/share/nginx/html
             - ./src/app/nginx:/app/nginx
@@ -32,6 +35,7 @@ services:
             - django
         networks:
             - transcendence
+
     django:
         build:
             context: ./src/app/django
@@ -48,6 +52,7 @@ services:
             - db
         networks:
             - transcendence
+
     db:
         image: postgres:15.5-bullseye
         container_name: postgres
@@ -56,7 +61,33 @@ services:
             - "5432:5432"
         volumes:
             - ./src/app/db:/var/lib/postgresql/data
+            # - ./pg_config:/etc/postgresql
+        environment:
+            - SHARED_PRELOAD_LIBRARIES=pg_stat_statements,pg_prometheus
         env_file:
             - .env
+        networks:
+            - transcendence
+
+    prometheus:
+        image: prom/prometheus
+        container_name: prometheus
+        restart: always
+        volumes:
+            - ./src/app/prometheus:/etc/prometheus
+        ports:
+            - "9090:9090"
+        command:
+            - "--config.file=/etc/prometheus/prometheus.yml"
+        networks:
+            - transcendence
+    grafana:
+        image: grafana/grafana
+        container_name: grafana
+        restart: always
+        ports:
+            - "3000:3000"
+        volumes:
+            - ./src/app/grafana:/var/lib/grafana
         networks:
             - transcendence
