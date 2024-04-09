@@ -61,6 +61,7 @@ class GetProfilePicView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        print('logs from GetProfilePicView: ',request.user.profil_pic)
         profil_pic = request.user.profil_pic
         return Response({'profil_pic': profil_pic})
     

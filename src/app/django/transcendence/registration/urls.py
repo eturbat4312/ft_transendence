@@ -17,7 +17,7 @@ urlpatterns = [
     path('api/verify_token/', VerifyTokenView.as_view(), name='verify-token'),
     re_path('api/register/', views.register),
     path('api/get_username/', GetUsernameView.as_view(), name='get-username'),
-	path('/api/get_profile_pic/',GetProfilePicView.as_view(), name='get-profilePic'), 
+	path('api/get_profile_pic/',GetProfilePicView.as_view(), name='get-profilePic'), 
     path('api/get_user_id/', GetUserIdView.as_view(), name='get-user-id'),
     path('api/get_username_from_id/<int:user_id>/', GetUsernameFromIdView.as_view(), name='get-user-from-id'),
     path("", include(router.urls)),
