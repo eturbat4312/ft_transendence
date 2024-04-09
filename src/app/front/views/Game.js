@@ -711,12 +711,45 @@ class Tic extends AbstractView {
         this.winner = null;
         this.winnerDisplay = document.getElementById('winner-tic');
         this.myName = localStorage.getItem("username");
+        this.ELO = null;
     }
 
-    startMatchmaking = () => {
+    getTicELO = async () => {
+        const serverIP = window.location.hostname;
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.log('Token not found');
+            return;
+        }
+        try {
+            const response = await fetch(`https://${serverIP}/api/get_elo/`, {
+                method: 'GET',
+                headers: {
+                    'Authorization': 'Token ' + token
+                }
+            });
+            if (!response.ok) {
+                throw new Error('Failed to fetch friend requests');
+            }
+            const data = await response.json();
+            return data.elo;
+        } catch (error) {
+            console.error('Error fetching friend requests:', error);
+            return [];
+        }
+    }
+
+    startMatchmaking = async () => {
         const serverIP = window.location.hostname;
         if (this.websocket === null || this.websocket.readyState !== WebSocket.OPEN) {
-            this.websocket = new WebSocket(`wss://${serverIP}/api/ws/matchmaking2/`);
+            this.ELO = await this.getTicELO();
+            console.log(`Elo: ${this.ELO}`);
+            if (this.ELO < 33)
+                this.websocket = new WebSocket(`wss://${serverIP}/api/ws/matchmakingbronze/`);
+            else if (this.ELO < 66)
+                this.websocket = new WebSocket(`wss://${serverIP}/api/ws/matchmakingsilver/`);
+            else if (this.ELO <= 100)
+                this.websocket = new WebSocket(`wss://${serverIP}/api/ws/matchmakinggold/`);
             this.websocket.onopen = () => {
                 console.log("Matchmaking WebSocket connection established");
                 this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
@@ -769,6 +802,33 @@ class Tic extends AbstractView {
             };
         } else {
             console.log("WebSocket connection is already open.");
+        }
+    }
+
+    updateELO = async (newELO) => {
+        console.log("updateELO: " + newELO);
+        if (newELO > 100)
+            newELO = 100;
+        if (newELO < 0)
+            newELO = 0;
+        const serverIP = window.location.hostname;
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.log('Token not found');
+            return;
+        }
+        try {
+            const response = await fetch(`https://${serverIP}/api/update_elo/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Token ' + token,
+                    'Content-Type': 'application/json',
+
+                },
+                body: JSON.stringify({ new_elo: newELO })
+            });
+        } catch (error) {
+            console.error('An error occurred while handling elo update:', error);
         }
     }
 
@@ -851,12 +911,19 @@ class Tic extends AbstractView {
             }
         }
         if (game_over) {
+            if (winner === "draw")
+                this.updateELO(this.ELO + 0);
+            else if (winner === this.myName)
+                this.updateELO(this.ELO + 8);
+            else
+                this.updateELO(this.ELO - 6);
             let message;
             if (winner === "draw")
                 message = `It's a draw...`;
             else if (winner)
                 message = `${winner} won the game !`;
             document.getElementById("winner-tic").innerText = message;
+
         }
     }
 

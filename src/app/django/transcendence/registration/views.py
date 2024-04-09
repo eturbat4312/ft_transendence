@@ -76,6 +76,29 @@ class GetUsernameFromIdView(APIView):
         except UserModel.DoesNotExist:
             return Response({'username': 'Unknown User'})
 
+class GetEloView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        elo = user.elo
+        return Response({'elo': elo})
+
+class UpdateEloView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        new_elo = request.data.get('new_elo')
+        if new_elo is None:
+            return Response({'error': 'elo not here'}, status=400)
+        user = request.user
+        user.elo = new_elo
+        user.save()
+
+        return Response({'success': 'elo updated'})
+
 class SendFriendRequestView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]

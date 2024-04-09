@@ -7,6 +7,7 @@ class User(AbstractUser):
     friends = models.ManyToManyField('self', symmetrical=False, related_name='friends_list')
     blocked = models.ManyToManyField('self', symmetrical=False, related_name='blocked_list')
     custom_field = models.CharField(max_length=255)
+    elo = models.IntegerField(default=0, blank=True, null=True)
     
 
     def __str__(self):

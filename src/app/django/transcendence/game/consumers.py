@@ -326,7 +326,111 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             "winner": event["winner"],
         }))
 
-class Matchmaking2Consumer(AsyncWebsocketConsumer):
+class MatchmakingBronzeConsumer(AsyncWebsocketConsumer):
+    waiting_players = []
+
+    async def connect(self):
+        await self.channel_layer.group_add("matchmaking2", self.channel_name)
+        await self.accept()
+        self.waiting_players.append(self.channel_name)
+        if len(self.waiting_players) >= 2:
+            player1_channel = self.waiting_players.pop(0)
+            player2_channel = self.waiting_players.pop(0)
+            game_id = self.generate_game_id()
+            game_group_name = f"game_{game_id}"
+            await self.channel_layer.group_add(game_group_name, player1_channel)
+            await self.channel_layer.group_add(game_group_name, player2_channel)
+            await self.channel_layer.group_send(game_group_name, {"type": "match_found", "game_id": game_id})
+
+    async def disconnect(self, close_code):
+        if self.channel_name in self.waiting_players:
+            self.waiting_players.remove(self.channel_name)
+        await self.channel_layer.group_discard("matchmaking2", self.channel_name)
+
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        print("Received: ", data)
+        if len(self.channel_layer.groups.get("matchmaking2", [])) == 1:
+            await self.channel_layer.send(self.channel_name, {"type": "player", "player1": True})
+        else:
+            await self.channel_layer.send(self.channel_name, {"type": "player", "player1": False})
+
+    async def player(self, event):
+        player1 = event["player1"]
+        await self.channel_layer.group_add("matchmaking_queue", self.channel_name)
+        await self.send(text_data=json.dumps({"action": "player", "player1": player1}))
+        if len(self.channel_layer.groups.get("matchmaking_queue", [])) >= 2:
+            await self.channel_layer.group_send("matchmaking_queue", {"type": "match_found"})
+
+
+    @classmethod
+    def generate_game_id(cls):
+        return secrets.token_urlsafe(8)
+
+    async def match_found(self, event):
+        game_id = event.get("game_id")
+        if game_id:
+            game_group_name = f"game_{game_id}"
+            await self.send(text_data=json.dumps({"action": "match_found", "game_id": game_id}))
+            await self.channel_layer.group_discard("matchmaking_queue", self.channel_name)
+            await self.channel_layer.group_add(game_group_name, self.channel_name)
+        else:
+            logging.error("Aucun game_id trouvé dans l'événement match_found.")
+
+class MatchmakingSilverConsumer(AsyncWebsocketConsumer):
+    waiting_players = []
+
+    async def connect(self):
+        await self.channel_layer.group_add("matchmaking2", self.channel_name)
+        await self.accept()
+        self.waiting_players.append(self.channel_name)
+        if len(self.waiting_players) >= 2:
+            player1_channel = self.waiting_players.pop(0)
+            player2_channel = self.waiting_players.pop(0)
+            game_id = self.generate_game_id()
+            game_group_name = f"game_{game_id}"
+            await self.channel_layer.group_add(game_group_name, player1_channel)
+            await self.channel_layer.group_add(game_group_name, player2_channel)
+            await self.channel_layer.group_send(game_group_name, {"type": "match_found", "game_id": game_id})
+
+    async def disconnect(self, close_code):
+        if self.channel_name in self.waiting_players:
+            self.waiting_players.remove(self.channel_name)
+        await self.channel_layer.group_discard("matchmaking2", self.channel_name)
+
+
+    async def receive(self, text_data):
+        data = json.loads(text_data)
+        print("Received: ", data)
+        if len(self.channel_layer.groups.get("matchmaking2", [])) == 1:
+            await self.channel_layer.send(self.channel_name, {"type": "player", "player1": True})
+        else:
+            await self.channel_layer.send(self.channel_name, {"type": "player", "player1": False})
+
+    async def player(self, event):
+        player1 = event["player1"]
+        await self.channel_layer.group_add("matchmaking_queue", self.channel_name)
+        await self.send(text_data=json.dumps({"action": "player", "player1": player1}))
+        if len(self.channel_layer.groups.get("matchmaking_queue", [])) >= 2:
+            await self.channel_layer.group_send("matchmaking_queue", {"type": "match_found"})
+
+
+    @classmethod
+    def generate_game_id(cls):
+        return secrets.token_urlsafe(8)
+
+    async def match_found(self, event):
+        game_id = event.get("game_id")
+        if game_id:
+            game_group_name = f"game_{game_id}"
+            await self.send(text_data=json.dumps({"action": "match_found", "game_id": game_id}))
+            await self.channel_layer.group_discard("matchmaking_queue", self.channel_name)
+            await self.channel_layer.group_add(game_group_name, self.channel_name)
+        else:
+            logging.error("Aucun game_id trouvé dans l'événement match_found.")
+
+class MatchmakingGoldConsumer(AsyncWebsocketConsumer):
     waiting_players = []
 
     async def connect(self):
