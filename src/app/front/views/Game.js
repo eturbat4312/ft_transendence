@@ -185,13 +185,16 @@ export default class Game extends AbstractView {
         }
     }
 
-    sendInGameStatus = () => {
+    sendInGameStatus = (bool) => {
         var websocketC = getWebsocket();
-        websocketC.send(JSON.stringify({ action: "in_game"})); 
+        if (bool)
+            websocketC.send(JSON.stringify({ action: "in_game"}));
+        else
+            websocketC.send(JSON.stringify({ action: "not_in_game"}));
     }
 
     startGame = () => {
-        this.sendInGameStatus();
+        this.sendInGameStatus(true);
         this.resetBall();
         this.gameActive = true;
         this.gameLoop();
@@ -412,10 +415,6 @@ export default class Game extends AbstractView {
         this.tournamentWS.send(message);
     }
 
-    sendInGameStatus() {
-
-    }
-
     tournamentDisconnection = (disconnectedPlayer) => {
         const username = localStorage.getItem("username");
         const player1Name = document.getElementById("player1-name").dataset.name;
@@ -476,6 +475,7 @@ export default class Game extends AbstractView {
             this.websocket.close();
         }
         this.websocket = null;
+        this.sendInGameStatus(false);
         if (!this.tournament) {
             const resetButton = document.querySelector(".btn-reset");
             resetButton.style.display = "block";

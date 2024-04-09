@@ -2,7 +2,7 @@ import { getNav, getSocial, getChat, handleLogout } from '../views/utils.js';
 import { eventDelete, addTournamentEventListeners, tournamentCreated, checkTournamentExists } from '../views/Tournament.js';
 import { addGameEventListeners, initPrivateGame } from '../views/Game.js';
 import { addChatEventListeners } from './utils.js';
-import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, showGameInvitationNotification, updateFriendRequestsModal, getFriends, updateBlockedModal } from './friendModal.js';
+import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, showGameInvitationNotification, updateFriendRequestsModal, getFriends, updateBlockedModal, addToPlayersPlaying, removeFromPlayersPlaying } from './friendModal.js';
 import '../theme/base.css'
 import '../theme/game.css'
 import '../theme/index.css'
@@ -148,6 +148,14 @@ export function getWebsocket() {
     return (websocket);
 }
 
+function setInGameStatus(friendId) {
+    const statusIcon = document.getElementById(friendId);
+    if (statusIcon) {
+        statusIcon.classList.remove("online");
+        statusIcon.classList.add("in-game");
+    }
+}
+
 const checkIfConnected = async () => {
     const auth = await isAuthenticated();
     if (!auth)
@@ -182,6 +190,7 @@ const checkIfConnected = async () => {
         }
         if (data.action === "disconnected") {
             removeDisconnectedPlayer(data.username);
+            removeFromPlayersPlaying(data.user_id);
             getFriends(websocket);
         }
         if (data.action === "friend_request" && data.to_user_id === userId) {
@@ -201,6 +210,16 @@ const checkIfConnected = async () => {
         }
         if (data.action === "pong" && data.to_user === username) {
             updateConnectedPlayer(data.username, data.user_id, true, websocket);
+        }
+        if (data.action === "in_game") {
+            addToPlayersPlaying(data.user_id);
+           // setInGameStatus(`friend-${data.user_id}`);
+            getFriends(websocket);
+        }
+        if (data.action === "not_in_game") {
+            removeFromPlayersPlaying(data.user_id);
+           // setInGameStatus(`friend-${data.user_id}`);
+            getFriends(websocket);
         }
         if (data.action === "accept_invite" && data.user_id === userId) {
             const prvBtn = document.getElementById('btn-start-private');

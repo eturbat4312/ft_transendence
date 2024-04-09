@@ -2,7 +2,26 @@ import { addNavEventListeners } from "./index.js";
 import { initPrivateGame } from "../views/Game.js";
 
 let connectedPlayers = [];
+let playersPlaying = [];
 
+
+export function addToPlayersPlaying(id) {
+    if (!playersPlaying.includes(id)) {
+        playersPlaying.push(id);
+        console.log(playersPlaying);
+    }
+}
+
+export function removeFromPlayersPlaying(id) {
+    const index = playersPlaying.indexOf(id);
+    if (index !== -1) {
+        playersPlaying.splice(index, 1);
+    }
+}
+
+function isPlaying(id) {
+    return playersPlaying.includes(String(id));
+}
 
 export function removeDisconnectedPlayer(playerName) {
     connectedPlayers = connectedPlayers.filter(player => player.name !== playerName);
@@ -639,8 +658,11 @@ export async function getFriends(websocket) {
                 friendElement.dataset.id = friend.id;
                 friendElement.dataset.name = friend.username;
                 const statusIcon = document.createElement("div");
+                statusIcon.setAttribute("id", `friend-${friend.id}`);
                 statusIcon.classList.add("player-status");
-                if (isFriendOnline(friend.username)) {
+                if (isPlaying(friend.id)) {
+                    statusIcon.classList.add("in-game");
+                } else if (isFriendOnline(friend.username)) {
                     statusIcon.classList.add("online");
                 } else {
                     statusIcon.classList.add("offline");

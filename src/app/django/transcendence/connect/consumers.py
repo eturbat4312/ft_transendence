@@ -27,6 +27,7 @@ class ConnectConsumer(AsyncWebsocketConsumer):
                 {
                     'type': 'user_disconnected',
                     'username': self.username,
+                    'user_id': self.user_id,
                 }
             )
 
@@ -114,6 +115,14 @@ class ConnectConsumer(AsyncWebsocketConsumer):
                     'user_id': self.user_id,
                 }
             )
+        elif action == 'not_in_game':
+            await self.channel_layer.group_send(
+                "connected_users",
+                {
+                    'type': 'not_in_game',
+                    'user_id': self.user_id,
+                }
+            )
         elif action == "start_tournament":
             await self.channel_layer.group_send(
                 "connected_users",
@@ -156,12 +165,19 @@ class ConnectConsumer(AsyncWebsocketConsumer):
     async def user_disconnected(self, event):
         await self.send(text_data=json.dumps({
             "username": event["username"],
+            "user_id": event["user_id"],
             "action": "disconnected",
         }))
     
     async def in_game(self, event):
         await self.send(text_data=json.dumps({
             "action": "in_game",
+            "user_id": event["user_id"],
+        }))
+
+    async def not_in_game(self, event):
+        await self.send(text_data=json.dumps({
+            "action": "not_in_game",
             "user_id": event["user_id"],
         }))
 
