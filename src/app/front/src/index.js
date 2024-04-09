@@ -2,7 +2,7 @@ import { getNav, getSocial, getChat, handleLogout } from '../views/utils.js';
 import { eventDelete, addTournamentEventListeners, tournamentCreated, checkTournamentExists } from '../views/Tournament.js';
 import { addGameEventListeners, initPrivateGame } from '../views/Game.js';
 import { addChatEventListeners } from './utils.js';
-import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, showGameInvitationNotification, updateFriendRequestsModal, getFriends, updateBlockedModal, addToPlayersPlaying, removeFromPlayersPlaying } from './friendModal.js';
+import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, showGameInvitationNotification, updateFriendRequestsModal, getFriends, updateBlockedModal, addToPlayersPlaying, removeFromPlayersPlaying, checkPlaying } from './friendModal.js';
 import '../theme/base.css'
 import '../theme/game.css'
 import '../theme/index.css'
@@ -184,6 +184,7 @@ const checkIfConnected = async () => {
         }
         if (data.action === "connected") {
             updateConnectedPlayer(data.username, data.userId, true, websocket);
+            checkPlaying(userId, websocket);
             //console.log("username: ", data.username, " userid: ", data.userId);
             // const message = JSON.stringify({ action: 'connected_player', username: username });
             // websocket.send(message);

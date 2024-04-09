@@ -19,6 +19,11 @@ export function removeFromPlayersPlaying(id) {
     }
 }
 
+export function checkPlaying(userId, websocket) {
+    if (isPlaying(userId))
+        websocket.send(JSON.stringify({ action: "in_game"}));
+}
+
 function isPlaying(id) {
     return playersPlaying.includes(String(id));
 }

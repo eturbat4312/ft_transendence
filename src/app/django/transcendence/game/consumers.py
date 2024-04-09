@@ -187,7 +187,7 @@ class MatchmakingConsumer(AsyncWebsocketConsumer):
             game_group_name = f"game_{game_id}"
             await self.send(text_data=json.dumps({"action": "match_found", "game_id": game_id}))
             await self.channel_layer.group_discard("matchmaking_queue", self.channel_name)
-            await self.channusernameel_layer.group_add(game_group_name, self.channel_name)
+            await self.channel_layer.group_add(game_group_name, self.channel_name)
         else:
             logging.error("Aucun game_id trouvé dans l'événement match_found.")
 
