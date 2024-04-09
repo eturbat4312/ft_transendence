@@ -664,7 +664,7 @@ export async function getFriends(websocket) {
                 friendElement.addEventListener('click', async () => {
                     const friendName = friend.username;
                     const friendId = friendElement.dataset.id;
-                    const friendInfoContent = ` <p>Userame: ${friendName}</p>
+                    const friendInfoContent = ` <p>Username: ${friendName}</p>
                                                 <button id="removeFriendBtn" class="btn btn-danger" data-bs-dismiss="modal">Remove from friends</button>
                                                 <button id="inviteGameBtn"  class="btn btn-success" data-bs-dismiss="modal">Invite to play 1v1</button>`;
                     document.getElementById('friendModalBody').innerHTML = friendInfoContent;
