@@ -9,6 +9,8 @@ import '../theme/index.css'
 import '../theme/style.css'
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
+var websocket = null;
+
 const routes = [
     { path: "/", view: "Welcome" },
     { path: "/home", view: "Home" },
@@ -142,6 +144,10 @@ window.addEventListener('popstate', () => {
     loadView(location.pathname);
 });
 
+export function getWebsocket() {
+    return (websocket);
+}
+
 const checkIfConnected = async () => {
     const auth = await isAuthenticated();
     if (!auth)
@@ -150,7 +156,7 @@ const checkIfConnected = async () => {
     const userId = localStorage.getItem('userId');
     console.log("my userId: ", userId);
     const serverIP = window.location.hostname;
-    var websocket = new WebSocket(`wss://${serverIP}/api/ws/connect/`);
+    websocket = new WebSocket(`wss://${serverIP}/api/ws/connect/`);
     websocket.onopen = () => {
         console.log("Connect WebSocket connection established");
         const message = JSON.stringify({ action: 'connect', username: username, userId: userId });

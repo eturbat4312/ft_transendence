@@ -1,4 +1,5 @@
 import AbstractView from "./AbstractView.js";
+import { getWebsocket } from "../src/index.js";
 
 export default class Game extends AbstractView {
     constructor(params) {
@@ -183,7 +184,13 @@ export default class Game extends AbstractView {
         }
     }
 
+    sendInGameStatus = () => {
+        var websocketC = getWebsocket();
+        websocketC.send(JSON.stringify({ action: "in_game"})); 
+    }
+
     startGame = () => {
+        this.sendInGameStatus();
         this.resetBall();
         this.gameActive = true;
         this.gameLoop();
@@ -404,15 +411,17 @@ export default class Game extends AbstractView {
         this.tournamentWS.send(message);
     }
 
+    sendInGameStatus() {
+
+    }
+
     tournamentDisconnection = (disconnectedPlayer) => {
         const username = localStorage.getItem("username");
         const player1Name = document.getElementById("player1-name").dataset.name;
         const player2Name = document.getElementById("player2-name").dataset.name;
-        console.log("tournament disconnection before return");
         console.log(username + " --- " + player1Name + " --- " + player2Name);
         if (disconnectedPlayer != player1Name && disconnectedPlayer != player2Name)
             return;
-        console.log("tournament disconnection after return");
         this.ballSpeedX = 0;
         this.ballSpeedY = 0;
         this.ball.style.display = "none";
@@ -532,6 +541,7 @@ export default class Game extends AbstractView {
                 break;
         }
     }
+
 
     startMatchmaking = () => {
         const username = localStorage.getItem("username");

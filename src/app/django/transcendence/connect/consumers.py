@@ -106,6 +106,14 @@ class ConnectConsumer(AsyncWebsocketConsumer):
                     'user_id': user_id,
                 }
             )
+        elif action == 'in_game':
+            await self.channel_layer.group_send(
+                "connected_users",
+                {
+                    'type': 'in_game',
+                    'user_id': self.user_id,
+                }
+            )
         elif action == "start_tournament":
             await self.channel_layer.group_send(
                 "connected_users",
@@ -149,6 +157,12 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "username": event["username"],
             "action": "disconnected",
+        }))
+    
+    async def in_game(self, event):
+        await self.send(text_data=json.dumps({
+            "action": "in_game",
+            "user_id": event["user_id"],
         }))
 
     async def send_error(self, message):
