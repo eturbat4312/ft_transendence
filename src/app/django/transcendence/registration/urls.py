@@ -3,7 +3,8 @@ from . import views
 from .views import LoginView, LogoutView, GetUsernameView, GetUserIdView, GetUsernameFromIdView, VerifyTokenView
 from .views import SendFriendRequestView, FriendRequestsView, RespondFriendRequestView, GetFriendsView, RemoveFriendView
 from .views import GetMessageHistoryView, SendMessageView, CreateTournamentView, CheckTournamentView, DeleteTournamentView
-from .views import BlockUserView, RemoveBlockedUserView, GetBlockedUserView, GetEloView, UpdateEloView
+from .views import BlockUserView, RemoveBlockedUserView, GetBlockedUserView, GetEloView, UpdateEloView, PlayerStatsView
+from .views import PostMatchView
 from rest_framework.routers import DefaultRouter
 
 # from .views import UserViewSet
@@ -36,4 +37,7 @@ urlpatterns = [
     path('api/get_blocked/', GetBlockedUserView.as_view(), name='get-blocked'),
     path('api/get_elo/', GetEloView.as_view(), name='get-elo'),
     path('api/update_elo/', UpdateEloView.as_view(), name='update-elo'),
+    path('api/player_stats/<int:user_id>', PlayerStatsView.as_view(), name='player-stats'),
+    path('api/post_match/', PostMatchView.as_view(), name='post-match'),
+
 ]

@@ -2,6 +2,13 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
+class Match(models.Model):
+    player = models.ForeignKey(User, related_name='player', on_delete=models.CASCADE)
+    opponent = models.ForeignKey(User, related_name='opponent', on_delete=models.CASCADE)
+    player_score = models.IntegerField()
+    opponent_score = models.IntegerField()
+    winner = models.ForeignKey(User, related_name='won_matches', on_delete=models.CASCADE)
+    played_at = models.DateTimeField(auto_now_add=True)
 
 class User(AbstractUser):
     friends = models.ManyToManyField('self', symmetrical=False, related_name='friends_list')
@@ -12,6 +19,15 @@ class User(AbstractUser):
 
     def __str__(self):
         return self.username
+    
+    def total_matches(self):
+        return self.matches_as_player1.count() + self.matches_as_player2.count()
+
+    def won_matches(self):
+        return self.won_matches.count()
+
+    def lost_matches(self):
+        return self.total_matches() - self.won_matches()
 
     class Meta:
         # Add the following line to resolve the related_name conflict

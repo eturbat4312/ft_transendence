@@ -207,6 +207,39 @@ class GetBlockedUserView(APIView):
         serializer = UserSerializer(blocked, many=True)
         return Response({'blocked': serializer.data})
 
+class PlayerStatsView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        user = get_object_or_404(User, id=user_id)
+        return Response({
+            'total_matches': user.total_matches(),
+            'won_matches': user.won_matches(),
+            'lost_matches': user.lost_matches(),
+        })
+
+class PostMatchView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        player = get_object_or_404(User, username=request.data.get('username'))
+        opponent = get_object_or_404(User, username=request.data.get('opponent_username'))
+        player_score = request.data.get('player_score')
+        opponent_score = request.data.get('opponent_score')
+        winner = player if player_score > opponent_score else opponent
+
+        match = Match.objects.create(
+            player=player,
+            opponent=opponent,
+            player_score=player_score,
+            opponent_score=opponent_score,
+            winner=winner,
+        )
+
+        return Response({'message': 'Match successfully stocked'}, status=status.HTTP_201_CREATED)
+
 class GetMessageHistoryView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
