@@ -2,14 +2,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 
-class Match(models.Model):
-    player = models.ForeignKey(User, related_name='player', on_delete=models.CASCADE)
-    opponent = models.ForeignKey(User, related_name='opponent', on_delete=models.CASCADE)
-    player_score = models.IntegerField()
-    opponent_score = models.IntegerField()
-    winner = models.ForeignKey(User, related_name='won_matches', on_delete=models.CASCADE)
-    played_at = models.DateTimeField(auto_now_add=True)
-
 class User(AbstractUser):
     friends = models.ManyToManyField('self', symmetrical=False, related_name='friends_list')
     blocked = models.ManyToManyField('self', symmetrical=False, related_name='blocked_list')
@@ -21,7 +13,7 @@ class User(AbstractUser):
         return self.username
     
     def total_matches(self):
-        return self.matches_as_player1.count() + self.matches_as_player2.count()
+        return self.player.count()
 
     def won_matches(self):
         return self.won_matches.count()
@@ -32,6 +24,14 @@ class User(AbstractUser):
     class Meta:
         # Add the following line to resolve the related_name conflict
         swappable = "AUTH_USER_MODEL"
+
+class Match(models.Model):
+    player = models.ForeignKey(User, related_name='player', on_delete=models.CASCADE)
+    opponent = models.ForeignKey(User, related_name='opponent', on_delete=models.CASCADE)
+    player_score = models.IntegerField()
+    opponent_score = models.IntegerField()
+    winner = models.ForeignKey(User, related_name='won_matches', on_delete=models.CASCADE)
+    played_at = models.DateTimeField(auto_now_add=True)
 
 class FriendRequest(models.Model):
     from_user = models.ForeignKey(User, related_name='from_user', on_delete=models.CASCADE)

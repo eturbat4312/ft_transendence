@@ -7,7 +7,7 @@ from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
 from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, FriendRequestSerializer, MessageSerializer
 from .models import User as UserModel
-from .models import FriendRequest, Message, Tournament
+from .models import FriendRequest, Message, Tournament, Match
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
@@ -212,11 +212,12 @@ class PlayerStatsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, user_id):
-        user = get_object_or_404(User, id=user_id)
+        user = get_object_or_404(UserModel, id=user_id)
         return Response({
             'total_matches': user.total_matches(),
             'won_matches': user.won_matches(),
             'lost_matches': user.lost_matches(),
+            'matches': list(matches),
         })
 
 class PostMatchView(APIView):
@@ -224,8 +225,8 @@ class PostMatchView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
-        player = get_object_or_404(User, username=request.data.get('username'))
-        opponent = get_object_or_404(User, username=request.data.get('opponent_username'))
+        player = get_object_or_404(UserModel, username=request.data.get('player_username'))
+        opponent = get_object_or_404(UserModel, username=request.data.get('opponent_username'))
         player_score = request.data.get('player_score')
         opponent_score = request.data.get('opponent_score')
         winner = player if player_score > opponent_score else opponent

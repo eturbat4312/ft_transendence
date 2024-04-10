@@ -39,6 +39,16 @@ class GameConsumer(AsyncWebsocketConsumer):
                 logging.error("No game_id provided. Closing connection.")
                 await self.close()
             await self.start_game()
+        
+        if action == "send_username":
+            print("send_username")
+            await self.channel_layer.group_send(
+                self.game_group_name,
+                {
+                    'type': 'send_username',
+                    'opponent': self.username
+                }
+            )
 
         if action == "private":
             game_id = text_data_json['game_id']
@@ -95,6 +105,12 @@ class GameConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             'action': 'update_ball_position',
             'ball_data': ball_data
+    }))
+
+    async def send_username(self, event):
+        await self.send(text_data=json.dumps({
+            'action': 'send_username',
+            'opponent': event['opponent']
     }))
 
     async def update_paddle1_position(self, event):

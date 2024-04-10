@@ -39,5 +39,4 @@ urlpatterns = [
     path('api/update_elo/', UpdateEloView.as_view(), name='update-elo'),
     path('api/player_stats/<int:user_id>', PlayerStatsView.as_view(), name='player-stats'),
     path('api/post_match/', PostMatchView.as_view(), name='post-match'),
-
 ]
