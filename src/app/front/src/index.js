@@ -14,6 +14,7 @@ var websocket = null;
 const routes = [
     { path: "/", view: "Welcome" },
     { path: "/home", view: "Home" },
+    { path: "/profile", view: "Profile" },
     { path: "/login", view: "Login" },
     { path: "/signup", view: "Signup" },
     { path: "/game", view: "Game" },
@@ -117,15 +118,18 @@ const loadComponents = async () => {
     addNavEventListeners();
 };
 
+const navLinkClickHandler = (event) => {
+    console.log("page:", event.currentTarget.getAttribute('href'));
+    event.preventDefault();
+    const path = event.currentTarget.getAttribute('href');
+    navigate(path);
+};
+
 export const addNavEventListeners = () => {
     const navLinks = document.querySelectorAll('.nav__link');
     navLinks.forEach(link => {
-        link.addEventListener('click', (event) => {
-            console.log("page:", link.getAttribute('href'));
-            event.preventDefault();
-            const path = link.getAttribute('href');
-            navigate(path);
-        });
+        link.removeEventListener('click', navLinkClickHandler);
+        link.addEventListener('click', navLinkClickHandler);
     });
     const logout = document.getElementById('logout');
     if (logout) {
