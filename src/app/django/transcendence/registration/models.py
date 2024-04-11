@@ -17,7 +17,7 @@ class User(AbstractUser):
         return self.player.count()
 
     def count_won_matches(self):
-        return self.won_matches.all().count()
+        return self.won_matches.all().count() / 2
 
     def lost_matches(self):
         return self.total_matches() - self.count_won_matches()

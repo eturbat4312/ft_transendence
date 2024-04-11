@@ -32,13 +32,13 @@ export default class Profile extends AbstractView {
         </div>
         <div class="card-body">
             <p class="card-text">
-                Games Played: <span id="gamesPlayed"></span>
+                Games Played: <span id="profile-gamesPlayed"></span>
             </p>
             <p class="card-text">
-                Games Won: <span id="gamesWon"></span>
+                Games Won: <span id="profile-gamesWon"></span>
             </p>
             <p class="card-text">
-                Games Lost: <span id="gamesLost"></span>
+                Games Lost: <span id="profile-gamesLost"></span>
             </p>
         </div>
     </div>

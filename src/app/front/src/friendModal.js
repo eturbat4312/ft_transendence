@@ -711,7 +711,7 @@ async function getPlayerStats(userId) {
             },
         });
         const data = await response.json();
-        console.log(data);
+        return (data);
     } catch (error) {
         console.error('An error occurred while getting player stats:', error);
     }
@@ -720,9 +720,22 @@ async function getPlayerStats(userId) {
 async function printProfile(userId)
 {
     const username = await fetchUsernameFromId(userId);
+    const data = await getPlayerStats(userId);
+    const totalMatches = data.total_matches;
+    const wonMatches = data.won_matches;
+    const lostMatches = data.lost_matches;
+    const matches = data.matches;
     const profileUser = document.getElementById("profile-username");
-    await getPlayerStats(userId);
+    const profileGamesPlayed = document.getElementById("profile-gamesPlayed");
+    const profileGamesWon = document.getElementById("profile-gamesWon");
+    const profileGamesLose = document.getElementById("profile-gamesLost");
+    const profileGamesHistory = document.getElementById("profile-username");
+
+    console.log(totalMatches, wonMatches, lostMatches, matches);
     profileUser.innerText = username;
+    profileGamesPlayed.innerText = totalMatches;
+    profileGamesWon.innerText = wonMatches;
+    profileGamesLose.innerText = lostMatches;
 }
 
 export async function getFriends(websocket) {
