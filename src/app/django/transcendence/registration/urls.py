@@ -6,7 +6,7 @@ from .views import GetMessageHistoryView, SendMessageView, CreateTournamentView,
 
 from .views import BlockUserView, RemoveBlockedUserView, GetBlockedUserView, GetEloView, UpdateEloView, GetProfilePicView
 from .views import GetEmailView, GetBioView, UpdateUsername, UpdateEmailView, UpdateProfilePicView, ChangePassword
-from .views import UpdateBioView,PlayerStatsView,PostMatchView
+from .views import UpdateBioView,PlayerStatsView,PostMatchView,GetMatchHistoryView
 
 from rest_framework.routers import DefaultRouter
 from django.conf import settings
@@ -50,5 +50,6 @@ urlpatterns = [
     path('api/update_elo/', UpdateEloView.as_view(), name='update-elo'),
     path('api/player_stats/<int:user_id>/', PlayerStatsView.as_view(), name='player-stats'),
     path('api/post_match/', PostMatchView.as_view(), name='post-match'),
+    path('api/get_match_history/', GetMatchHistoryView.as_view(), name='get-match-history'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

@@ -127,7 +127,7 @@ export default class extends AbstractView {
         }
 
         try {
-            const responseStats = await fetch(`https://${serverIP}/api/get_statistics/`, {
+            const responseStats = await fetch(`https://${serverIP}/api/player_stats/${id}/`, {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Token ' + token
@@ -136,9 +136,9 @@ export default class extends AbstractView {
 
             if (responseStats.ok) {
                 const stats = await responseStats.json();
-                document.getElementById('gamesPlayed').innerText = stats.gamesPlayed;
-                document.getElementById('gamesWon').innerText = stats.gamesWon;
-                document.getElementById('gamesLost').innerText = stats.gamesLost;
+                document.getElementById('gamesPlayed').innerText = stats.total_matches;
+                document.getElementById('gamesWon').innerText = stats.won_matches;
+                document.getElementById('gamesLost').innerText = stats.lost_matches;
             } else {
                 console.log('Failed to get statistics:', await responseStats.text());
             }
@@ -200,7 +200,7 @@ export default class extends AbstractView {
                 matchHistory.forEach(match => {
                     const listItem = document.createElement('li');
                     listItem.className = 'list-group-item bg-secondary text-light';
-                    listItem.innerHTML = `Played against <strong>${match.opponent}</strong> - Result: <strong>${match.result}</strong>`;
+                    listItem.innerHTML = `Date: <strong>${match.played_at}</strong> Played against <strong>${match.opponent}</strong> - Result: <strong>${match.player_score}</strong> - <strong>${match.opponent_score}</strong> - Winner <strong>${match.winner}</strong> `;
                     matchListElement.appendChild(listItem);
                 });
             } else {

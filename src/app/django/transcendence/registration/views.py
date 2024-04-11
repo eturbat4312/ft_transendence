@@ -256,6 +256,7 @@ class PostMatchView(APIView):
         player_score = request.data.get('player_score')
         opponent_score = request.data.get('opponent_score')
         winner = player if player_score > opponent_score else opponent
+        played_at = request.data.get('played_at')
 
         match = Match.objects.create(
             player=player,
@@ -263,9 +264,19 @@ class PostMatchView(APIView):
             player_score=player_score,
             opponent_score=opponent_score,
             winner=winner,
+            played_at=played_at
         )
 
         return Response({'message': 'Match successfully stocked'}, status=status.HTTP_201_CREATED)
+
+class GetMatchHistoryView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        match = Match.objects.filter(player=request.user)
+        serializer = MatchSerializer(match, many=True)
+        return Response({'match': serializer.data})
 
 class GetMessageHistoryView(APIView):
     authentication_classes = [TokenAuthentication]
