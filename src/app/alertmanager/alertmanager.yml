@@ -1,0 +1,7 @@
+route:
+  receiver: 'discord-notifications'
+
+receivers:
+- name: 'discord-notifications'
+  webhook_configs:
+  - url: 'https://discord.com/api/webhooks/xxxxxxxxxxxxxx'

@@ -2,6 +2,14 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
 
+rule_files:
+  - 'rules.yml'
+
+alerting:
+  alertmanagers:
+  - static_configs:
+    - targets: ['alertmanager:9093']
+
 scrape_configs:
   - job_name: 'django'
     metrics_path: /metrics
@@ -16,11 +24,11 @@ scrape_configs:
     static_configs:
       - targets: ['prometheus:9090']
 
-  - job_name: 'postgres'
-    metrics_path: /metrics
-    static_configs:
-      - targets: ['postgres:5432']
-    metric_relabel_configs:
-      - source_labels: [__name__]
-        regex: '.*_(connections|locks|transactions)_total' 
-        action: keep
+  # - job_name: 'postgres'
+  #   metrics_path: /metrics
+  #   static_configs:
+  #     - targets: ['postgres:5432']
+  #   metric_relabel_configs:
+  #     - source_labels: [__name__]
+  #       regex: '.*_(connections|locks|transactions)_total' 
+  #       action: keep

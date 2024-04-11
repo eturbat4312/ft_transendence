@@ -74,7 +74,9 @@ services:
         container_name: prometheus
         restart: always
         volumes:
-            - ./src/app/prometheus:/etc/prometheus
+            - ./src/app/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+            - ./src/app/prometheus/config/rules.yml:/etc/prometheus/rules.yml
+
         ports:
             - "9090:9090"
         command:
@@ -89,5 +91,15 @@ services:
             - "3000:3000"
         volumes:
             - ./src/app/grafana:/var/lib/grafana
+        networks:
+            - transcendence
+    alertmanager:
+        image: quay.io/prometheus/alertmanager
+        container_name: alertmanager
+        restart: always
+        ports:
+            - "9093:9093"
+        volumes:
+            - ./src/app/alertmanager:/etc/alertmanager
         networks:
             - transcendence
