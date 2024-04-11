@@ -5,11 +5,19 @@ from .models import User, FriendRequest, Message, Match
 class RegisterSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
     username = serializers.CharField(max_length=150)
-    # email = serializers.EmailField()
+    email = serializers.EmailField()
+    profil_pic = serializers.ImageField(required=False, allow_null=True)
     password = serializers.CharField(write_only=True)
+    bio = serializers.CharField(max_length=255, required=False, allow_null=True)
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'password', 'profil_pic', 'bio']
 
     def create(self, validated_data):
-        user = User.objects.create_user(**validated_data)
+        print("create function serializer !!!")
+        profil_pic = validated_data.pop('profil_pic', 'default.png')  # Default avatar if not provided
+        user = User.objects.create_user(profil_pic=profil_pic, **validated_data)
         return user
 
 

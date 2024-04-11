@@ -4,7 +4,7 @@ export default class Settings extends AbstractView {
     constructor(params) {
         super(params);
         this.setTitle("Settings");
-        //this.setInfo().then(r => console.log('Settings Info loaded'))
+        this.initialize().then(r => console.log('Settings Info loaded'));
     }
 
     async getHtml() {
@@ -40,34 +40,30 @@ export default class Settings extends AbstractView {
     }
 
     async profileSection() {
-        const profilePicUrl = await this.getProfilePicUrl();
-        const userName = await this.getUsername();
         return `
         <div class="tab-pane fade active show" id="account-general">
             <div class="card-body media align-items-center">
-                <img id="profilePic" src="${profilePicUrl}" alt="Photo de profil" class="img-fluid rounded-circle" style="width: 150px; height: 150px;"> 
                 <div class="media-body ml-4">
                     <label class="btn btn-outline-primary">
                         Upload new photo
                         <input type="file" class="account-settings-fileinput">
-                    </label> &nbsp;
+                    </label>
+                    <button id="savePhoto" type="button"  class="btn btn-primary">Save photo</button>&nbsp;
                 </div>
             </div>
             <hr class="border-light m-0">
             <div class="card-body">
-                <div class="form-group">
-                    <span id="username"></span>
-                </div>
                  <div class="form-group">
-                    <label class="form-label">Nickname</label>
-                    <input id="Nickname" type="text" class="form-control mb-1" value="">
+                    <label class="form-label">Username</label>
+                    <input id="Username" type="text" class="form-control mb-1" value="">
+                    <button id="saveUsername" type="button"  class="btn btn-primary">Save username</button>&nbsp;
                 </div>
                 <div class="form-group">
                     <label class="form-label">E-mail</label>
                     <input id="email" type="text" class="form-control mb-1" value="">
+                    <button id="saveEmail" type="button"  class="btn btn-primary">Save email</button>&nbsp;
                 </div>
             </div>
-            <button type="button" style="bottom: 0; left: 0;" class="btn btn-primary">Save changes</button>&nbsp;
         </div>
         `;
     }
@@ -104,23 +100,21 @@ export default class Settings extends AbstractView {
                     <textarea class="form-control" rows="5"></textarea>
                 </div>
             </div> 
-            <button type="button" style="bottom: 0; left: 0;" class="btn btn-primary">Save changes</button>&nbsp;
+            <button id="saveBio" type="button" style="bottom: 0; left: 0;" class="btn btn-primary">Save Bio</button>&nbsp;
         </div>
         `;
     }
 
-    async setInfo() {
-        const serverIP = window.location.hostname;
-        const token = localStorage.getItem('token');
-        if (!token) {
-            console.log('Token not found');
-            return;
-        }
-
-
+    async initialize() {
+        document.getElementById('saveUsername').addEventListener('click', () => this.updateUsername());
+        document.getElementById('saveEmail').addEventListener('click', () => this.updateEmail());
+        document.getElementById('savePhoto').addEventListener('click', () => this.updateProfilePic());
+        document.getElementById('changePasswordButton').addEventListener('click', () => this.changePassword());
+        document.getElementById('saveBio').addEventListener('click', () => this.updateBio());
     }
 
-    async getProfilePicUrl() {
+    async updateUsername() {
+        const username = document.getElementById('Username').value;
         const serverIP = window.location.hostname;
         const token = localStorage.getItem('token');
         if (!token) {
@@ -129,28 +123,28 @@ export default class Settings extends AbstractView {
         }
 
         try {
-            const response = await fetch(`https://${serverIP}/api/get_profile_pic/`, {
-                method: 'GET',
+            const response = await fetch(`https://${serverIP}/api/update_username/`, {
+                method: 'POST',
                 headers: {
-                    'Authorization': 'Token ' + token
-                }
+                    'Authorization': 'Token ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ username: username })
             });
 
             if (response.ok) {
-                const data = await response.json();
-                return data.profile_pic_url;
+                console.log('Username updated');
             } else {
-                console.log('Failed to get profile pic:', await response.text());
-                return null;
+                console.log('Failed to update username:', await response.text());
             }
 
         } catch (error) {
             console.log('Error:', error);
-            return null;
         }
     }
 
-    async getUsername ()    {
+    async updateEmail() {
+        const email = document.getElementById('email').value;
         const serverIP = window.location.hostname;
         const token = localStorage.getItem('token');
         if (!token) {
@@ -159,23 +153,123 @@ export default class Settings extends AbstractView {
         }
 
         try {
-            const responseUsername = await fetch(`https://${serverIP}/api/get_username/`, {
-                method: 'GET',
+            const response = await fetch(`https://${serverIP}/api/update_email/`, {
+                method: 'POST',
                 headers: {
-                    'Authorization': 'Token ' + token
-                }
+                    'Authorization': 'Token ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ email: email })
             });
 
-            if (responseUsername.ok) {
-                const userData = await responseUsername.json();
-                const username = userData.username;
-                document.getElementById('username').innerText = 'Username: ' + username;
+            if (response.ok) {
+                console.log('Email updated');
             } else {
-                console.log('Failed to get username:', await responseUsername.text());
+                console.log('Failed to update email:', await response.text());
             }
 
         } catch (error) {
             console.log('Error:', error);
         }
     }
+
+    async updateProfilePic() {
+        const serverIP = window.location.hostname;
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.log('Token not found');
+            return;
+        }
+
+        const fileInput = document.querySelector('.account-settings-fileinput');
+        const formData = new FormData();
+        formData.append('file', fileInput.files[0]);
+
+        try {
+            const response = await fetch(`https://${serverIP}/api/update_profile_pic/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Token ' + token
+                },
+                body: formData
+            });
+
+            if (response.ok) {
+                console.log('Profile picture updated');
+            } else {
+                console.log('Failed to update profile picture:', await response.text());
+            }
+
+        } catch (error) {
+            console.log('Error:', error);
+        }
+    }
+
+    async changePassword() {
+        const currentPassword = document.getElementById('currentPasswordInput').value;
+        const newPassword = document.getElementById('newPasswordInput').value;
+        const repeatPassword = document.getElementById('repeatPasswordInput').value;
+        const serverIP = window.location.hostname;
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.log('Token not found');
+            return;
+        }
+
+        if (newPassword !== repeatPassword) {
+            document.getElementById('passwordChangeMessage').innerText = 'Passwords do not match';
+            return;
+        }
+
+        try {
+            const response = await fetch(`https://${serverIP}/api/change_password/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Token ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ current_password: currentPassword, new_password: newPassword })
+            });
+
+            if (response.ok) {
+                document.getElementById('passwordChangeMessage').innerText = 'Password changed';
+            } else {
+                document.getElementById('passwordChangeMessage').innerText = 'Failed to change password';
+            }
+
+        } catch (error) {
+            console.log('Error:', error);
+        }
+    }
+
+    async updateBio() {
+        const bio = document.querySelector('.form-control').value;
+        const serverIP = window.location.hostname;
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.log('Token not found');
+            return;
+        }
+
+        try {
+            const response = await fetch(`https://${serverIP}/api/update_bio/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Token ' + token,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ bio: bio })
+            });
+
+            if (response.ok) {
+                console.log('Bio updated');
+            } else {
+                console.log('Failed to update bio:', await response.text());
+            }
+
+        } catch (error) {
+            console.log('Error:', error);
+        }
+    }
+
 }
