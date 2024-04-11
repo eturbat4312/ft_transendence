@@ -1,6 +1,6 @@
 FROM node
 
-WORKDIR /usr/src/app
+WORKDIR /app/front
 
 RUN apt-get update && apt-get install -y iputils-ping dnsutils
 

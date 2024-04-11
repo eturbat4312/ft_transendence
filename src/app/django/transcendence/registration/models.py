@@ -15,11 +15,11 @@ class User(AbstractUser):
     def total_matches(self):
         return self.player.count()
 
-    def won_matches(self):
-        return self.won_matches.count()
+    def count_won_matches(self):
+        return self.won_matches.all().count()
 
     def lost_matches(self):
-        return self.total_matches() - self.won_matches()
+        return self.total_matches() - self.count_won_matches()
 
     class Meta:
         # Add the following line to resolve the related_name conflict

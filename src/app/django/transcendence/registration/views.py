@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, FriendRequestSerializer, MessageSerializer
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, FriendRequestSerializer, MessageSerializer, MatchSerializer
 from .models import User as UserModel
 from .models import FriendRequest, Message, Tournament, Match
 from django.db import transaction
@@ -212,12 +212,14 @@ class PlayerStatsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request, user_id):
-        user = get_object_or_404(UserModel, id=user_id)
+        user = UserModel.objects.get(id=user_id)
+        matches = Match.objects.filter(player=user)
+        match_serializer = MatchSerializer(matches, many=True)
         return Response({
             'total_matches': user.total_matches(),
-            'won_matches': user.won_matches(),
+            'won_matches': user.count_won_matches(),
             'lost_matches': user.lost_matches(),
-            'matches': list(matches),
+            'matches': match_serializer.data,
         })
 
 class PostMatchView(APIView):

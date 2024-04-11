@@ -37,6 +37,6 @@ urlpatterns = [
     path('api/get_blocked/', GetBlockedUserView.as_view(), name='get-blocked'),
     path('api/get_elo/', GetEloView.as_view(), name='get-elo'),
     path('api/update_elo/', UpdateEloView.as_view(), name='update-elo'),
-    path('api/player_stats/<int:user_id>', PlayerStatsView.as_view(), name='player-stats'),
+    path('api/player_stats/<int:user_id>/', PlayerStatsView.as_view(), name='player-stats'),
     path('api/post_match/', PostMatchView.as_view(), name='post-match'),
 ]

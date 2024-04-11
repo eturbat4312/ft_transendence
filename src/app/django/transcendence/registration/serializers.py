@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, FriendRequest, Message
+from .models import User, FriendRequest, Message, Match
 
 
 class RegisterSerializer(serializers.Serializer):
@@ -36,3 +36,8 @@ class MessageSerializer(serializers.ModelSerializer):
     class Meta:
         model = Message
         fields = ['id', 'sender', 'receiver', 'content', 'timestamp']
+
+class MatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Match
+        fields = ['id', 'player', 'opponent', 'player_score', 'opponent_score', 'winner', 'played_at']

@@ -695,10 +695,33 @@ async function removeBlockedUser(blockedId, blockedUsername, websocket) {
     }
 }
 
+async function getPlayerStats(userId) {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+    try {
+        const response = await fetch(`https://${serverIP}/api/player_stats/${userId}/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Token ' + token,
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await response.json();
+        console.log(data);
+    } catch (error) {
+        console.error('An error occurred while getting player stats:', error);
+    }
+}
+
 async function printProfile(userId)
 {
     const username = await fetchUsernameFromId(userId);
     const profileUser = document.getElementById("profile-username");
+    await getPlayerStats(userId);
     profileUser.innerText = username;
 }
 
