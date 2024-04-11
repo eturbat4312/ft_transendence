@@ -9,6 +9,9 @@ export default class extends AbstractView {
         this.setTitle("Signup");
         // Bind the registerUser method to the class instance
         this.registerUser = this.registerUser.bind(this);
+        setTimeout(() => {
+            this.initialize();
+        }, 100);
     }
 
     async initialize() {

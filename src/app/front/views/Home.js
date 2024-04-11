@@ -1,4 +1,5 @@
 import AbstractView from "./AbstractView.js";
+import { printProfile } from "../src/friendModal.js";
 
 export default class extends AbstractView {
     constructor(params) {
@@ -9,57 +10,99 @@ export default class extends AbstractView {
 
     async getHtml() {
         return `
-    <div class="container" style="max-width: 800px; overflow-y: auto; max-height: 700px;"> <!-- Ajout de styles pour le défilement -->
-        <div class="card bg-dark text-light mx-auto">
-            <div class="card-header text-center">
-                <h2>Profile</h2>
+        <div class="container mt-3 centered">
+        <div class="row">
+          <div class="col-lg-4">
+            <div class="card mb-4">
+              <div class="card-body text-center">
+                <img id="profilePic" src="" alt="Profile pic" class="rounded-circle img-fluid" style="width: 150px;">
+                <p class="text-muted mb-1">Player</p>
+              </div>
             </div>
-            <div class="card-body">
-                <img id="profilePic" src="" class="img-fluid rounded-circle" alt="Profile pic">
-                <p class="card-text">
-                    <span id="username"></span>
+            <div class="card mb-4 mb-lg-0">
+              <div class="card-body">
+                <p class="mb-4">
+                    Pong Games Played: <span id="pong-gamesPlayed"></span>
                 </p>
-                <p class="card-text">
-                    <span id="email"></span>
+                <p class="mb-4">
+                    Pong Games Won: <span id="pong-gamesWon"></span>
                 </p>
-                <p class="card-text"> 
-                    <span id="bio"></span>
+                <p class="mb-4">
+                    Pong Games Lost: <span id="pong-gamesLost"></span>
                 </p>
+                <hr>
+                <p class="mb-4">
+                    TTT Games Played: <span id="tic-gamesPlayed"></span>
+                </p>
+                <p class="mb-4">
+                    TTT Games Won: <span id="tic-gamesWon"></span>
+                </p>
+                <p class="mb-4">
+                    TTT Games Lost: <span id="tic-gamesLost"></span>
+                </p>
+              </div>
             </div>
-        </div>
-        <div class="card bg-dark text-light mx-auto">
-            <div class="card-header text-center">
-                <h2>Statistics</h2>
+          </div>
+          <div class="col-lg-8">
+            <div class="card mb-4" style="max-width: calc(100% - 200px);">
+              <div class="card-body">
+                <div class="row">
+                  <div class="col-sm-3">
+                    <p class="mb-0">Username</p>
+                  </div>
+                  <div class="col-sm-9">
+                    <p id="profile-username" class="text-muted mb-0"></p>
+                  </div>
+                </div>
+                <hr>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <p class="mb-0">Email</p>
+                  </div>
+                  <div class="col-sm-9">
+                    <p id="profile-email" class="text-muted mb-0">test@example.com</p>
+                  </div>
+                </div>
+                <hr>
+                <div class="row">
+                  <div class="col-sm-3">
+                    <p class="mb-0">Bio</p>
+                  </div>
+                  <div class="col-sm-9">
+                    <p id="profile-bio" class="text-muted mb-0">bio</p>
+                  </div>
+                </div>
+              </div>
             </div>
-            <div class="card-body">
-                <p class="card-text">
-                    Games Played: <span id="gamesPlayed"></span>
-                </p>
-                <p class="card-text">
-                    Games Won: <span id="gamesWon"></span>
-                </p>
-                <p class="card-text">
-                    Games Lost: <span id="gamesLost"></span>
-                </p>
-            </div>
-        </div>
-        <div class="card bg-dark text-light mx-auto">
-            <div class="card-header text-center">
-                <h2>Match History</h2>
-            </div>
-            <div class="card-body">
-                <ul class="list-group">
+            <div class="row">
+              <div class="col-md-6">
+                <div class="card mb-4 mb-md-0">
+                  <div class="card-body">
+                    <p class="mb-4">PONG HISTORY</p>
+                    <ul id="pong-history" class="list-group">
                     
-                </ul>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+              <div class="col-md-6">
+                <div class="card mb-4 mb-md-0" style="max-width: calc(100% - 200px);">
+                  <div class="card-body">
+                    <p class="mb-4">TIC-TAC-TOE HISTORY</p>
+                  </div>
+                </div>
+              </div>
             </div>
+          </div>
         </div>
-    </div>
+      </div>
     `;
     }
 
 
 
     async initialize() {
+        console.log("2 times or not");
         const serverIP = window.location.hostname;
         const token = localStorage.getItem('token');
         if (!token) {
@@ -67,25 +110,7 @@ export default class extends AbstractView {
             return;
         }
 
-        try {
-            const responseUsername = await fetch(`https://${serverIP}/api/get_username/`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Token ' + token
-                }
-            });
-
-            if (responseUsername.ok) {
-                const userData = await responseUsername.json();
-                const username = userData.username;
-                document.getElementById('username').innerText = 'Username: ' + username;
-            } else {
-                console.log('Failed to get username:', await responseUsername.text());
-            }
-
-        } catch (error) {
-            console.log('Error:', error);
-        }
+    
 
         try {
             const responseEmail = await fetch(`https://${serverIP}/api/get_email/`, {
@@ -125,32 +150,12 @@ export default class extends AbstractView {
         } catch (error) {
             console.log('Error:', error);
         }
-
-        try {
-            const responseStats = await fetch(`https://${serverIP}/api/player_stats/${id}/`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Token ' + token
-                }
-            });
-
-            if (responseStats.ok) {
-                const stats = await responseStats.json();
-                document.getElementById('gamesPlayed').innerText = stats.total_matches;
-                document.getElementById('gamesWon').innerText = stats.won_matches;
-                document.getElementById('gamesLost').innerText = stats.lost_matches;
-            } else {
-                console.log('Failed to get statistics:', await responseStats.text());
-            }
-
-        } catch (error) {
-            console.log('Error:', error);
-        }
-        await this.getProfilePic()
-        await this.getMatchHistory()
+        const userId = localStorage.getItem("userId");
+        await this.getProfilePic(userId);
+        await printProfile(userId);
     }
 
-    async getProfilePic() {
+    async getProfilePic(userId) {
         const serverIP = window.location.hostname;
         const token = localStorage.getItem('token');
         if (!token) {
@@ -159,7 +164,7 @@ export default class extends AbstractView {
         }
 
         try {
-            const response = await fetch(`https://${serverIP}/api/get_profile_pic/`, {
+            const response = await fetch(`https://${serverIP}/api/get_profile_pic/${userId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Token ' + token
@@ -173,39 +178,6 @@ export default class extends AbstractView {
                 console.log('Failed to get profile pic:', await response.text());
             }
 
-        } catch (error) {
-            console.log('Error:', error);
-        }
-    }
-
-    async getMatchHistory() {
-        const serverIP = window.location.hostname;
-        const token = localStorage.getItem('token');
-        if (!token) {
-            console.log('Token not found');
-            return;
-        }
-
-        try {
-            const response = await fetch(`https://${serverIP}/api/get_match_history/`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Token ' + token
-                }
-            });
-
-            if (response.ok) {
-                const matchHistory = await response.json();
-                const matchListElement = document.querySelector('.card-body ul.list-group');
-                matchHistory.forEach(match => {
-                    const listItem = document.createElement('li');
-                    listItem.className = 'list-group-item bg-secondary text-light';
-                    listItem.innerHTML = `Date: <strong>${match.played_at}</strong> Played against <strong>${match.opponent}</strong> - Result: <strong>${match.player_score}</strong> - <strong>${match.opponent_score}</strong> - Winner <strong>${match.winner}</strong> `;
-                    matchListElement.appendChild(listItem);
-                });
-            } else {
-                console.log('Failed to get match history:', await response.text());
-            }
         } catch (error) {
             console.log('Error:', error);
         }

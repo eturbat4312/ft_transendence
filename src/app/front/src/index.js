@@ -69,7 +69,8 @@ const loadView = async (path) => {
             const viewInstance = new View();
             viewInstance.getHtml().then(html => {
                 document.querySelector('#app').innerHTML = html;
-                viewInstance.initialize();
+                //viewInstance.initialize();
+                console.log("JJJJEEEEEEEEEE");
                 if (path === '/game') {
                     addGameEventListeners();
                 }
@@ -278,7 +279,7 @@ const checkIfConnected = async () => {
 document.addEventListener('DOMContentLoaded', async () => {
     await loadComponents();
     await loadView(location.pathname);
-    addChatEventListeners();
+    //addChatEventListeners();
     if (location.pathname != "/already-connected")
         checkIfConnected();
 });

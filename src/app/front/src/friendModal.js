@@ -5,6 +5,34 @@ let connectedPlayers = [];
 let playersPlaying = [];
 
 
+async function getProfilePic(userId) {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+
+    try {
+        const response = await fetch(`https://${serverIP}/api/get_profile_pic/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Token ' + token
+            }
+        });
+
+        if (response.ok) {
+            const data = await response.json();
+            document.getElementById('profilePic').src = data.profil_pic;
+        } else {
+            console.log('Failed to get profile pic:', await response.text());
+        }
+
+    } catch (error) {
+        console.log('Error:', error);
+    }
+}
+
 export function addToPlayersPlaying(id) {
     if (!playersPlaying.includes(id)) {
         playersPlaying.push(id);
@@ -717,31 +745,32 @@ async function getPlayerStats(userId) {
     }
 }
 
-async function printProfile(userId)
+export async function printProfile(userId)
 {
     const username = await fetchUsernameFromId(userId);
     const data = await getPlayerStats(userId);
+    await getProfilePic(userId);
     const totalMatches = data.total_matches;
     const wonMatches = data.won_matches;
     const lostMatches = data.lost_matches;
     const matches = data.matches;
     const profileUser = document.getElementById("profile-username");
-    const profileGamesPlayed = document.getElementById("profile-gamesPlayed");
-    const profileGamesWon = document.getElementById("profile-gamesWon");
-    const profileGamesLose = document.getElementById("profile-gamesLost");
-    const profileHistory = document.getElementById("profile-history");
+    const pongGamesPlayed = document.getElementById("pong-gamesPlayed");
+    const pongGamesWon = document.getElementById("pong-gamesWon");
+    const pongGamesLose = document.getElementById("pong-gamesLost");
+    const pongHistory = document.getElementById("pong-history");
 
     console.log(totalMatches, wonMatches, lostMatches, matches);
-    profileUser.innerText = username;
-    profileGamesPlayed.innerText = totalMatches;
-    profileGamesWon.innerText = wonMatches;
-    profileGamesLose.innerText = lostMatches;
+    profileUser.innerText = `${username}`;
+    pongGamesPlayed.innerText = totalMatches;
+    pongGamesWon.innerText = wonMatches;
+    pongGamesLose.innerText = lostMatches;
     for (let i = 0; i < matches.length; i++) {
         const opponent = await fetchUsernameFromId(matches[i].opponent);
         const li = document.createElement('li');
         li.textContent = `${new Date(matches[i].played_at).toLocaleDateString()}: ${username} ${matches[i].player_score} - ${matches[i].opponent_score} ${opponent}`;
         li.className = 'list-group-item';
-        profileHistory.appendChild(li);
+        pongHistory.appendChild(li);
     }
 }
 

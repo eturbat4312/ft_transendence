@@ -60,9 +60,11 @@ class GetProfilePicView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        print('logs from GetProfilePicView: ',request.user.profil_pic.url)
-        profil_pic_url = request.user.profil_pic.url if request.user.profil_pic else None
+    def get(self, request, user_id):
+        user = UserModel.objects.get(id=user_id)
+        print('logs from GetProfilePicView: ', user.profil_pic.url)
+
+        profil_pic_url = user.profil_pic.url if user.profil_pic else None
         return Response({'profil_pic': profil_pic_url})
 
 class GetEmailView(APIView):

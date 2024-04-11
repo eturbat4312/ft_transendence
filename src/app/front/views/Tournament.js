@@ -27,7 +27,7 @@ export default class Tournament extends AbstractView {
     async getHtml() {
         return `
         <div id="tournament-container" class="container mt-3 centered">
-        <div class="card bg-dark text-light mx-auto" style="max-width: 800px;">
+        <div class="card bg-dark text-light mx-auto" style="max-width: calc(100% - 200px);">
             <div class="card-header text-center">
                 <h2>Tournament</h2>
                 <button id="delete-tournament" class="btn btn-danger">DELETE</button>

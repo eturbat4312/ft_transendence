@@ -4,7 +4,9 @@ export default class Settings extends AbstractView {
     constructor(params) {
         super(params);
         this.setTitle("Settings");
-        this.initialize().then(r => console.log('Settings Info loaded'));
+        setTimeout(() => {
+            this.initialize();
+        }, 100);
     }
 
     async getHtml() {

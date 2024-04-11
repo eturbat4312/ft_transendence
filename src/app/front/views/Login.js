@@ -5,6 +5,9 @@ export default class extends AbstractView {
     constructor(params) {
         super(params);
         this.setTitle("Login");
+        setTimeout(() => {
+            this.initialize();
+        }, 100);
     }
 
     async getHtml() {

@@ -1,13 +1,14 @@
 const getProfilePicUrl = async () => {
     const serverIP = window.location.hostname;
     const token = localStorage.getItem('token');
+    const userId = localStorage.getItem("userId");
     if (!token) {
         console.log('Token not found');
         return;
     }
 
     try {
-        const response = await fetch(`https://${serverIP}/api/get_profile_pic/`, {
+        const response = await fetch(`https://${serverIP}/api/get_profile_pic/${userId}`, {
             method: 'GET',
             headers: {
                 'Authorization': 'Token ' + token
@@ -31,7 +32,7 @@ const getProfilePicUrl = async () => {
 
 const getNav = async () => {
     const profilePicUrl = await getProfilePicUrl();
-    const profilePic = profilePicUrl ? `<img src="${profilePicUrl}" alt="Profile pic" class="rounded-circle" style="width: 30px; height: 30px;">` : 'PP';
+    const profilePic = profilePicUrl ? `<img src="${profilePicUrl}" alt="Profile pic" class="rounded-circle" style="width: 32px; height: 32px;">` : 'PP';
         return `
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="z-index: 3;">
             <div class="container-fluid">
