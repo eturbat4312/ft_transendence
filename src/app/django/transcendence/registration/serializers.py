@@ -8,10 +8,11 @@ class RegisterSerializer(serializers.Serializer):
     email = serializers.EmailField()
     profil_pic = serializers.ImageField(required=False, allow_null=True)
     password = serializers.CharField(write_only=True)
+    bio = serializers.CharField(max_length=255, required=False, allow_null=True)
 
     class Meta:
         model = User
-        fields = ['id', 'username', 'email', 'password', 'profil_pic']
+        fields = ['id', 'username', 'email', 'password', 'profil_pic', 'bio']
 
     def create(self, validated_data):
         print("create function serializer !!!")

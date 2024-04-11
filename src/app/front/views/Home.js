@@ -9,24 +9,25 @@ export default class extends AbstractView {
 
     async getHtml() {
         return `
-        <div class="card bg-dark text-light mx-auto" style="max-width: 800px;">
+    <div class="container" style="max-width: 800px; overflow-y: auto; max-height: 700px;"> <!-- Ajout de styles pour le défilement -->
+        <div class="card bg-dark text-light mx-auto">
             <div class="card-header text-center">
                 <h2>Profile</h2>
             </div>
             <div class="card-body">
                 <img id="profilePic" src="" class="img-fluid rounded-circle" alt="Profile pic">
                 <p class="card-text">
-                   <span id="username"></span>
+                    <span id="username"></span>
                 </p>
                 <p class="card-text">
-                  <span id="email"></span>
+                    <span id="email"></span>
                 </p>
                 <p class="card-text"> 
-                   <span id="bio"></span>
+                    <span id="bio"></span>
                 </p>
             </div>
         </div>
-        <div class="card bg-dark text-light mx-auto" style="max-width: 800px;">
+        <div class="card bg-dark text-light mx-auto">
             <div class="card-header text-center">
                 <h2>Statistics</h2>
             </div>
@@ -42,7 +43,7 @@ export default class extends AbstractView {
                 </p>
             </div>
         </div>
-        <div class="card bg-dark text-light mx-auto" style="max-width: 800px;">
+        <div class="card bg-dark text-light mx-auto">
             <div class="card-header text-center">
                 <h2>Match History</h2>
             </div>
@@ -51,10 +52,12 @@ export default class extends AbstractView {
                     
                 </ul>
             </div>
-                    
         </div>
-`;
+    </div>
+    `;
     }
+
+
 
     async initialize() {
         const serverIP = window.location.hostname;
@@ -165,7 +168,7 @@ export default class extends AbstractView {
 
             if (response.ok) {
                 const data = await response.json();
-                document.getElementById('profilePic').src = data.profile_pic;
+                document.getElementById('profilePic').src = data.profil_pic;
             } else {
                 console.log('Failed to get profile pic:', await response.text());
             }

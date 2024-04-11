@@ -4,6 +4,8 @@ from .views import LoginView, LogoutView, GetUsernameView, GetUserIdView, GetUse
 from .views import SendFriendRequestView, FriendRequestsView, RespondFriendRequestView, GetFriendsView, RemoveFriendView
 from .views import GetMessageHistoryView, SendMessageView, CreateTournamentView, CheckTournamentView, DeleteTournamentView
 from .views import BlockUserView, RemoveBlockedUserView, GetBlockedUserView, GetEloView, UpdateEloView, GetProfilePicView
+from .views import GetEmailView, GetBioView, UpdateUsername, UpdateEmailView, UpdateProfilePicView, ChangePassword
+from .views import UpdateBioView
 from rest_framework.routers import DefaultRouter
 from django.conf import settings
 from django.conf.urls.static import static
@@ -17,7 +19,15 @@ urlpatterns = [
     path('api/verify_token/', VerifyTokenView.as_view(), name='verify-token'),
     re_path('api/register/', views.register),
     path('api/get_username/', GetUsernameView.as_view(), name='get-username'),
-	path('api/get_profile_pic/',GetProfilePicView.as_view(), name='get-profilePic'), 
+	path('api/get_profile_pic/',GetProfilePicView.as_view(), name='get-profilePic'),
+    path('/api/update_profile_pic/', UpdateProfilePicView.as_view(), name='update-profilePic'),
+    path('api/get_email/', GetEmailView.as_view(), name='get-email'),
+    path('/api/update_email/', UpdateEmailView.as_view(), name='update-email'),
+    path('api/get_bio/', GetBioView.as_view(), name='get-bio'),
+    path('api/update_username/', UpdateUsername.as_view(), name='update-username'),
+    path('api/change_password/', ChangePassword.as_view(), name='change-password'),
+    path('api/update_bio/', UpdateBioView.as_view(), name='update-bio'),
+
     path('api/get_user_id/', GetUserIdView.as_view(), name='get-user-id'),
     path('api/get_username_from_id/<int:user_id>/', GetUsernameFromIdView.as_view(), name='get-user-from-id'),
     path("", include(router.urls)),

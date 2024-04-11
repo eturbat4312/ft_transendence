@@ -28,6 +28,7 @@ services:
         volumes:
             - ./src/app/front/dist:/usr/share/nginx/html
             - ./src/app/nginx:/app/nginx
+            - ./src/app/django/transcendence/media:/var/www/media
         depends_on:
             - django
         networks:

@@ -61,10 +61,25 @@ class GetProfilePicView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        print('logs from GetProfilePicView: ',request.user.profil_pic)
-        profil_pic = request.user.profil_pic
-        return Response({'profil_pic': profil_pic})
-    
+        print('logs from GetProfilePicView: ',request.user.profil_pic.url)
+        profil_pic_url = request.user.profil_pic.url if request.user.profil_pic else None
+        return Response({'profil_pic': profil_pic_url})
+
+class GetEmailView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        email = request.user.email
+        return Response({'email': email})
+
+class GetBioView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        bio = request.user.bio
+        return Response({'bio': bio})
 class GetUserIdView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -301,3 +316,59 @@ class LogoutView(APIView):
     def post(self, request):
         request.user.auth_token.delete()
         return Response({'message': 'Logged out successfully'})
+
+class UpdateProfilePicView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        new_profil_pic = request.data.get('new_profil_pic')
+        user.profil_pic = new_profil_pic
+        user.save()
+        return Response({'message': 'Profile picture updated successfully'})
+
+class UpdateUsername(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        new_username = request.data.get('new_username')
+        user.username = new_username
+        user.save()
+        return Response({'message': 'Username updated successfully'})
+
+class UpdateEmailView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        new_email = request.data.get('new_email')
+        user.email = new_email
+        user.save()
+        return Response({'message': 'Email updated successfully'})
+
+class ChangePassword(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        new_password = request.data.get('new_password')
+        user.set_password(new_password)
+        user.save()
+        return Response({'message': 'Password updated successfully'})
+
+class UpdateBioView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        user = request.user
+        new_bio = request.data.get('new_bio')
+        user.bio = new_bio
+        user.save()
+        return Response({'message': 'Bio updated successfully'})
+

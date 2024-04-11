@@ -16,7 +16,7 @@ const getProfilePicUrl = async () => {
 
         if (response.ok) {
             const data = await response.json();
-            return data.profile_pic_url;
+            return data.profil_pic;
         } else {
             console.log('Failed to get profile pic:', await response.text());
             return null;
