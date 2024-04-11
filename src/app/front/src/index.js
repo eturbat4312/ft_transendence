@@ -2,16 +2,19 @@ import { getNav, getSocial, getChat, handleLogout } from '../views/utils.js';
 import { eventDelete, addTournamentEventListeners, tournamentCreated, checkTournamentExists } from '../views/Tournament.js';
 import { addGameEventListeners, initPrivateGame } from '../views/Game.js';
 import { addChatEventListeners } from './utils.js';
-import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, showGameInvitationNotification, updateFriendRequestsModal, getFriends, updateBlockedModal } from './friendModal.js';
+import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, showGameInvitationNotification, updateFriendRequestsModal, getFriends, updateBlockedModal, addToPlayersPlaying, removeFromPlayersPlaying, checkPlaying } from './friendModal.js';
 import '../theme/base.css'
 import '../theme/game.css'
 import '../theme/index.css'
 import '../theme/style.css'
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 
+var websocket = null;
+
 const routes = [
     { path: "/", view: "Welcome" },
     { path: "/home", view: "Home" },
+    { path: "/profile", view: "Profile" },
     { path: "/login", view: "Login" },
     { path: "/signup", view: "Signup" },
     { path: "/game", view: "Game" },
@@ -115,15 +118,18 @@ const loadComponents = async () => {
     addNavEventListeners();
 };
 
+const navLinkClickHandler = (event) => {
+    console.log("page:", event.currentTarget.getAttribute('href'));
+    event.preventDefault();
+    const path = event.currentTarget.getAttribute('href');
+    navigate(path);
+};
+
 export const addNavEventListeners = () => {
     const navLinks = document.querySelectorAll('.nav__link');
     navLinks.forEach(link => {
-        link.addEventListener('click', (event) => {
-            console.log("page:", link.getAttribute('href'));
-            event.preventDefault();
-            const path = link.getAttribute('href');
-            navigate(path);
-        });
+        link.removeEventListener('click', navLinkClickHandler);
+        link.addEventListener('click', navLinkClickHandler);
     });
     const logout = document.getElementById('logout');
     if (logout) {
@@ -142,6 +148,18 @@ window.addEventListener('popstate', () => {
     loadView(location.pathname);
 });
 
+export function getWebsocket() {
+    return (websocket);
+}
+
+function setInGameStatus(friendId) {
+    const statusIcon = document.getElementById(friendId);
+    if (statusIcon) {
+        statusIcon.classList.remove("online");
+        statusIcon.classList.add("in-game");
+    }
+}
+
 const checkIfConnected = async () => {
     const auth = await isAuthenticated();
     if (!auth)
@@ -150,7 +168,7 @@ const checkIfConnected = async () => {
     const userId = localStorage.getItem('userId');
     console.log("my userId: ", userId);
     const serverIP = window.location.hostname;
-    var websocket = new WebSocket(`wss://${serverIP}/api/ws/connect/`);
+    websocket = new WebSocket(`wss://${serverIP}/api/ws/connect/`);
     websocket.onopen = () => {
         console.log("Connect WebSocket connection established");
         const message = JSON.stringify({ action: 'connect', username: username, userId: userId });
@@ -170,12 +188,14 @@ const checkIfConnected = async () => {
         }
         if (data.action === "connected") {
             updateConnectedPlayer(data.username, data.userId, true, websocket);
+            checkPlaying(userId, websocket);
             //console.log("username: ", data.username, " userid: ", data.userId);
             // const message = JSON.stringify({ action: 'connected_player', username: username });
             // websocket.send(message);
         }
         if (data.action === "disconnected") {
             removeDisconnectedPlayer(data.username);
+            removeFromPlayersPlaying(data.user_id);
             getFriends(websocket);
         }
         if (data.action === "friend_request" && data.to_user_id === userId) {
@@ -195,6 +215,16 @@ const checkIfConnected = async () => {
         }
         if (data.action === "pong" && data.to_user === username) {
             updateConnectedPlayer(data.username, data.user_id, true, websocket);
+        }
+        if (data.action === "in_game") {
+            addToPlayersPlaying(data.user_id);
+           // setInGameStatus(`friend-${data.user_id}`);
+            getFriends(websocket);
+        }
+        if (data.action === "not_in_game") {
+            removeFromPlayersPlaying(data.user_id);
+           // setInGameStatus(`friend-${data.user_id}`);
+            getFriends(websocket);
         }
         if (data.action === "accept_invite" && data.user_id === userId) {
             const prvBtn = document.getElementById('btn-start-private');

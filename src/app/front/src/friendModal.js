@@ -2,7 +2,31 @@ import { addNavEventListeners } from "./index.js";
 import { initPrivateGame } from "../views/Game.js";
 
 let connectedPlayers = [];
+let playersPlaying = [];
 
+
+export function addToPlayersPlaying(id) {
+    if (!playersPlaying.includes(id)) {
+        playersPlaying.push(id);
+        console.log(playersPlaying);
+    }
+}
+
+export function removeFromPlayersPlaying(id) {
+    const index = playersPlaying.indexOf(id);
+    if (index !== -1) {
+        playersPlaying.splice(index, 1);
+    }
+}
+
+export function checkPlaying(userId, websocket) {
+    if (isPlaying(userId))
+        websocket.send(JSON.stringify({ action: "in_game"}));
+}
+
+function isPlaying(id) {
+    return playersPlaying.includes(String(id));
+}
 
 export function removeDisconnectedPlayer(playerName) {
     connectedPlayers = connectedPlayers.filter(player => player.name !== playerName);
@@ -44,8 +68,9 @@ function updateplayerModal(websocket) {
         const userId = listItem.dataset.id;
         console.log("typeof userID: " + typeof userId);
         const playerInfoContent = `
-        <p>Name: ${playerName}</p><button id="addFriendBtn" data-user-id="${playerName}" class="btn btn-primary">Add to friends</button>
-        <button id="blockBtn" data-user-id="${playerName}" class="btn btn-danger">Block player</button>`;
+        <p>Name: ${playerName}</p><button id="addFriendBtn" data-user-id="${userId}" class="btn btn-primary">Add to friends</button>
+        <button id="blockBtn" data-user-id="${userId}" class="btn btn-danger">Block player</button>
+        <a href="/profile" id="profileBtn" data-user-id="${userId}" class="btn btn-info nav__link">Profile</a>`;
         document.getElementById('playerModalBody').innerHTML = playerInfoContent;
         const addFriendBtn = document.getElementById('addFriendBtn');
         const blockBtn = document.getElementById('blockBtn');
@@ -55,8 +80,17 @@ function updateplayerModal(websocket) {
         blockBtn.addEventListener('click', async function() {
             await blockRequest(userId, playerName, websocket);
         });
+        const profileBtn = document.getElementById('profileBtn');
+        profileBtn.addEventListener('click', function() {
+            console.log("function");
+            setTimeout(() => {
+                console.log(userId)
+                printProfile(userId);
+            }, 50);
+        });
         const playerModal = new bootstrap.Modal(document.getElementById('playerModal'));
         playerModal.show();
+        addNavEventListeners();
     });
 }
 
@@ -259,6 +293,58 @@ export async function fetchUsernameFromId(userId) {
 
         const data = await response.json();
         return data.username;
+    } catch (error) {
+        console.error('Error fetching friend requests:', error);
+        return [];
+    }
+}
+
+async function fetchProfilePicFromId(userId) {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+    try {
+        const response = await fetch(`https://${serverIP}/api/get_profilepic_from_id/${userId}/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Token ' + token
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch friend requests');
+        }
+
+        const data = await response.json();
+        return data.profilepic;
+    } catch (error) {
+        console.error('Error fetching friend requests:', error);
+        return [];
+    }
+}
+
+async function fetchGamesPlayedFromId(userId) {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+    try {
+        const response = await fetch(`https://${serverIP}/api/get_games_played_from_id/${userId}/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Token ' + token
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch friend requests');
+        }
+
+        const data = await response.json();
+        return data.gamesplayed;
     } catch (error) {
         console.error('Error fetching friend requests:', error);
         return [];
@@ -609,7 +695,35 @@ async function removeBlockedUser(blockedId, blockedUsername, websocket) {
     }
 }
 
+async function getPlayerStats(userId) {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+    try {
+        const response = await fetch(`https://${serverIP}/api/player_stats/${userId}/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Token ' + token,
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await response.json();
+        console.log(data);
+    } catch (error) {
+        console.error('An error occurred while getting player stats:', error);
+    }
+}
 
+async function printProfile(userId)
+{
+    const username = await fetchUsernameFromId(userId);
+    const profileUser = document.getElementById("profile-username");
+    await getPlayerStats(userId);
+    profileUser.innerText = username;
+}
 
 export async function getFriends(websocket) {
     const serverIP = window.location.hostname;
@@ -639,8 +753,11 @@ export async function getFriends(websocket) {
                 friendElement.dataset.id = friend.id;
                 friendElement.dataset.name = friend.username;
                 const statusIcon = document.createElement("div");
+                statusIcon.setAttribute("id", `friend-${friend.id}`);
                 statusIcon.classList.add("player-status");
-                if (isFriendOnline(friend.username)) {
+                if (isPlaying(friend.id)) {
+                    statusIcon.classList.add("in-game");
+                } else if (isFriendOnline(friend.username)) {
                     statusIcon.classList.add("online");
                 } else {
                     statusIcon.classList.add("offline");
@@ -664,9 +781,10 @@ export async function getFriends(websocket) {
                 friendElement.addEventListener('click', async () => {
                     const friendName = friend.username;
                     const friendId = friendElement.dataset.id;
-                    const friendInfoContent = ` <p>Userame: ${friendName}</p>
+                    const friendInfoContent = ` <p>Username: ${friendName}</p>
                                                 <button id="removeFriendBtn" class="btn btn-danger" data-bs-dismiss="modal">Remove from friends</button>
-                                                <button id="inviteGameBtn"  class="btn btn-success" data-bs-dismiss="modal">Invite to play 1v1</button>`;
+                                                <button id="inviteGameBtn"  class="btn btn-success" data-bs-dismiss="modal">Invite to play 1v1</button>
+                                                <a href="/profile" id="friendProfileBtn" data-user-id="${friendId}" class="btn btn-info nav__link">Profile</a>`;
                     document.getElementById('friendModalBody').innerHTML = friendInfoContent;
                     const removeFriendBtn = document.getElementById('removeFriendBtn');
                     removeFriendBtn.addEventListener('click', async function() {
@@ -677,18 +795,27 @@ export async function getFriends(websocket) {
                     const inviteGame = document.getElementById('inviteGameBtn');
                     inviteGame.addEventListener('click', async function() {
                         if (location.pathname === '/game') {
-                            if (isFriendOnline(friendName)) {
+                            if (isPlaying(friendId)) {
+                                alert(`${friendName} is already in a game`);
+                            } else if (isFriendOnline(friendName)) {
                                 const message = JSON.stringify({ action: 'invite_play', userId: userId, toUserId: friendId });
                                 websocket.send(message);
                             } else {
-                                alert("This player is not online");
+                                alert(`${friendName} is not online`);
                             }
                         } else {
                             alert("YOU HAVE TO BE ON GAME PAGE TO INVITE SOMEONE");
                         }
                     });
+                    const profileBtn = document.getElementById('friendProfileBtn');
+                    profileBtn.addEventListener('click', function() {
+                        setTimeout(() => {
+                            printProfile(friendId);
+                        }, 50);
+                    });
                     const modal = new bootstrap.Modal(document.getElementById('friendModal'));
                     modal.show();
+                    addNavEventListeners();
                 });
             });
         } else {

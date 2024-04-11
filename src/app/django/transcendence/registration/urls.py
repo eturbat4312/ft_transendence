@@ -3,9 +3,11 @@ from . import views
 from .views import LoginView, LogoutView, GetUsernameView, GetUserIdView, GetUsernameFromIdView, VerifyTokenView
 from .views import SendFriendRequestView, FriendRequestsView, RespondFriendRequestView, GetFriendsView, RemoveFriendView
 from .views import GetMessageHistoryView, SendMessageView, CreateTournamentView, CheckTournamentView, DeleteTournamentView
+
 from .views import BlockUserView, RemoveBlockedUserView, GetBlockedUserView, GetEloView, UpdateEloView, GetProfilePicView
 from .views import GetEmailView, GetBioView, UpdateUsername, UpdateEmailView, UpdateProfilePicView, ChangePassword
-from .views import UpdateBioView
+from .views import UpdateBioView,PlayerStatsView,PostMatchView
+
 from rest_framework.routers import DefaultRouter
 from django.conf import settings
 from django.conf.urls.static import static
@@ -46,7 +48,7 @@ urlpatterns = [
     path('api/get_blocked/', GetBlockedUserView.as_view(), name='get-blocked'),
     path('api/get_elo/', GetEloView.as_view(), name='get-elo'),
     path('api/update_elo/', UpdateEloView.as_view(), name='update-elo'),
+    path('api/player_stats/<int:user_id>/', PlayerStatsView.as_view(), name='player-stats'),
+    path('api/post_match/', PostMatchView.as_view(), name='post-match'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 
-
-urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

@@ -39,7 +39,7 @@ const getNav = async () => {
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse d-lg-flex" id="navbarSupportedContent" style="z-index: 1;">
-                    <a class="navbar-brand col-lg-3 me-0 pong-title" href="#">PONG</a>
+                    <a class="navbar-brand col-lg-3 me-0 pong-title" href="#">PXNG</a>
                     <ul class="navbar-nav col-lg-6 justify-content-lg-center">
                         <li class="nav-item">
                             <a href="/home" class="nav__link nav-link active" data-link>Home</a>

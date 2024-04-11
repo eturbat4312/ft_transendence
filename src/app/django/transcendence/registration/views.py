@@ -5,9 +5,9 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, FriendRequestSerializer, MessageSerializer
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, FriendRequestSerializer, MessageSerializer, MatchSerializer
 from .models import User as UserModel
-from .models import FriendRequest, Message, Tournament
+from .models import FriendRequest, Message, Tournament, Match
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
@@ -230,6 +230,42 @@ class GetBlockedUserView(APIView):
         blocked = current_user.blocked.all()
         serializer = UserSerializer(blocked, many=True)
         return Response({'blocked': serializer.data})
+
+class PlayerStatsView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        user = UserModel.objects.get(id=user_id)
+        matches = Match.objects.filter(player=user)
+        match_serializer = MatchSerializer(matches, many=True)
+        return Response({
+            'total_matches': user.total_matches(),
+            'won_matches': user.count_won_matches(),
+            'lost_matches': user.lost_matches(),
+            'matches': match_serializer.data,
+        })
+
+class PostMatchView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        player = get_object_or_404(UserModel, username=request.data.get('player_username'))
+        opponent = get_object_or_404(UserModel, username=request.data.get('opponent_username'))
+        player_score = request.data.get('player_score')
+        opponent_score = request.data.get('opponent_score')
+        winner = player if player_score > opponent_score else opponent
+
+        match = Match.objects.create(
+            player=player,
+            opponent=opponent,
+            player_score=player_score,
+            opponent_score=opponent_score,
+            winner=winner,
+        )
+
+        return Response({'message': 'Match successfully stocked'}, status=status.HTTP_201_CREATED)
 
 class GetMessageHistoryView(APIView):
     authentication_classes = [TokenAuthentication]

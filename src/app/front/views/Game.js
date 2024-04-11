@@ -1,4 +1,5 @@
 import AbstractView from "./AbstractView.js";
+import { getWebsocket } from "../src/index.js";
 
 export default class Game extends AbstractView {
     constructor(params) {
@@ -11,12 +12,13 @@ export default class Game extends AbstractView {
         this.scoreDisplay2 = document.getElementById("player2-score");
         this.websocket = null;
         this.tournamentWS = null;
+        this.loopTime = 23;
         this.paddle1Y = 170;
         this.paddle2Y = 170;
         this.ballX = 300;
         this.ballY = 200;
-        this.ballSpeedX = 2;
-        this.ballSpeedY = 2;
+        this.ballSpeedX = 6;
+        this.ballSpeedY = 6;
         this.player1Score = 0;
         this.player2Score = 0;
         this.gameActive = true;
@@ -24,6 +26,10 @@ export default class Game extends AbstractView {
         this.isMaster = false;
         this.player1 = false;
         this.player2 = false;
+        this.opponent = null;
+        this.myName = localStorage.getItem("username");
+        this.opponentScore = null;
+        this.myScore = null;
         this.winner = null;
         this.spectator = false;
         this.tournament = false;
@@ -64,7 +70,9 @@ export default class Game extends AbstractView {
                 </div>
                 <div id="score">
                     <span id="player1-score" class="score">0</span>
+                    <div id="player1-name" class="d-none"></div>
                     <span id="player2-score" class="score">0</span>
+                    <div id="player2-name" class="d-none"></div>
                 </div>
                 <div class="end-game-container">
                     <div id="winner"></div>
@@ -126,6 +134,18 @@ export default class Game extends AbstractView {
         (this.player1Score === 3 || this.player2Score === 3) ? this.endGame() : this.resetBall();
 	}
 
+    printNames = () => {
+        if (this.player1) {
+            document.getElementById("player1-name").innerText = this.myName;
+            document.getElementById("player2-name").innerText = this.opponent;
+        } else if (this.player2) {
+            document.getElementById("player2-name").innerText = this.myName;
+            document.getElementById("player1-name").innerText = this.opponent;
+        }
+        document.getElementById("player2-name").classList.remove("d-none");
+        document.getElementById("player1-name").classList.remove("d-none");
+    }
+
     gameLoop = () => {
         let checkIfGamePage = null;
         if (location.pathname === "/game")
@@ -139,6 +159,9 @@ export default class Game extends AbstractView {
                 this.websocket = null;
             }
         }
+        let startTime = new Date().getTime();
+        let endTime = new Date().getTime();
+        let executionTime = endTime - startTime;
         this.update();
         if (!this.isOffline && this.gameActive) {
             this.websocket.onmessage = (event) => {
@@ -153,6 +176,11 @@ export default class Game extends AbstractView {
                     if (data.action === "update_paddle2_position") {
                         this.updatePaddle2Position(data.paddle_data);
                     }
+                }
+                if (data.action === "send_username" && data.opponent != this.myName) {
+                    console.log("opponent: " + data.opponent);
+                    this.opponent = data.opponent;
+                    this.printNames();
                 }
                 if (this.player2 || this.spectator) {
                     if (data.action === "update_paddle1_position") {
@@ -170,16 +198,32 @@ export default class Game extends AbstractView {
                 }
             };
         }
-        if (this.gameActive)
-            requestAnimationFrame(this.gameLoop);
+        var self = this;
+        if (this.gameActive) {
+            if(executionTime < this.loopTime) { 
+                setTimeout(function(){ self.gameLoop(); }, this.loopTime - executionTime);
+            }else{
+                setTimeout(function(){ self.gameLoop(); }, 0);
+            }
+        }
+    }
+
+    sendInGameStatus = (bool) => {
+        var websocketC = getWebsocket();
+        if (bool)
+            websocketC.send(JSON.stringify({ action: "in_game"}));
+        else
+            websocketC.send(JSON.stringify({ action: "not_in_game"}));
     }
 
     startGame = () => {
+        this.sendInGameStatus(true);
         this.resetBall();
         this.gameActive = true;
         this.gameLoop();
         this.ball.style.display = "block";
         if (!this.tournament) {
+            setTimeout(() => { this.websocket.send(JSON.stringify({ action: "send_username" })); }, 100);
             document.getElementById("start-game").style.display = "none";
             document.getElementById("btn-start-private").style.display = "none";
         }
@@ -248,16 +292,16 @@ export default class Game extends AbstractView {
 
     updatePaddlePosition = () => {
 		if (this.keysPressed.ArrowUp) {
-			this.paddle2Y -= 3;
+			this.paddle2Y -= 6;
 		}
 		if (this.keysPressed.ArrowDown) {
-			this.paddle2Y += 3;
+			this.paddle2Y += 6;
 		}
 		if (this.keysPressed.w) {
-			this.paddle1Y -= 3;
+			this.paddle1Y -= 6;
 		}
 		if (this.keysPressed.s) {
-			this.paddle1Y += 3;
+			this.paddle1Y += 6;
 		}
 	
 		this.paddle1Y = Math.max(2, Math.min(this.paddle1Y, 338));
@@ -283,16 +327,16 @@ export default class Game extends AbstractView {
     sendPaddle1Position = () => {
         if (this.gameActive && this.websocket) {
             if (this.keysPressed.ArrowUp) {
-                this.paddle1Y -= 3;
+                this.paddle1Y -= 6;
             }
             if (this.keysPressed.ArrowDown) {
-                this.paddle1Y += 3;
+                this.paddle1Y += 6;
             }
             if (this.keysPressed.w) {
-                this.paddle1Y -= 3;
+                this.paddle1Y -= 6;
             }
             if (this.keysPressed.s) {
-                this.paddle1Y += 3;
+                this.paddle1Y += 6;
             }
             const message = JSON.stringify({
                 action: 'update_paddle1_position',
@@ -309,16 +353,16 @@ export default class Game extends AbstractView {
     sendPaddle2Position = () => {
         if (this.gameActive && this.websocket) {
             if (this.keysPressed.ArrowUp) {
-                this.paddle2Y -= 3;
+                this.paddle2Y -= 6;
             }
             if (this.keysPressed.ArrowDown) {
-                this.paddle2Y += 3;
+                this.paddle2Y += 6;
             }
             if (this.keysPressed.w) {
-                this.paddle2Y -= 3;
+                this.paddle2Y -= 6;
             }
             if (this.keysPressed.s) {
-                this.paddle2Y += 3;
+                this.paddle2Y += 6;
             }
             const message = JSON.stringify({
                 action: 'update_paddle2_position',
@@ -384,8 +428,8 @@ export default class Game extends AbstractView {
 			if (counter < 0) {
 				clearInterval(counterInterval);
 				document.getElementById("countdown").style.display = "none";
-				this.ballSpeedX = 2;
-				this.ballSpeedY = 2;
+				this.ballSpeedX = 6;
+				this.ballSpeedY = 6;
 			}
 		}, 1000);
     }
@@ -399,11 +443,9 @@ export default class Game extends AbstractView {
         const username = localStorage.getItem("username");
         const player1Name = document.getElementById("player1-name").dataset.name;
         const player2Name = document.getElementById("player2-name").dataset.name;
-        console.log("tournament disconnection before return");
         console.log(username + " --- " + player1Name + " --- " + player2Name);
         if (disconnectedPlayer != player1Name && disconnectedPlayer != player2Name)
             return;
-        console.log("tournament disconnection after return");
         this.ballSpeedX = 0;
         this.ballSpeedY = 0;
         this.ball.style.display = "none";
@@ -428,10 +470,47 @@ export default class Game extends AbstractView {
             }, 3000);
     }
 
+    postMatchResults = async () => {
+        const serverIP = window.location.hostname;
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.log('Token not found');
+            return;
+        }
+        try {
+            const response = await fetch(`https://${serverIP}/api/post_match/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Token ' + token,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    player_username: this.myName,
+                    opponent_username: this.opponent,
+                    player_score: this.myScore,
+                    opponent_score: this.opponentScore,
+                }),
+            });
+        } catch (error) {
+            console.error('An error occurred while posting match results:', error);
+        }
+    }
+
+    storeScore = () => {
+        if (this.player1) {
+            this.myScore = this.player1Score;
+            this.opponentScore = this.player2Score;
+        } else if (this.player2) {
+            this.myScore = this.player2Score;
+            this.opponentScore = this.player1Score;
+        }
+    }
+
     endGame = () => {
         this.ballSpeedX = 0;
         this.ballSpeedY = 0;
         this.ball.style.display = "none";
+        this.storeScore();
         if (this.playerDisconnected) {
             document.getElementById("winner").innerText = "Opponent disconnected...";
         }
@@ -455,8 +534,10 @@ export default class Game extends AbstractView {
         this.gameActive = false;
         if (!this.isOffline) {
             this.websocket.close();
+            this.postMatchResults();
         }
         this.websocket = null;
+        this.sendInGameStatus(false);
         if (!this.tournament) {
             const resetButton = document.querySelector(".btn-reset");
             resetButton.style.display = "block";
@@ -523,6 +604,7 @@ export default class Game extends AbstractView {
                 break;
         }
     }
+
 
     startMatchmaking = () => {
         const username = localStorage.getItem("username");
@@ -835,10 +917,12 @@ class Tic extends AbstractView {
     startGame = () => {
         document.getElementById("tic-card").classList.add("d-none");
         document.getElementById("tic-tac-toe").classList.remove("d-none");
-        this.websocket.send(JSON.stringify({
-            action: "send_username",
-            username: this.myName
-        }));
+        setTimeout(() => {
+            this.websocket.send(JSON.stringify({
+                action: "send_username",
+                username: this.myName
+            }));
+        }, 500);
         const self = this;
         this.websocket.onmessage = function(event) {
             const data = JSON.parse(event.data);
