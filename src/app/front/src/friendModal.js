@@ -729,13 +729,20 @@ async function printProfile(userId)
     const profileGamesPlayed = document.getElementById("profile-gamesPlayed");
     const profileGamesWon = document.getElementById("profile-gamesWon");
     const profileGamesLose = document.getElementById("profile-gamesLost");
-    const profileGamesHistory = document.getElementById("profile-username");
+    const profileHistory = document.getElementById("profile-history");
 
     console.log(totalMatches, wonMatches, lostMatches, matches);
     profileUser.innerText = username;
     profileGamesPlayed.innerText = totalMatches;
     profileGamesWon.innerText = wonMatches;
     profileGamesLose.innerText = lostMatches;
+    for (let i = 0; i < matches.length; i++) {
+        const opponent = await fetchUsernameFromId(matches[i].opponent);
+        const li = document.createElement('li');
+        li.textContent = `${new Date(matches[i].played_at).toLocaleDateString()}: ${username} ${matches[i].player_score} - ${matches[i].opponent_score} ${opponent}`;
+        li.className = 'list-group-item';
+        profileHistory.appendChild(li);
+    }
 }
 
 export async function getFriends(websocket) {

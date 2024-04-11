@@ -47,7 +47,7 @@ export default class Profile extends AbstractView {
             <h2>Match History</h2>
         </div>
         <div class="card-body">
-            <ul class="list-group">
+            <ul id="profile-history" class="list-group">
                 
             </ul>
         </div>
