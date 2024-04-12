@@ -74,7 +74,9 @@ const loadView = async (path) => {
                     addGameEventListeners();
                 }
                 if (path === '/tournament') {
-                    eventDelete();
+                    setTimeout(() => {
+                        eventDelete();
+                    }, 100);
                 }
                 if (!requiresAuthentication) {
                     addNavEventListeners();

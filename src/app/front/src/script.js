@@ -232,7 +232,7 @@
 //     }
 // });
 
-export function addTournamentEventListeners() {
+//export function addTournamentEventListeners() {
 
     // console.log("tedddst");
 
@@ -261,7 +261,7 @@ export function addTournamentEventListeners() {
     //         joinMatchmaking();
     //     });
     // });
-}
+//}
 
 
 function selectTournament(players) {

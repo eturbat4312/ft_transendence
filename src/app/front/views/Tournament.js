@@ -1,6 +1,7 @@
 import { fetchUsernameFromId } from "../src/friendModal.js";
 import AbstractView from "./AbstractView.js";
 import { startTournamentGame } from "./Game.js";
+import { getWebsocket } from "../src/index.js";
 
 export default class Tournament extends AbstractView {
     constructor(params) {
@@ -23,9 +24,6 @@ export default class Tournament extends AbstractView {
             player4: false
         };
         this.disconnected = [];
-        setTimeout(() => {
-            this.initialize();
-        }, 100);
     }
 
     async getHtml() {
@@ -80,14 +78,6 @@ export default class Tournament extends AbstractView {
         </div>   
      </div>
         `;
-    }
-
-    async initialize() {
-        const creatorId = await checkTournamentExists();
-        if (creatorId) {
-            const username = await fetchUsernameFromId();
-            tournamentCreated(username);
-        }
     }
 
     assignPlayer(i) {
@@ -625,10 +615,15 @@ async function createTournament(websocket) {
     }
 }
 
-export function eventDelete() {
-    const deleteBtn = document.getElementById("delete-tournament");
-    deleteBtn.addEventListener('click', () => { deleteTournament(); });
-}
+export async function eventDelete() {
+    const creatorId = await checkTournamentExists();
+    if (creatorId) {
+        const username = await fetchUsernameFromId(creatorId);
+        tournamentCreated(username);
+    } else {
+        addTournamentEventListeners(getWebsocket())
+    }
+ }
 
 async function deleteTournament() {
     const serverIP = window.location.hostname;
@@ -662,7 +657,6 @@ export function addTournamentEventListeners(websocket) {
     const tournament = new Tournament();
     if (startBtn) {
         startBtn.addEventListener('click', () => {
-            console.log(" je nte");
             createTournament(websocket);
             tournament.initTournament(false);
         });
