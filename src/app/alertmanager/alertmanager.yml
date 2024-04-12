@@ -1,6 +1,7 @@
 route:
   receiver: 'discord'
   group_wait: 1s
+  group_interval: 1s
 
 receivers:
 - name: 'discord'
