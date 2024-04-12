@@ -66,7 +66,7 @@ export default class extends AbstractView {
                     <p class="mb-0">Email</p>
                   </div>
                   <div class="col-sm-9">
-                    <p id="profile-email" class="text-muted mb-0">test@example.com</p>
+                    <p id="email" class="text-muted mb-0"></p>
                   </div>
                 </div>
                 <hr>
