@@ -335,7 +335,7 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             "action": "not_ready",
         }))
 
-        async def master_leave(self, event):
+    async def master_leave(self, event):
         await self.send(text_data=json.dumps({
             "action": "master_leave",
         }))

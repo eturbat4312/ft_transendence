@@ -15,8 +15,8 @@ export default class Settings extends AbstractView {
         const bioSection = this.bioSection();
 
         return `
-        <div class="container mt-3 centered">
-            <div class="card overflow-hidden mx-auto bg-dark text-light" style="max-width: 800px;">
+        <div class="container mt-3 centered" style="max-width: calc(100% - 200px);">
+            <div class="card overflow-hidden mx-auto bg-dark text-light" style="max-width: calc(100% - 200px);">
                 <div class="card-header text-center">
                     <h2>Settings</h2>
                 </div>
