@@ -94,16 +94,16 @@ services:
             - ./src/app/grafana:/var/lib/grafana
         networks:
             - transcendence
-    alertmanager:
-        image: quay.io/prometheus/alertmanager
-        container_name: alertmanager
-        restart: always
-        ports:
-            - "9093:9093"
-        volumes:
-            - ./src/app/alertmanager:/etc/alertmanager
-        networks:
-            - transcendence
+    # alertmanager:
+    #     image: quay.io/prometheus/alertmanager
+    #     container_name: alertmanager
+    #     restart: always
+    #     ports:
+    #         - "9093:9093"
+    #     volumes:
+    #         - ./src/app/alertmanager:/etc/alertmanager
+    #     networks:
+    #         - transcendence
     discord-alerts:
         image: benjojo/alertmanager-discord
         container_name: discord-alerts
