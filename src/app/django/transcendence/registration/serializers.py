@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import User, FriendRequest, Message, Match
+from .models import User, FriendRequest, Message, Match, TicMatch
 
 
 class RegisterSerializer(serializers.Serializer):
@@ -49,3 +49,8 @@ class MatchSerializer(serializers.ModelSerializer):
     class Meta:
         model = Match
         fields = ['id', 'player', 'opponent', 'player_score', 'opponent_score', 'winner', 'played_at']
+
+class TicMatchSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TicMatch
+        fields = ['id', 'player', 'opponent', 'match_status', 'played_at']

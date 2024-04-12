@@ -5,6 +5,32 @@ let connectedPlayers = [];
 let playersPlaying = [];
 
 
+
+async function getTicELO (userId) {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+    try {
+        const response = await fetch(`https://${serverIP}/api/get_elo/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Token ' + token
+            }
+        });
+        if (!response.ok) {
+            throw new Error('Failed to fetch elo');
+        }
+        const data = await response.json();
+        return data.elo;
+    } catch (error) {
+        console.error('Error fetching elo:', error);
+        return [];
+    }
+}
+
 async function getProfilePic(userId) {
     const serverIP = window.location.hostname;
     const token = localStorage.getItem('token');
@@ -745,32 +771,80 @@ async function getPlayerStats(userId) {
     }
 }
 
+async function getTicStats(userId) {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+    try {
+        const response = await fetch(`https://${serverIP}/api/tic_stats/${userId}/`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Token ' + token,
+                'Content-Type': 'application/json',
+            },
+        });
+        const data = await response.json();
+        return (data);
+    } catch (error) {
+        console.error('An error occurred while getting player stats:', error);
+    }
+}
+
 export async function printProfile(userId)
 {
     const username = await fetchUsernameFromId(userId);
     const data = await getPlayerStats(userId);
+    const tic = await getTicStats(userId);
+    const elo = await getTicELO(userId);
     await getProfilePic(userId);
     const totalMatches = data.total_matches;
     const wonMatches = data.won_matches;
     const lostMatches = data.lost_matches;
     const matches = data.matches;
+    const totalTic = tic.total_matches;
+    const wonTic = tic.won_matches;
+    const drawTic = tic.draw_matches;
+    const lostTic = tic.lost_matches;
+    const ticMatches = tic.matches;
     const profileUser = document.getElementById("profile-username");
     const pongGamesPlayed = document.getElementById("pong-gamesPlayed");
     const pongGamesWon = document.getElementById("pong-gamesWon");
     const pongGamesLose = document.getElementById("pong-gamesLost");
     const pongHistory = document.getElementById("pong-history");
+    const ticGamesPlayed = document.getElementById("tic-gamesPlayed");
+    const ticGamesWon = document.getElementById("tic-gamesWon");
+    const ticGamesDraw = document.getElementById("tic-gamesDraw");
+    const ticGamesLose = document.getElementById("tic-gamesLost");
+    const ticElo = document.getElementById("tic-elo");
+    const ticHistory = document.getElementById("tic-history");
 
     console.log(totalMatches, wonMatches, lostMatches, matches);
     profileUser.innerText = `${username}`;
     pongGamesPlayed.innerText = totalMatches;
     pongGamesWon.innerText = wonMatches;
     pongGamesLose.innerText = lostMatches;
+    ticGamesPlayed.innerText = totalTic;
+    ticGamesWon.innerText = wonTic;
+    ticGamesDraw.innerText = drawTic;
+    ticGamesLose.innerText = lostTic;
+    ticElo.innerText = elo;
+
     for (let i = 0; i < matches.length; i++) {
         const opponent = await fetchUsernameFromId(matches[i].opponent);
         const li = document.createElement('li');
         li.textContent = `${new Date(matches[i].played_at).toLocaleDateString()}: ${username} ${matches[i].player_score} - ${matches[i].opponent_score} ${opponent}`;
         li.className = 'list-group-item';
         pongHistory.appendChild(li);
+    }
+    for (let i = 0; i < ticMatches.length; i++) {
+        const opponent = await fetchUsernameFromId(ticMatches[i].opponent);
+        const li = document.createElement('li');
+        li.textContent = `${new Date(ticMatches[i].played_at).toLocaleDateString()}: ${username} - ${opponent}: ${ticMatches[i].match_status}`;
+        li.className = 'list-group-item';
+        ticHistory.appendChild(li);
     }
 }
 

@@ -38,7 +38,13 @@ export default class extends AbstractView {
                     TTT Games Won: <span id="tic-gamesWon"></span>
                 </p>
                 <p class="mb-4">
+                    TTT Tie Games: <span id="tic-gamesDraw"></span>
+                </p>
+                <p class="mb-4">
                     TTT Games Lost: <span id="tic-gamesLost"></span>
+                </p>
+                <p class="mb-4">
+                    TTT Rank: <span id="tic-elo"></span>
                 </p>
               </div>
             </div>
@@ -75,7 +81,7 @@ export default class extends AbstractView {
               </div>
             </div>
             <div class="row">
-              <div class="col-md-6">
+              <div class="col-md-5">
                 <div class="card mb-4 mb-md-0">
                   <div class="card-body">
                     <p class="mb-4">PONG HISTORY</p>
@@ -85,10 +91,13 @@ export default class extends AbstractView {
                   </div>
                 </div>
               </div>
-              <div class="col-md-6">
+              <div class="col-md-7">
                 <div class="card mb-4 mb-md-0" style="max-width: calc(100% - 200px);">
                   <div class="card-body">
                     <p class="mb-4">TIC-TAC-TOE HISTORY</p>
+                    <ul id="tic-history" class="list-group">
+                    
+                    </ul>
                   </div>
                 </div>
               </div>

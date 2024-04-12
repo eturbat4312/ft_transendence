@@ -5,9 +5,9 @@ from rest_framework.decorators import api_view, authentication_classes, permissi
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.authentication import TokenAuthentication
 from rest_framework.authtoken.models import Token
-from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, FriendRequestSerializer, MessageSerializer, MatchSerializer
+from .serializers import UserSerializer, RegisterSerializer, LoginSerializer, FriendRequestSerializer, MessageSerializer, MatchSerializer, TicMatchSerializer
 from .models import User as UserModel
-from .models import FriendRequest, Message, Tournament, Match
+from .models import FriendRequest, Message, Tournament, Match, TicMatch
 from django.db import transaction
 from django.shortcuts import get_object_or_404
 from django.contrib.auth.hashers import make_password
@@ -82,6 +82,7 @@ class GetBioView(APIView):
     def get(self, request):
         bio = request.user.bio
         return Response({'bio': bio})
+
 class GetUserIdView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -106,8 +107,8 @@ class GetEloView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        user = request.user
+    def get(self, request, user_id):
+        user = UserModel.objects.get(id=user_id)
         elo = user.elo
         return Response({'elo': elo})
 
@@ -248,6 +249,22 @@ class PlayerStatsView(APIView):
             'matches': match_serializer.data,
         })
 
+class TicPlayerStatsView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, user_id):
+        user = UserModel.objects.get(id=user_id)
+        matches = TicMatch.objects.filter(player=user)
+        match_serializer = TicMatchSerializer(matches, many=True)
+        return Response({
+            'total_matches': user.total_tic_matches(),
+            'won_matches': user.won_tic_matches(),
+            'lost_matches': user.lost_tic_matches(),
+            'draw_matches': user.draw_tic_matches(),
+            'matches': match_serializer.data,
+        })
+
 class PostMatchView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
@@ -266,6 +283,25 @@ class PostMatchView(APIView):
             player_score=player_score,
             opponent_score=opponent_score,
             winner=winner,
+            played_at=played_at
+        )
+
+        return Response({'message': 'Match successfully stocked'}, status=status.HTTP_201_CREATED)
+
+class PostTicMatchView(APIView):
+    authentication_classes = [TokenAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        player = get_object_or_404(UserModel, username=request.data.get('player_username'))
+        opponent = get_object_or_404(UserModel, username=request.data.get('opponent_username'))
+        match_status = request.data.get('match_status')  # 'win', 'loss', or 'draw'
+        played_at = request.data.get('played_at')
+
+        match = TicMatch.objects.create(
+            player=player,
+            opponent=opponent,
+            match_status=match_status,
             played_at=played_at
         )
 

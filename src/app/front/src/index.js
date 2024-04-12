@@ -70,7 +70,6 @@ const loadView = async (path) => {
             viewInstance.getHtml().then(html => {
                 document.querySelector('#app').innerHTML = html;
                 //viewInstance.initialize();
-                console.log("JJJJEEEEEEEEEE");
                 if (path === '/game') {
                     addGameEventListeners();
                 }

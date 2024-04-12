@@ -21,6 +21,18 @@ class User(AbstractUser):
 
     def lost_matches(self):
         return self.total_matches() - self.count_won_matches()
+    
+    def total_tic_matches(self):
+        return self.tic_player.count()
+
+    def won_tic_matches(self):
+        return self.tic_player.filter(match_status='win').count()
+
+    def lost_tic_matches(self):
+        return self.tic_player.filter(match_status='loss').count()
+
+    def draw_tic_matches(self):
+        return self.tic_player.filter(match_status='draw').count()
 
     class Meta:
         # Add the following line to resolve the related_name conflict
@@ -33,6 +45,15 @@ class Match(models.Model):
     opponent_score = models.IntegerField()
     winner = models.ForeignKey(User, related_name='won_matches', on_delete=models.CASCADE)
     played_at = models.DateTimeField(auto_now_add=True)
+
+class TicMatch(models.Model):
+    player = models.ForeignKey(User, related_name='tic_player', on_delete=models.CASCADE)
+    opponent = models.ForeignKey(User, related_name='tic_opponent', on_delete=models.CASCADE)
+    match_status = models.CharField(max_length=10)  # 'win', 'loss', or 'draw'
+    played_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.player} vs {self.opponent} - {self.match_status}"
 
 class FriendRequest(models.Model):
     from_user = models.ForeignKey(User, related_name='from_user', on_delete=models.CASCADE)

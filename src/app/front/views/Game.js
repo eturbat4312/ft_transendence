@@ -117,6 +117,22 @@ export default class Game extends AbstractView {
         `;
     }
 
+    navLinkClickHandler = (event) => {
+        if (this.gameActive) {
+            this.websocket.close();
+            this.websocket = null;
+            this.sendInGameStatus(false);
+        }
+    }
+
+    checkIfLeave = () => {
+        const navLinks = document.querySelectorAll('.nav__link');
+        navLinks.forEach(link => {
+            link.removeEventListener('click', this.navLinkClickHandler);
+            link.addEventListener('click', this.navLinkClickHandler);
+        });
+    }
+
     updateScore = (data) => {
         const { player1Score, player2Score } = data;
         this.player1Score = player1Score;
@@ -148,17 +164,18 @@ export default class Game extends AbstractView {
 
     gameLoop = () => {
         let checkIfGamePage = null;
-        if (location.pathname === "/game")
-            checkIfGamePage = document.getElementById("game");
-        if (location.pathname === "/tournament")
-            checkIfGamePage = document.getElementById("tournament-container");
-        if (!checkIfGamePage) {
-            this.gameActive = false;
-            if (!this.isOffline) {
-                this.websocket.close();
-                this.websocket = null;
-            }
-        }
+        // if (location.pathname === "/game")
+        //     checkIfGamePage = document.getElementById("game");
+        // if (location.pathname === "/tournament")
+        //     checkIfGamePage = document.getElementById("tournament-container");
+        // if (!checkIfGamePage) {
+        //     this.gameActive = false;
+        //     if (!this.isOffline) {
+        //         this.websocket.close();
+        //         this.sendInGameStatus(false);
+        //         this.websocket = null;
+        //     }
+        // }
         let startTime = new Date().getTime();
         let endTime = new Date().getTime();
         let executionTime = endTime - startTime;
@@ -218,6 +235,7 @@ export default class Game extends AbstractView {
 
     startGame = () => {
         this.sendInGameStatus(true);
+        this.checkIfLeave();
         this.resetBall();
         this.gameActive = true;
         this.gameLoop();
@@ -791,6 +809,8 @@ class Tic extends AbstractView {
         this.player1Name = null;
         this.player2Name = null;
         this.winner = null;
+        this.opponent = null;
+        this.gameActive = false;
         this.winnerDisplay = document.getElementById('winner-tic');
         this.myName = localStorage.getItem("username");
         this.ELO = null;
@@ -799,24 +819,25 @@ class Tic extends AbstractView {
     getTicELO = async () => {
         const serverIP = window.location.hostname;
         const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
         if (!token) {
             console.log('Token not found');
             return;
         }
         try {
-            const response = await fetch(`https://${serverIP}/api/get_elo/`, {
+            const response = await fetch(`https://${serverIP}/api/get_elo/${userId}`, {
                 method: 'GET',
                 headers: {
                     'Authorization': 'Token ' + token
                 }
             });
             if (!response.ok) {
-                throw new Error('Failed to fetch friend requests');
+                throw new Error('Failed to fetch elo');
             }
             const data = await response.json();
             return data.elo;
         } catch (error) {
-            console.error('Error fetching friend requests:', error);
+            console.error('Error fetching elo:', error);
             return [];
         }
     }
@@ -914,7 +935,33 @@ class Tic extends AbstractView {
         }
     }
 
+    endGame = () => {
+        this.websocket.close();
+        this.websocket = null;
+        this.gameActive = false;
+        this.sendInGameStatus(false);
+        document.getElementById("winner-tic").innerText = `${this.opponent} left the game. You can leave the page now.`;
+    }
+
+    navLinkClickHandler = (event) => {
+        if (this.gameActive) {
+            this.websocket.close();
+            this.sendInGameStatus(false);
+        }
+    }
+
+    checkIfLeave = () => {
+        const navLinks = document.querySelectorAll('.nav__link');
+        navLinks.forEach(link => {
+            link.removeEventListener('click', this.navLinkClickHandler);
+            link.addEventListener('click', this.navLinkClickHandler);
+        });
+    }
+
     startGame = () => {
+        this.gameActive = true;
+        this.sendInGameStatus(true);
+        this.checkIfLeave();
         document.getElementById("tic-card").classList.add("d-none");
         document.getElementById("tic-tac-toe").classList.remove("d-none");
         setTimeout(() => {
@@ -926,6 +973,11 @@ class Tic extends AbstractView {
         const self = this;
         this.websocket.onmessage = function(event) {
             const data = JSON.parse(event.data);
+            if (self.gameActive) {
+                if (data.action === "player_disconnected") {
+                    self.endGame();
+                }
+            }
             if (data.action === 'update_board') {
                 console.log("updateBoard");
                 console.log(data);
@@ -943,11 +995,15 @@ class Tic extends AbstractView {
             } else if (data.action === 'send_username') {
                 console.log(data.username);
                 if (self.player1) {
-                    if (data.username != self.myName)
+                    if (data.username != self.myName) {
                         self.player2Name = data.username;
+                        self.opponent = data.username;
+                    }
                 } else if (self.player2) {
-                    if (data.username != self.myName)
+                    if (data.username != self.myName) {
                         self.player1Name = data.username;
+                        self.opponent = data.username;
+                    }
                 }
                 console.log("player1Name = " + self.player1Name);
                 console.log("player2Name = " + self.player2Name);
@@ -977,6 +1033,40 @@ class Tic extends AbstractView {
         });
     };
 
+    postTicMatchResults = async (status) => {
+        console.log(status);
+        const serverIP = window.location.hostname;
+        const token = localStorage.getItem('token');
+        if (!token) {
+            console.log('Token not found');
+            return;
+        }
+        try {
+            const response = await fetch(`https://${serverIP}/api/tic_post_match/`, {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Token ' + token,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    player_username: this.myName,
+                    opponent_username: this.opponent,
+                    match_status: status,
+                }),
+            });
+        } catch (error) {
+            console.error('An error occurred while posting match results:', error);
+        }
+    }
+
+    sendInGameStatus = (bool) => {
+        var websocketC = getWebsocket();
+        if (bool)
+            websocketC.send(JSON.stringify({ action: "in_game"}));
+        else
+            websocketC.send(JSON.stringify({ action: "not_in_game"}));
+    }
+
     updateGameBoard = (data) => {
         const board = data.board;
         const game_over = data.game_over;
@@ -994,20 +1084,25 @@ class Tic extends AbstractView {
                 }
             }
         }
-        if (game_over) {
-            if (winner === "draw")
+        if (game_over && this.gameActive === true) {
+            this.gameActive = false;
+            this.sendInGameStatus(false);
+            if (winner === "draw") {
                 this.updateELO(this.ELO + 0);
-            else if (winner === this.myName)
+                this.postTicMatchResults('draw');
+            } else if (winner === this.myName) {
                 this.updateELO(this.ELO + 8);
-            else
+                this.postTicMatchResults('win');
+            } else {
                 this.updateELO(this.ELO - 6);
+                this.postTicMatchResults('loss');
+            }
             let message;
             if (winner === "draw")
                 message = `It's a draw...`;
             else if (winner)
                 message = `${winner} won the game !`;
             document.getElementById("winner-tic").innerText = message;
-
         }
     }
 
@@ -1036,18 +1131,21 @@ class Tic extends AbstractView {
             const [a, b, c] = combination;
             if (this.board[a] !== '' && this.board[a] === this.board[b] && this.board[a] === this.board[c]) {
                 this.winner = this.board[a];
+                this.sendInGameStatus(false);
                 this.winnerDisplay.textContent = `Player ${this.winner} wins!`;
                 this.resetButton.style.display = 'block';
                 return;
             }
         }
         if (!this.board.includes('')) {
+            this.sendInGameStatus(false);
             this.winnerDisplay.textContent = 'It\'s a draw!';
             this.resetButton.style.display = 'block';
         }
     }
 
     startOfflineGame = () => {
+        this.sendInGameStatus(true);
         document.getElementById("tic-card").classList.add("d-none");
         document.getElementById("tic-tac-toe").classList.remove("d-none");
         this.cells.forEach(cell => {

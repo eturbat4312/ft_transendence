@@ -6,7 +6,7 @@ from .views import GetMessageHistoryView, SendMessageView, CreateTournamentView,
 
 from .views import BlockUserView, RemoveBlockedUserView, GetBlockedUserView, GetEloView, UpdateEloView, GetProfilePicView
 from .views import GetEmailView, GetBioView, UpdateUsername, UpdateEmailView, UpdateProfilePicView, ChangePassword
-from .views import UpdateBioView,PlayerStatsView,PostMatchView,GetMatchHistoryView
+from .views import UpdateBioView,PlayerStatsView,PostMatchView,GetMatchHistoryView, PostTicMatchView, TicPlayerStatsView
 
 from rest_framework.routers import DefaultRouter
 from django.conf import settings
@@ -46,10 +46,12 @@ urlpatterns = [
     path('api/block_user/<int:user_id>/', BlockUserView.as_view(), name='block-user'),
     path('api/remove_blocked/<int:blocked_id>/', RemoveBlockedUserView.as_view(), name='remove-blocked'),
     path('api/get_blocked/', GetBlockedUserView.as_view(), name='get-blocked'),
-    path('api/get_elo/', GetEloView.as_view(), name='get-elo'),
+    path('api/get_elo/<int:user_id>/', GetEloView.as_view(), name='get-elo'),
     path('api/update_elo/', UpdateEloView.as_view(), name='update-elo'),
     path('api/player_stats/<int:user_id>/', PlayerStatsView.as_view(), name='player-stats'),
     path('api/post_match/', PostMatchView.as_view(), name='post-match'),
+    path('api/tic_stats/<int:user_id>/', TicPlayerStatsView.as_view(), name='tic-player-stats'),
+    path('api/tic_post_match/', PostTicMatchView.as_view(), name='tic-post-match'),
     path('api/get_match_history/', GetMatchHistoryView.as_view(), name='get-match-history'),
 ]+ static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
 

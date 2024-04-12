@@ -36,6 +36,9 @@ export default class Profile extends AbstractView {
                 TTT Games Won: <span id="tic-gamesWon"></span>
             </p>
             <p class="mb-4">
+                TTT Tie Games: <span id="tic-gamesDraw"></span>
+            </p>
+            <p class="mb-4">
                 TTT Games Lost: <span id="tic-gamesLost"></span>
             </p>
             <p class="mb-4">
@@ -90,6 +93,9 @@ export default class Profile extends AbstractView {
             <div class="card mb-4 mb-md-0" style="max-width: calc(100% - 200px);">
               <div class="card-body">
                 <p class="mb-4">TIC-TAC-TOE HISTORY</p>
+                <ul id="tic-history" class="list-group">
+                
+                </ul>
               </div>
             </div>
           </div>

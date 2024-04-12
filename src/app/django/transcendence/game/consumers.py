@@ -136,7 +136,6 @@ class GameConsumer(AsyncWebsocketConsumer):
         }))
 
     async def player_disconnected(self, event):
-        logging.info("playerDisconnected method")
         await self.send(text_data=json.dumps({
         'action': 'player_disconnected',
         'username': event['username']
@@ -612,7 +611,6 @@ class Game2Consumer(AsyncWebsocketConsumer):
         }))
 
     async def player_disconnected(self, event):
-        logging.info("playerDisconnected method")
         await self.send(text_data=json.dumps({
             'action': 'player_disconnected'
         }))
