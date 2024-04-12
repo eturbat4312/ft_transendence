@@ -240,36 +240,36 @@ const checkIfConnected = async () => {
             if (document.getElementById("start-tournament")) {
                 tournamentCreated(data.username);
             }
-            const tournament = document.getElementById("tournament");
-            tournament.addEventListener('click', () => {
-                setTimeout(() => {
-                    console.log("happen after tournament button in nav");
-                    tournamentCreated(data.username);
-                }, 100);
-            });
+            // const tournament = document.getElementById("tournament");
+            // tournament.addEventListener('click', () => {
+            //     setTimeout(() => {
+            //         console.log("happen after tournament button in nav");
+            //         tournamentCreated(data.username);
+            //     }, 100);
+            // });
         }
     }
-    const isTournament = await checkTournamentExists();
-    if (isTournament && location.pathname === "/tournament") {
-        tournamentCreated(isTournament);
-    }// else if (isTournament && location.pathname != "/tournament") {
-    //     const tournament = document.getElementById("tournament");
-    //     tournament.addEventListener('click', () => {
-    //         setTimeout(() => {
-    //             tournamentCreated(isTournament);
-    //         }, 100);
-    //     });
-    // }
-    if (document.getElementById("start-tournament"))
-        addTournamentEventListeners(websocket);
-    const tournament = document.getElementById("tournament");
-    tournament.addEventListener('click', () => {
-        setTimeout(() => {
-            if (isTournament)
-                tournamentCreated(isTournament)
-            else addTournamentEventListeners(websocket);
-        }, 100);
-    });
+    // const isTournament = await checkTournamentExists();
+    // if (isTournament && location.pathname === "/tournament") {
+    //     tournamentCreated(isTournament);
+    // }// else if (isTournament && location.pathname != "/tournament") {
+    // //     const tournament = document.getElementById("tournament");
+    // //     tournament.addEventListener('click', () => {
+    // //         setTimeout(() => {
+    // //             tournamentCreated(isTournament);
+    // //         }, 100);
+    // //     });
+    // // }
+    // if (document.getElementById("start-tournament"))
+    //     addTournamentEventListeners(websocket);
+    // const tournament = document.getElementById("tournament");
+    // tournament.addEventListener('click', () => {
+    //     setTimeout(() => {
+    //         if (isTournament)
+    //             tournamentCreated(isTournament)
+    //         else addTournamentEventListeners(websocket);
+    //     }, 100);
+    // });
     websocket.onerror = function(event) {
         console.error('Erreur WebSocket:', event);
     }

@@ -1,3 +1,4 @@
+import { fetchUsernameFromId } from "../src/friendModal.js";
 import AbstractView from "./AbstractView.js";
 import { startTournamentGame } from "./Game.js";
 
@@ -22,6 +23,9 @@ export default class Tournament extends AbstractView {
             player4: false
         };
         this.disconnected = [];
+        setTimeout(() => {
+            this.initialize();
+        }, 100);
     }
 
     async getHtml() {
@@ -76,6 +80,14 @@ export default class Tournament extends AbstractView {
         </div>   
      </div>
         `;
+    }
+
+    async initialize() {
+        const creatorId = await checkTournamentExists();
+        if (creatorId) {
+            const username = await fetchUsernameFromId();
+            tournamentCreated(username);
+        }
     }
 
     assignPlayer(i) {
@@ -663,6 +675,11 @@ export function tournamentCreated(username) {
 
 export async function checkTournamentExists() {
     const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
     try {
         const response = await fetch(`https://${serverIP}/api/check_tournament/`, {
             method: 'GET',

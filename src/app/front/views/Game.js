@@ -119,8 +119,11 @@ export default class Game extends AbstractView {
 
     navLinkClickHandler = (event) => {
         if (this.gameActive) {
-            this.websocket.close();
-            this.websocket = null;
+            this.gameActive = false;
+            if (!this.isOffline) {
+                this.websocket.close();
+                this.websocket = null;
+            }
             this.sendInGameStatus(false);
         }
     }
@@ -241,7 +244,8 @@ export default class Game extends AbstractView {
         this.gameLoop();
         this.ball.style.display = "block";
         if (!this.tournament) {
-            setTimeout(() => { this.websocket.send(JSON.stringify({ action: "send_username" })); }, 100);
+            if (!this.isOffline)
+                setTimeout(() => { this.websocket.send(JSON.stringify({ action: "send_username" })); }, 100);
             document.getElementById("start-game").style.display = "none";
             document.getElementById("btn-start-private").style.display = "none";
         }
