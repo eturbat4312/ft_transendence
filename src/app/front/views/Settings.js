@@ -127,12 +127,14 @@ export default class Settings extends AbstractView {
                     'Authorization': 'Token ' + token,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ username: username })
+                body: JSON.stringify({ new_username: username })
             });
-
+            console.log('data send to backend : ', JSON.stringify({ username: username }));
             if (response.ok) {
-                console.log('Username updated');
+                alert('Username updated');
+    
             } else {
+                alert( 'Failed to update username');
                 console.log('Failed to update username:', await response.text());
             }
 
@@ -157,12 +159,14 @@ export default class Settings extends AbstractView {
                     'Authorization': 'Token ' + token,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ email: email })
+                body: JSON.stringify({ new_email: email })
             });
 
             if (response.ok) {
+                alert( 'Email updated');
                 console.log('Email updated');
             } else {
+                alert('Failed to update email');
                 console.log('Failed to update email:', await response.text());
             }
 
@@ -193,8 +197,10 @@ export default class Settings extends AbstractView {
             });
 
             if (response.ok) {
+                alert('Profile picture updated');
                 console.log('Profile picture updated');
             } else {
+                alert('Failed to update profile picture');
                 console.log('Failed to update profile picture:', await response.text());
             }
 
@@ -261,8 +267,10 @@ export default class Settings extends AbstractView {
             });
             console.log('Data sent to backend:', JSON.stringify({ bio: bio }));
             if (response.ok) {
+                alert ('Bio updated');
                 console.log('Bio updated');
             } else {
+                alert('Failed to update Bio');
                 console.log('Failed to update bio:', await response.text());
             }
 
