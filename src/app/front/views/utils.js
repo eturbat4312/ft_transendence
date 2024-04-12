@@ -118,6 +118,7 @@ const getSocial = async () => {
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#friendRequestsModal">
             Friends Requests
         </button>
+        <br>
         <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#blockedModal">
             Blocked list
         </button>

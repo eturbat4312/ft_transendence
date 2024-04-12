@@ -75,7 +75,7 @@ export default class extends AbstractView {
                     <p class="mb-0">Bio</p>
                   </div>
                   <div class="col-sm-9">
-                    <p id="profile-bio" class="text-muted mb-0">bio</p>
+                    <p id="bio" class="text-muted mb-0"></p>
                   </div>
                 </div>
               </div>
@@ -151,7 +151,8 @@ export default class extends AbstractView {
             if (responseBio.ok) {
                 const userData = await responseBio.json();
                 const bio = userData.bio;
-                document.getElementById('bio').innerText = 'Bio: ' + bio;
+				console.log("bio : ",bio);
+                document.getElementById('bio').innerText = bio;
             } else {
                 console.log('Failed to get bio:', await responseBio.text());
             }
