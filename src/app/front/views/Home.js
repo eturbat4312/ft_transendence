@@ -151,8 +151,10 @@ export default class extends AbstractView {
             if (responseBio.ok) {
                 const userData = await responseBio.json();
                 const bio = userData.bio;
+				console.log("userdata.bio : ", userData.bio);
                 document.getElementById('bio').innerText = 'Bio: ' + bio;
             } else {
+				console.log("userdata.bio : ", userData.bio);
                 console.log('Failed to get bio:', await responseBio.text());
             }
 

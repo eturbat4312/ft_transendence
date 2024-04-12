@@ -94,6 +94,7 @@ export default class extends AbstractView {
             } else {
                 console.log('Login failed!');
                 console.log(response.statusText);
+				alert(response.statusText);
             }
 
         } catch (error) {
