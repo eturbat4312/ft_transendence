@@ -24,9 +24,6 @@ export default class Tournament extends AbstractView {
             player4: false
         };
         this.disconnected = [];
-        setTimeout(() => {
-            this.initialize();
-        }, 100);
     }
 
     async getHtml() {
@@ -81,16 +78,6 @@ export default class Tournament extends AbstractView {
         </div>   
      </div>
         `;
-    }
-
-    async initialize() {
-        const creatorId = await checkTournamentExists();
-        if (creatorId) {
-            const username = await fetchUsernameFromId();
-            tournamentCreated(username);
-        } else {
-            addTournamentEventListeners(getWebsocket())
-        }
     }
 
     assignPlayer(i) {
@@ -628,10 +615,15 @@ async function createTournament(websocket) {
     }
 }
 
-export function eventDelete() {
-    const deleteBtn = document.getElementById("delete-tournament");
-    deleteBtn.addEventListener('click', () => { deleteTournament(); });
-}
+export async function eventDelete() {
+    const creatorId = await checkTournamentExists();
+    if (creatorId) {
+        const username = await fetchUsernameFromId(creatorId);
+        tournamentCreated(username);
+    } else {
+        addTournamentEventListeners(getWebsocket())
+    }
+ }
 
 async function deleteTournament() {
     const serverIP = window.location.hostname;
