@@ -1,6 +1,7 @@
 import { fetchUsernameFromId } from "../src/friendModal.js";
 import AbstractView from "./AbstractView.js";
 import { startTournamentGame } from "./Game.js";
+import { getWebsocket } from "../src/index.js";
 
 export default class Tournament extends AbstractView {
     constructor(params) {
@@ -87,6 +88,8 @@ export default class Tournament extends AbstractView {
         if (creatorId) {
             const username = await fetchUsernameFromId();
             tournamentCreated(username);
+        } else {
+            addTournamentEventListeners(getWebsocket())
         }
     }
 
@@ -662,7 +665,6 @@ export function addTournamentEventListeners(websocket) {
     const tournament = new Tournament();
     if (startBtn) {
         startBtn.addEventListener('click', () => {
-            console.log(" je nte");
             createTournament(websocket);
             tournament.initTournament(false);
         });
