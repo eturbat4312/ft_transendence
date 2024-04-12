@@ -30,7 +30,7 @@ export default class Tournament extends AbstractView {
 
     async getHtml() {
         return `
-        <div id="tournament-container" class="container mt-3 centered">
+        <div id="tournament-container" class="container mt-3 centered" style="max-width: calc(100% - 200px);">
         <div class="card bg-dark text-light mx-auto" style="max-width: calc(100% - 200px);">
             <div class="card-header text-center">
                 <h2>Tournament</h2>
