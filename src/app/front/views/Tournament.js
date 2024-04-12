@@ -501,6 +501,15 @@ export default class Tournament extends AbstractView {
         }
     }
 
+    masterLeave() {
+        document.getElementById("gameT").classList.add("d-none");
+        document.getElementById("player-queue").classList.add("d-none");
+        document.getElementById("spinner-container").classList.add("d-none");
+        const tournamentMessage = document.getElementById("tournament-message");
+        tournamentMessage.textContent = `Tournament creator leaved the tournament... Tournament is cancelled.\nReload or leave the page.`;
+        document.getElementById("tournament-container").classList.remove("d-none");
+    }
+
     enterTournament() {
         const serverIP = window.location.hostname;
         const username = localStorage.getItem("username");
@@ -557,6 +566,10 @@ export default class Tournament extends AbstractView {
                     setTimeout(() => {
                         self.printResults(data.winner);
                     }, 3000);
+                }
+                if (data.action === "master_leave") {
+                    deleteTournament();
+                    self.masterLeave();
                 }
             };
             const checkPageChange = () => {
