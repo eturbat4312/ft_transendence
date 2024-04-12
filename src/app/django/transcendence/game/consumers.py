@@ -210,8 +210,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     tournament_users = {}
     username = None
     user_id = None
+    master = False
 
     async def connect(self):
+        if len(self.tournament_users) == 0:
+            self.master = True
         if len(self.tournament_users) >= 4:
             await self.accept()
             await self.send(text_data=json.dumps({
@@ -243,13 +246,21 @@ class TournamentConsumer(AsyncWebsocketConsumer):
             )
             del self.tournament_users[self.user_id]
             await self.channel_layer.group_discard("tournament_users", self.channel_name)
-            await self.channel_layer.group_send(
-                "tournament_users",
-                {
-                    'type': 'tournament_leave',
-                    'username': self.username,
-                }
-            )
+            if self.master:
+                await self.channel_layer.group_send(
+                    "tournament_users",
+                    {
+                        'type': 'master_leave',
+                    }
+                )
+            else:
+                await self.channel_layer.group_send(
+                    "tournament_users",
+                    {
+                        'type': 'tournament_leave',
+                        'username': self.username,
+                    }
+                )
 
     async def receive(self, text_data):
         text_data_json = json.loads(text_data)
@@ -322,6 +333,11 @@ class TournamentConsumer(AsyncWebsocketConsumer):
     async def tournament_not_ready(self, event):
         await self.send(text_data=json.dumps({
             "action": "not_ready",
+        }))
+
+        async def master_leave(self, event):
+        await self.send(text_data=json.dumps({
+            "action": "master_leave",
         }))
     
     async def start_tournament(self, event):

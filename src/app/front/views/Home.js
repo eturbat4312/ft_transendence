@@ -11,7 +11,7 @@ export default class extends AbstractView {
     async getHtml() {
         return `
         <div class="container mt-3 centered">
-        <div class="row">
+        <div class="row" style="max-width: calc(100% - 200px);">
           <div class="col-lg-4">
             <div class="card mb-4">
               <div class="card-body text-center">
@@ -50,7 +50,7 @@ export default class extends AbstractView {
             </div>
           </div>
           <div class="col-lg-8">
-            <div class="card mb-4" style="max-width: calc(100% - 200px);">
+            <div class="card mb-4">
               <div class="card-body">
                 <div class="row">
                   <div class="col-sm-3">
@@ -92,7 +92,7 @@ export default class extends AbstractView {
                 </div>
               </div>
               <div class="col-md-7">
-                <div class="card mb-4 mb-md-0" style="max-width: calc(100% - 200px);">
+                <div class="card mb-4 mb-md-0">
                   <div class="card-body">
                     <p class="mb-4">TIC-TAC-TOE HISTORY</p>
                     <ul id="tic-history" class="list-group">

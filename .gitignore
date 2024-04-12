@@ -8,3 +8,4 @@ logs
 *.log
 db/
 env/
+src/app/django/transcendence/media

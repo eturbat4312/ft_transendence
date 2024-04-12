@@ -1,3 +1,4 @@
+import { fetchUsernameFromId } from "../src/friendModal.js";
 import AbstractView from "./AbstractView.js";
 import { startTournamentGame } from "./Game.js";
 
@@ -22,11 +23,14 @@ export default class Tournament extends AbstractView {
             player4: false
         };
         this.disconnected = [];
+        setTimeout(() => {
+            this.initialize();
+        }, 100);
     }
 
     async getHtml() {
         return `
-        <div id="tournament-container" class="container mt-3 centered">
+        <div id="tournament-container" class="container mt-3 centered" style="max-width: calc(100% - 200px);">
         <div class="card bg-dark text-light mx-auto" style="max-width: calc(100% - 200px);">
             <div class="card-header text-center">
                 <h2>Tournament</h2>
@@ -76,6 +80,14 @@ export default class Tournament extends AbstractView {
         </div>   
      </div>
         `;
+    }
+
+    async initialize() {
+        const creatorId = await checkTournamentExists();
+        if (creatorId) {
+            const username = await fetchUsernameFromId();
+            tournamentCreated(username);
+        }
     }
 
     assignPlayer(i) {
@@ -489,6 +501,15 @@ export default class Tournament extends AbstractView {
         }
     }
 
+    masterLeave() {
+        document.getElementById("gameT").classList.add("d-none");
+        document.getElementById("player-queue").classList.add("d-none");
+        document.getElementById("spinner-container").classList.add("d-none");
+        const tournamentMessage = document.getElementById("tournament-message");
+        tournamentMessage.textContent = `Tournament creator leaved the tournament... Tournament is cancelled.\nReload or leave the page.`;
+        document.getElementById("tournament-container").classList.remove("d-none");
+    }
+
     enterTournament() {
         const serverIP = window.location.hostname;
         const username = localStorage.getItem("username");
@@ -545,6 +566,10 @@ export default class Tournament extends AbstractView {
                     setTimeout(() => {
                         self.printResults(data.winner);
                     }, 3000);
+                }
+                if (data.action === "master_leave") {
+                    deleteTournament();
+                    self.masterLeave();
                 }
             };
             const checkPageChange = () => {
@@ -663,6 +688,11 @@ export function tournamentCreated(username) {
 
 export async function checkTournamentExists() {
     const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
     try {
         const response = await fetch(`https://${serverIP}/api/check_tournament/`, {
             method: 'GET',

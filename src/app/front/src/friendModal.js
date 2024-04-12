@@ -654,6 +654,7 @@ async function blockRequest(id, playerName, websocket)
         if (data.status === 'success') {
             alert('User blocked successfully!');
             await removeFriend(id, websocket);
+            await respondFriendRequest(id, false, websocket);
             updateBlockedModal(websocket);
             updateConnectedPlayer(playerName, id, true, websocket);
         } else {
