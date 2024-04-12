@@ -1,7 +1,12 @@
 route:
-  receiver: 'discord-notifications'
+  receiver: 'discord'
+  group_wait: 1s
 
 receivers:
-- name: 'discord-notifications'
+- name: 'discord'
   webhook_configs:
-  - url: 'https://discord.com/api/webhooks/xxxxxxxxxxxxxx'
+  - url: 'http://discord-alerts:9094'
+
+
+# templates:
+# - 'message: "{{ $labels.instance }} of job {{ $labels.job }} has been down for more than 1 minute."'

@@ -103,3 +103,13 @@ services:
             - ./src/app/alertmanager:/etc/alertmanager
         networks:
             - transcendence
+    discord-alerts:
+        image: benjojo/alertmanager-discord
+        container_name: discord-alerts
+        restart: always
+        environment:
+            - DISCORD_WEBHOOK=https://discord.com/api/webhooks/1228282712603754617/554undQORjiKu2u7zn6w07rdM5wDwbA5A6MfrEh1KGo6uj181CAgIaFTh7fS1aee_Kk3
+        ports:
+            - "9094:9094"
+        networks:
+            - transcendence
