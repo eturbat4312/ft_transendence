@@ -223,6 +223,21 @@ export default class Tournament extends AbstractView {
             return (true);
     }
 
+    navLinkClickHandler = (event) => {
+            this.websocketT.close();
+            this.websocketT = null;
+            deleteTournament();
+            console.log("delete");
+    }
+
+    checkIfLeave = () => {
+        const navLinks = document.querySelectorAll('.nav__link');
+        navLinks.forEach(link => {
+            link.removeEventListener('click', this.navLinkClickHandler);
+            link.addEventListener('click', this.navLinkClickHandler);
+        });
+    }
+
     initTournament(bool) {
         if (bool) {
             const joinBtn = document.getElementById("join-tournament");
@@ -237,6 +252,7 @@ export default class Tournament extends AbstractView {
         playerQueue.classList.remove("d-none");
         if (!bool) {
             this.tournamentMaster = true;
+            this.checkIfLeave();
             this.enterTournament();
         }
     }
@@ -621,6 +637,7 @@ export function addTournamentEventListeners(websocket) {
     const tournament = new Tournament();
     if (startBtn) {
         startBtn.addEventListener('click', () => {
+            console.log(" je nte");
             createTournament(websocket);
             tournament.initTournament(false);
         });

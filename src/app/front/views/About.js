@@ -21,9 +21,11 @@ export default class extends AbstractView {
                     <strong>Features:</strong>
                     <ul>
                         <li>Classic Pong gameplay</li>
-                        <li>Customizable settings</li>
+                        <li>Tic tac toe game</li>
                         <li>Multiplayer mode</li>
-                        <li>Global chat and private chat</li>
+                        <li>Multiplayer tournament</li>
+                        <li>Profiles</li>
+                        <li>Private chat</li>
                         <li>Tournament mode</li>
                         <li>Social space</li>
                     </ul>
