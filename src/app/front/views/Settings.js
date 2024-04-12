@@ -75,10 +75,6 @@ export default class Settings extends AbstractView {
     <div class="tab-pane fade" id="account-change-password">
         <div class="card-body pb-2">
             <div class="form-group">
-                <label class="form-label">Current password</label>
-                <input id="currentPasswordInput" type="password" class="form-control">
-            </div>
-            <div class="form-group">
                 <label class="form-label">New password</label>
                 <input id="newPasswordInput" type="password" class="form-control">
             </div>
@@ -99,7 +95,7 @@ export default class Settings extends AbstractView {
             <div class="card-body pb-2">
                 <div class="form-group">
                     <label class="form-label">Bio</label>
-                    <textarea class="form-control" rows="5"></textarea>
+                    <textarea id="newBio" class="form-control" rows="5"></textarea>
                 </div>
             </div> 
             <button id="saveBio" type="button" style="bottom: 0; left: 0;" class="btn btn-primary">Save Bio</button>&nbsp;
@@ -208,7 +204,7 @@ export default class Settings extends AbstractView {
     }
 
     async changePassword() {
-        const currentPassword = document.getElementById('currentPasswordInput').value;
+        
         const newPassword = document.getElementById('newPasswordInput').value;
         const repeatPassword = document.getElementById('repeatPasswordInput').value;
         const serverIP = window.location.hostname;
@@ -217,6 +213,7 @@ export default class Settings extends AbstractView {
             console.log('Token not found');
             return;
         }
+
 
         if (newPassword !== repeatPassword) {
             document.getElementById('passwordChangeMessage').innerText = 'Passwords do not match';
@@ -230,7 +227,7 @@ export default class Settings extends AbstractView {
                     'Authorization': 'Token ' + token,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ current_password: currentPassword, new_password: newPassword })
+                body: JSON.stringify({ new_password: newPassword })
             });
 
             if (response.ok) {
@@ -245,7 +242,7 @@ export default class Settings extends AbstractView {
     }
 
     async updateBio() {
-        const bio = document.querySelector('.form-control').value;
+        const bio = document.getElementById('newBio').value;
         const serverIP = window.location.hostname;
         const token = localStorage.getItem('token');
         if (!token) {
@@ -260,9 +257,9 @@ export default class Settings extends AbstractView {
                     'Authorization': 'Token ' + token,
                     'Content-Type': 'application/json'
                 },
-                body: JSON.stringify({ bio: bio })
+                body: JSON.stringify({ new_bio: bio })
             });
-
+            console.log('Data sent to backend:', JSON.stringify({ bio: bio }));
             if (response.ok) {
                 console.log('Bio updated');
             } else {
