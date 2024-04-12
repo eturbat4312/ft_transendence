@@ -8,6 +8,7 @@ class User(AbstractUser):
     custom_field = models.CharField(max_length=255)
     profil_pic = models.ImageField(upload_to="profil_pic", null=True, blank=True)
     elo = models.IntegerField(default=0, blank=True, null=True)
+    bio = models.CharField(max_length=255, blank=True, null=True)
     
 
     def __str__(self):
