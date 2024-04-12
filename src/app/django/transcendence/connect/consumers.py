@@ -131,6 +131,13 @@ class ConnectConsumer(AsyncWebsocketConsumer):
                     'username': self.username,
                 }
             )
+        elif action == "delete_tournament":
+            await self.channel_layer.group_send(
+                "connected_users",
+                {
+                    'type': 'delete_tournament',
+                }
+            )
         elif action == "ping":
             await self.channel_layer.group_send(
                 "connected_users",
@@ -226,6 +233,11 @@ class ConnectConsumer(AsyncWebsocketConsumer):
         await self.send(text_data=json.dumps({
             "username": event["username"],
             "action": "start_tournament",
+        }))
+    
+    async def delete_tournament(self, event):
+        await self.send(text_data=json.dumps({
+            "action": "delete_tournament",
         }))
     
     async def ping(self, event):

@@ -458,7 +458,7 @@ export async function updateFriendRequestsModal(websocket) {
         const ul = document.createElement('ul');
         for (const request of friendRequests) {
             const username = await fetchUsernameFromId(request.from_user);
-    
+            console.log("updateFriendRequsetModal: " + username);
             let isBlocked = false;
             for (const blockedUser of blockedList) {
                 if (username === blockedUser.username) {
@@ -698,7 +698,6 @@ export async function updateBlockedModal(websocket) {
 
     const data = await fetchBlockedList();
     const blockedList = data.blocked;
-    console.log(blockedList);
 
     blockedContainer.innerHTML = '';
 

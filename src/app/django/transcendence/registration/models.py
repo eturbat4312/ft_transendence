@@ -1,6 +1,7 @@
 # models.py
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+import math
 
 class User(AbstractUser):
     friends = models.ManyToManyField('self', symmetrical=False, related_name='friends_list')
@@ -18,7 +19,7 @@ class User(AbstractUser):
         return self.player.count()
 
     def count_won_matches(self):
-        return self.won_matches.all().count() / 2
+        return math.ceil(self.won_matches.all().count() / 2)
 
     def lost_matches(self):
         return self.total_matches() - self.count_won_matches()

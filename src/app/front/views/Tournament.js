@@ -29,7 +29,7 @@ export default class Tournament extends AbstractView {
     async getHtml() {
         return `
         <div id="tournament-container" class="container mt-3 centered" style="max-width: calc(100% - 200px);">
-        <div class="card bg-dark text-light mx-auto" style="max-width: calc(100% - 200px);">
+        <div class="card bg-dark text-light mx-auto" style="max-width: 800px">
             <div class="card-header text-center">
                 <h2>Tournament</h2>
                 <button id="delete-tournament" class="btn btn-danger">DELETE</button>
@@ -225,11 +225,23 @@ export default class Tournament extends AbstractView {
             return (true);
     }
 
-    navLinkClickHandler = (event) => {
-            this.websocketT.close();
-            this.websocketT = null;
+    sendDeletedMessage() {
+        if (this.tournamentMaster) {
             deleteTournament();
-            console.log("delete");
+            var tmpWebsocket = getWebsocket();
+            tmpWebsocket.send(JSON.stringify({ "action": "delete_tournament"}));
+        }
+    }
+
+    navLinkClickHandler = (event) => {
+        if (this.websocketT)
+            this.websocketT.close();
+        if (this.tournamentMaster)
+            this.sendDeletedMessage()
+        const navLinks = document.querySelectorAll('.nav__link');
+        navLinks.forEach(link => {
+            link.removeEventListener('click', this.navLinkClickHandler);
+        });
     }
 
     checkIfLeave = () => {
@@ -254,8 +266,8 @@ export default class Tournament extends AbstractView {
         playerQueue.classList.remove("d-none");
         if (!bool) {
             this.tournamentMaster = true;
-            this.checkIfLeave();
             this.enterTournament();
+            window.addEventListener('beforeunload', this.sendDeletedMessage.bind(this));
         }
     }
 
@@ -504,6 +516,7 @@ export default class Tournament extends AbstractView {
         const serverIP = window.location.hostname;
         const username = localStorage.getItem("username");
         const userId = localStorage.getItem("userId");
+        this.checkIfLeave();
         if (this.websocketT === null) {
             this.websocketT = new WebSocket(`wss://${serverIP}/api/ws/tournament/`);
             this.websocketT.onopen = () => {
@@ -562,23 +575,11 @@ export default class Tournament extends AbstractView {
                     self.masterLeave();
                 }
             };
-            const checkPageChange = () => {
-                if (!document.getElementById("tournament-container")) {
-                    console.log("change page");
-                    this.websocketT.close();
-                    this.websocketT = null;
-                    clearInterval(intervalId);
-                }
-            }
-            const intervalId = setInterval(checkPageChange, 1000);
-
             this.websocketT.onclose = (event) => {
                 console.log("Tournament WebSocket connection closed", event);
-                clearInterval(intervalId); 
             };
             this.websocketT.onerror = (error) => {
                 console.error("WebSocket error:", error);
-                clearInterval(intervalId);
             };
         } else {
             console.log("WebSocket connection is already open.");
@@ -618,11 +619,12 @@ async function createTournament(websocket) {
 export async function eventDelete() {
     const creatorId = await checkTournamentExists();
     if (creatorId) {
-        const username = await fetchUsernameFromId(creatorId);
-        tournamentCreated(username);
+        tournamentCreated(creatorId);
     } else {
         addTournamentEventListeners(getWebsocket())
     }
+    const deleteBtn = document.getElementById("delete-tournament");
+    deleteBtn.addEventListener('click', () => { deleteTournament(); });
  }
 
 async function deleteTournament() {
@@ -663,6 +665,11 @@ export function addTournamentEventListeners(websocket) {
     }
     const deleteBtn = document.getElementById("delete-tournament");
     deleteBtn.addEventListener('click', () => { deleteTournament(); });
+}
+
+export function tournamentDeleted() {
+    document.getElementById("join-tournament").remove();
+    document.getElementById("start-tournament").classList.remove("d-none");
 }
 
 export function tournamentCreated(username) {

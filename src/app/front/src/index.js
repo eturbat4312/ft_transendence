@@ -1,5 +1,5 @@
 import { getNav, getSocial, getChat, handleLogout } from '../views/utils.js';
-import { eventDelete, addTournamentEventListeners, tournamentCreated, checkTournamentExists } from '../views/Tournament.js';
+import { eventDelete, addTournamentEventListeners, tournamentCreated, checkTournamentExists, tournamentDeleted } from '../views/Tournament.js';
 import { addGameEventListeners, initPrivateGame } from '../views/Game.js';
 import { addChatEventListeners } from './utils.js';
 import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, showGameInvitationNotification, updateFriendRequestsModal, getFriends, updateBlockedModal, addToPlayersPlaying, removeFromPlayersPlaying, checkPlaying } from './friendModal.js';
@@ -250,6 +250,10 @@ const checkIfConnected = async () => {
             //     }, 100);
             // });
         }
+        if (data.action === "delete_tournament")
+            if (document.getElementById("join-tournament")) {
+                tournamentDeleted();
+            }
     }
     // const isTournament = await checkTournamentExists();
     // if (isTournament && location.pathname === "/tournament") {

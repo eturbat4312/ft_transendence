@@ -12,8 +12,10 @@ export default class Profile extends AbstractView {
     <div class="row" style="max-width: calc(100% - 200px);">
       <div class="col-lg-4">
         <div class="card mb-4">
-          <div class="card-body text-center">
-            <img id="profilePic" src="" alt="Profile pic" class="rounded-circle img-fluid" style="width: 150px;">
+          <div class="card-body text-center center-content">
+            <div class="profilePicWrapper">
+              <img id="profilePic" src="" alt="Profile pic" class="img-fluid">
+            </div>
             <p class="text-muted mb-1">Player</p>
           </div>
         </div>
