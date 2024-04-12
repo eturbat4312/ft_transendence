@@ -185,7 +185,7 @@ export default class Settings extends AbstractView {
 
         const fileInput = document.querySelector('.account-settings-fileinput');
         const formData = new FormData();
-        formData.append('file', fileInput.files[0]);
+        formData.append('new_profil_pic', fileInput.files[0]);
 
         try {
             const response = await fetch(`https://${serverIP}/api/update_profile_pic/`, {
