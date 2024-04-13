@@ -1,4 +1,4 @@
-const getProfilePicUrl = async () => {
+export const getProfilePicUrl = async () => {
     const serverIP = window.location.hostname;
     const token = localStorage.getItem('token');
     const userId = localStorage.getItem("userId");
@@ -32,7 +32,7 @@ const getProfilePicUrl = async () => {
 
 const getNav = async () => {
     const profilePicUrl = await getProfilePicUrl();
-    const profilePic = profilePicUrl ? `<img src="${profilePicUrl}" alt="Profile pic" class="rounded-circle" style="width: 32px; height: 32px;">` : 'PP';
+    const profilePic = profilePicUrl ? `<img id="nav-pp" src="${profilePicUrl}" alt="Profile pic" class="rounded" style="width: 32px; height: 32px;">` : 'PP';
         return `
         <nav class="navbar navbar-expand-lg navbar-dark bg-dark" style="z-index: 3;">
             <div class="container-fluid">
@@ -40,7 +40,7 @@ const getNav = async () => {
                     <span class="navbar-toggler-icon"></span>
                 </button>
                 <div class="collapse navbar-collapse d-lg-flex" id="navbarSupportedContent" style="z-index: 1;">
-                    <a class="navbar-brand col-lg-3 me-0 pong-title" href="#">PXNG</a>
+                    <a class="navbar-brand col-lg-3 me-0 pong-title">PXNG</a>
                     <ul class="navbar-nav col-lg-6 justify-content-lg-center">
                         <li class="nav-item">
                             <a href="/home" class="nav__link nav-link active" data-link>Home</a>
@@ -109,19 +109,18 @@ const getSocial = async () => {
     </div>
     <div id="player-bar" class="player-bar bg-dark">
         <h2>Social</h2>
-            <div id="player-list-container" class="container">
-                <p>Friends</p>
-                <ul id="friend-list" class="player-list"></ul>
-                <p>Players</p>
-                <ul id="player-list" class="player-list"></ul>
-            </div>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#friendRequestsModal">
-            Friends Requests
-        </button>
-        <br>
-        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#blockedModal">
-            Blocked list
-        </button>
+        <div id="player-list-container" class="container">
+            <p>Friends</p>
+            <ul id="friend-list" class="player-list"></ul>
+            <hr>
+            <p>Players</p>
+            <ul id="player-list" class="player-list"></ul>
+        </div>
+        <hr>
+        <div class="d-grid gap-2 col-11 position-absolute">
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#friendRequestsModal">Friends Requests</button>
+            <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#blockedModal">Blocked List</button>
+        </div>
     </div>
     <div class="modal fade" id="friendRequestsModal" tabindex="-1" aria-labelledby="friendRequestsModalLabel" aria-hidden="true">
         <div class="modal-dialog">

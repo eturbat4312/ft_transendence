@@ -111,8 +111,8 @@ const loadComponents = async () => {
         const navHTML = await getNav(currentPath);
         document.querySelector("#nav").innerHTML = navHTML;
 
-        const chatHTML = await getChat(currentPath);
-        document.querySelector("#chat").innerHTML = chatHTML;
+        // const chatHTML = await getChat(currentPath);
+        // document.querySelector("#chat").innerHTML = chatHTML;
 
         const socialHTML = await getSocial(currentPath);
         document.querySelector("#social").innerHTML = socialHTML;

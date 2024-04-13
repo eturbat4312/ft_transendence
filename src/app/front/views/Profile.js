@@ -8,7 +8,7 @@ export default class Profile extends AbstractView {
 
     async getHtml() {
         return `
-  <div class="container mt-3 centered">
+  <div class="container mt-3 centered lexend">
     <div class="row" style="max-width: calc(100% - 200px);">
       <div class="col-lg-4">
         <div class="card mb-4">

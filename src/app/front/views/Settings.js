@@ -1,4 +1,6 @@
+import { navigate } from "../src/index.js";
 import AbstractView from "./AbstractView.js";
+import { getProfilePicUrl } from "./utils.js";
 
 export default class Settings extends AbstractView {
     constructor(params) {
@@ -203,7 +205,10 @@ export default class Settings extends AbstractView {
 
             if (response.ok) {
                 alert('Profile picture updated');
-                console.log('Profile picture updated');
+                const profilePicUrl = await getProfilePicUrl();
+                const profilePic = document.getElementById("nav-pp");
+                profilePic.src = profilePicUrl;
+                console.log(profilePicUrl);
             } else {
                 alert('Failed to update profile picture');
                 console.log('Failed to update profile picture:', await response.text());
