@@ -18,7 +18,8 @@ export default class Game extends AbstractView {
         this.ballX = 300;
         this.ballY = 200;
         this.ballSpeedX = 6;
-        this.ballSpeedY = 6;
+        this.ballSpeedY = 5;
+        this.ballSpeedIncrease = 0.01;
         this.player1Score = 0;
         this.player2Score = 0;
         this.gameActive = true;
@@ -120,7 +121,7 @@ export default class Game extends AbstractView {
     navLinkClickHandler = (event) => {
         if (this.gameActive) {
             this.gameActive = false;
-            if (!this.isOffline) {
+            if (!this.isOffline && this.websocket) {
                 this.websocket.close();
                 this.websocket = null;
             }
@@ -255,6 +256,8 @@ export default class Game extends AbstractView {
         if (!this.gameActive) return;
         this.ballX += this.ballSpeedX;
         this.ballY += this.ballSpeedY;
+        this.ballSpeedX += Math.sign(this.ballSpeedX) * this.ballSpeedIncrease;
+        this.ballSpeedY += Math.sign(this.ballSpeedY) * this.ballSpeedIncrease;
 
         if (this.isMaster) {
             this.updateMasterBallPosition();
@@ -450,8 +453,16 @@ export default class Game extends AbstractView {
 			if (counter < 0) {
 				clearInterval(counterInterval);
 				document.getElementById("countdown").style.display = "none";
-				this.ballSpeedX = 6;
-				this.ballSpeedY = 6;
+				if (Math.random() < 0.5) {
+                    this.ballSpeedX = -6;
+                } else {
+                    this.ballSpeedX = 6;
+                }
+                if (Math.random() < 0.5) {
+                    this.ballSpeedY = -5;
+                } else {
+                    this.ballSpeedY = 5;
+                }
 			}
 		}, 1000);
     }
@@ -556,7 +567,8 @@ export default class Game extends AbstractView {
         this.gameActive = false;
         if (!this.isOffline) {
             this.websocket.close();
-            this.postMatchResults();
+            if (!this.playerDisconnected)
+                this.postMatchResults();
         }
         this.websocket = null;
         this.sendInGameStatus(false);
@@ -578,8 +590,8 @@ export default class Game extends AbstractView {
         this.paddle2Y = 170;
         this.ballX = 300;
         this.ballY = 200;
-        this.ballSpeedX = 2;
-        this.ballSpeedY = 2;
+        this.ballSpeedX = 6;
+        this.ballSpeedY = 5;
         this.player1Score = 0;
         this.player2Score = 0;
         this.gameActive = true;
@@ -949,7 +961,8 @@ class Tic extends AbstractView {
 
     navLinkClickHandler = (event) => {
         if (this.gameActive) {
-            this.websocket.close();
+            if (this.websocket)
+                this.websocket.close();
             this.sendInGameStatus(false);
         }
     }
