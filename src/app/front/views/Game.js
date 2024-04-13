@@ -199,7 +199,6 @@ export default class Game extends AbstractView {
                     }
                 }
                 if (data.action === "send_username" && data.opponent != this.myName) {
-                    console.log("opponent: " + data.opponent);
                     this.opponent = data.opponent;
                     this.printNames();
                 }
@@ -476,8 +475,14 @@ export default class Game extends AbstractView {
 
     tournamentDisconnection = (disconnectedPlayer) => {
         const username = localStorage.getItem("username");
+        const master = document.getElementById("player1").dataset.name;
         const player1Name = document.getElementById("player1-name").dataset.name;
         const player2Name = document.getElementById("player2-name").dataset.name;
+        if (disconnectedPlayer === master){
+            this.resetGame();
+            this.websocket.close();
+            return;
+        }
         if (disconnectedPlayer != player1Name && disconnectedPlayer != player2Name)
             return;
         this.ballSpeedX = 0;
@@ -654,10 +659,8 @@ export default class Game extends AbstractView {
             this.websocket.onmessage = function(event) {
                 const data = JSON.parse(event.data);
                 if (data.action === "match_found") {
-                    console.log("match found");
                     self.websocket.close();
                     const gameId = data.game_id;
-                    console.log("gameId = ", gameId);
                     self.websocket = new WebSocket(`wss://${serverIP}/api/ws/game/`);
                     self.websocket.onopen = function() {
                         if (!self.player1)
@@ -671,10 +674,8 @@ export default class Game extends AbstractView {
                     if (data.is_master) {
                         self.isMaster = true;
                         self.player1 = true;
-                        console.log("You are the ballMaster!");
                     } else {
                         self.player2 = true;
-                        console.log("You are not the ballMaster.");
                     }
                 }
             };
@@ -862,7 +863,6 @@ class Tic extends AbstractView {
         const serverIP = window.location.hostname;
         if (this.websocket === null || this.websocket.readyState !== WebSocket.OPEN) {
             this.ELO = await this.getTicELO();
-            console.log(`Elo: ${this.ELO}`);
             if (this.ELO < 33)
                 this.websocket = new WebSocket(`wss://${serverIP}/api/ws/matchmakingbronze/`);
             else if (this.ELO < 66)
@@ -877,10 +877,8 @@ class Tic extends AbstractView {
             this.websocket.onmessage = function(event) {
                 const data = JSON.parse(event.data);
                 if (data.action === "match_found") {
-                    console.log("match found");
                     self.websocket.close();
                     const gameId = data.game_id;
-                    console.log("gameId = ", gameId);
                     self.websocket = new WebSocket(`wss://${serverIP}/api/ws/game2/`);
                     self.websocket.onopen = function() {
                         if (!self.player1) {
@@ -897,7 +895,6 @@ class Tic extends AbstractView {
                         self.player1 = true;
                         self.player1Name = self.myName;
                         self.isTurn = true;
-                        console.log("You are player 1!");
                     }
                 }
             };
@@ -925,7 +922,6 @@ class Tic extends AbstractView {
     }
 
     updateELO = async (newELO) => {
-        console.log("updateELO: " + newELO);
         if (newELO > 100)
             newELO = 100;
         if (newELO < 0)
@@ -996,8 +992,6 @@ class Tic extends AbstractView {
                 }
             }
             if (data.action === 'update_board') {
-                console.log("updateBoard");
-                console.log(data);
                 self.updateGameBoard(data);
             } else if (data.action === 'player_move' && self.myName != data.player_id) {
                 self.isTurn = true;
@@ -1010,7 +1004,6 @@ class Tic extends AbstractView {
             } else if (data.action === 'player_move' && self.myName === data.player_id) {
                 self.isTurn = false;
             } else if (data.action === 'send_username') {
-                console.log(data.username);
                 if (self.player1) {
                     if (data.username != self.myName) {
                         self.player2Name = data.username;
@@ -1022,15 +1015,12 @@ class Tic extends AbstractView {
                         self.opponent = data.username;
                     }
                 }
-                console.log("player1Name = " + self.player1Name);
-                console.log("player2Name = " + self.player2Name);
             }
 
         };
         const cells = document.querySelectorAll(".cell");
         cells.forEach(cell => {
             cell.addEventListener("click", () => {
-                console.log(this.isTurn);
                 if (!this.isOffline && (this.player1 || this.player2) && this.isTurn) {
                     const cellId = cell.getAttribute("id").split("-").slice(1).map(Number);
                     this.websocket.send(JSON.stringify({
@@ -1051,7 +1041,6 @@ class Tic extends AbstractView {
     };
 
     postTicMatchResults = async (status) => {
-        console.log(status);
         const serverIP = window.location.hostname;
         const token = localStorage.getItem('token');
         if (!token) {
@@ -1229,10 +1218,8 @@ export function initPrivateGame(userId, opponentUserId) {
     const gameId = `${smallerId}${largerId}`;
     const gameView = new Game();
     let GM;
-    console.log("userId: " + userId + " small: " + smallerId);
     if (parseInt(userId) === smallerId) GM = true;
     else GM = false;
-    console.log(GM);
     gameView.startPrivateGame(userId, opponentUserId, gameId, GM);
 }
 

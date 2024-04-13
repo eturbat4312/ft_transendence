@@ -2,6 +2,7 @@ import { fetchUsernameFromId } from "../src/friendModal.js";
 import AbstractView from "./AbstractView.js";
 import { startTournamentGame } from "./Game.js";
 import { getWebsocket } from "../src/index.js";
+import { navigate } from "../src/index.js";
 
 export default class Tournament extends AbstractView {
     constructor(params) {
@@ -144,6 +145,7 @@ export default class Tournament extends AbstractView {
             if (this.checkInterval)
                 clearInterval(this.checkInterval);
         }
+        console.log("handleFirstRound");
         let message;
         let winner;
         if (player1 && player2) {
@@ -171,6 +173,7 @@ export default class Tournament extends AbstractView {
             if (this.checkInterval)
                 clearInterval(this.checkInterval);
         }
+        console.log("handleSecoundRound");
         let message;
         let winner;
         if (player1 && player2) {
@@ -235,6 +238,9 @@ export default class Tournament extends AbstractView {
         }
         if (!player1 && !player2)
             return (false);
+        let master = document.getElementById("player1").dataset.name;
+        if (player1 && player1Name === master)
+            return;
         this.handleFirstRound(player1Name, player2Name, player1, player2);
         this.handleSecoundRound(player1Name, player2Name, player1, player2);
         this.handleFinal(player1Name, player2Name, player1, player2);
@@ -251,8 +257,10 @@ export default class Tournament extends AbstractView {
     }
 
     navLinkClickHandler = (event) => {
-        if (this.websocketT)
+        if (this.websocketT) {
             this.websocketT.close();
+            this.websocketT = null;
+        }
         if (this.tournamentMaster)
             this.sendDeletedMessage()
         const navLinks = document.querySelectorAll('.nav__link');
@@ -309,34 +317,24 @@ export default class Tournament extends AbstractView {
         this.checkInterval = setInterval(() => {
             this.checkIfDisconnected(player1Name, player2Name);
         }, 1000);
+        const ready1 = document.getElementById("ready-player-one");
+        ready1.addEventListener('click', () => { 
+            ready1.disabled = true;
+            this.sendReadyMessage(1);
+        });
+        const ready2 = document.getElementById("ready-player-two");
+        ready2.addEventListener('click', () => { 
+            ready2.disabled = true;
+            this.sendReadyMessage(2);
+        });
         if (this.players['player1']) {
             this.playing = true;
-            const ready1 = document.getElementById("ready-player-one");
             ready1.disabled = false;
             ready1.classList.remove("d-none");
-            ready1.addEventListener('click', () => { 
-                ready1.disabled = true;
-                this.sendReadyMessage(1);
-            });
-            const ready2 = document.getElementById("ready-player-two");
-            ready2.addEventListener('click', () => { 
-                ready2.disabled = true;
-                this.sendReadyMessage(2);
-            });
         } else if (this.players['player2']) {
             this.playing = true;
-            const ready2 = document.getElementById("ready-player-two");
             ready2.disabled = false;
             ready2.classList.remove("d-none");
-            ready2.addEventListener('click', () => { 
-                ready2.disabled = true;
-                this.sendReadyMessage(2);
-            });
-            const ready1 = document.getElementById("ready-player-one");
-            ready1.addEventListener('click', () => { 
-                ready1.disabled = true;
-                this.sendReadyMessage(1);
-            });
         }
     }
 
@@ -351,29 +349,11 @@ export default class Tournament extends AbstractView {
             const ready1 = document.getElementById("ready-player-one");
             ready1.disabled = false;
             ready1.classList.remove("d-none");
-            ready1.addEventListener('click', () => { 
-                ready1.disabled = true;
-                this.sendReadyMessage(1);
-            });
-            const ready2 = document.getElementById("ready-player-two");
-            ready2.addEventListener('click', () => { 
-                ready2.disabled = true;
-                this.sendReadyMessage(2);
-            });
         } else if (this.players['player4']) {
             this.playing = true;
             const ready2 = document.getElementById("ready-player-two");
             ready2.disabled = false;
             ready2.classList.remove("d-none");
-            ready2.addEventListener('click', () => { 
-                ready2.disabled = true;
-                this.sendReadyMessage(2);
-            });
-            const ready1 = document.getElementById("ready-player-one");
-            ready1.addEventListener('click', () => { 
-                ready1.disabled = true;
-                this.sendReadyMessage(1);
-            });
         }
     }
 
@@ -381,7 +361,6 @@ export default class Tournament extends AbstractView {
         this.checkInterval = setInterval(() => {
             this.checkIfDisconnected(this.round1winner, this.round2winner);
         }, 1000);
-        console.log(`demiwinner: ${this.demiwinner}\n`)
         if (this.demiwinner && (this.players['player1'] || this.players['player2'])) {
             this.playing = true;
             const ready1 = document.getElementById("ready-player-one");
@@ -534,7 +513,13 @@ export default class Tournament extends AbstractView {
         const tournamentMessage = document.getElementById("tournament-message");
         tournamentMessage.textContent = `${winner} is the tournament great winner !`;
         document.getElementById("tournament-container").classList.remove("d-none");
+        this.resetTournament();
         this.websocketT.close();
+        this.websocketT = null;
+        setTimeout(() => {
+            navigate("/tournament");
+            alert("Tournament is finished");
+        }, 100);
     }
 
     printResults(winner) {
@@ -572,6 +557,24 @@ export default class Tournament extends AbstractView {
         const tournamentMessage = document.getElementById("tournament-message");
         tournamentMessage.textContent = `Tournament creator leaved the tournament... Tournament is cancelled.\nReload or leave the page.`;
         document.getElementById("tournament-container").classList.remove("d-none");
+        this.resetTournament();
+        this.websocketT.close();
+        this.websocketT = null;
+        setTimeout(() => {
+            navigate("/tournament");
+            alert("Tournament is finished");
+        }, 100);
+    }
+
+    resetTournament() {
+        const playerSlot = document.querySelectorAll(".player-slot");
+        for (let i = 0; i < playerSlot.length; i++) {
+            if (playerSlot[i].textContent) {
+                playerSlot[i].textContent = null;
+                playerSlot[i].dataset.name = null;
+                playerSlot[i].dataset.id = null;
+            }
+        }
     }
 
     enterTournament() {
@@ -592,19 +595,30 @@ export default class Tournament extends AbstractView {
                 if (data.action === "tournament_full") {
                     self.websocketT.close();
                     self.websocketT = null;
-                    alert("TOURNAMENT IS FULL!");
+                    alert("Tournament is full!");
+                }
+                if (data.action === "tournament_started" && self.started === false) {
+                    self.websocketT.close();
+                    self.websocketT = null;
+                    navigate("/tournament");
+                    setTimeout(() => {
+                        alert("Tournament already started!");
+                    }, 50);
                 }
                 if (data.action === "not_full") {
                     self.initTournament(true);
                 }
                 if (data.action === "player_list") {
-                    setTimeout(() => {
-                        self.addPlayerToHTML(data.username, data.userId);
-                    }, 50);
-                    
+                    if (self.started) {
+                        if (self.tournamentMaster)
+                            self.websocketT.send(JSON.stringify({ "action": "tournament_started"}));
+                    } else {
+                        setTimeout(() => {
+                            self.addPlayerToHTML(data.username, data.userId);
+                        }, 50);
+                    }
                 }
                 if (data.action === "leave") {
-                    console.log(data.username, " disconnected from tournament !");
                     if (!self.started)
                         self.removeDisconnectedQueue(data.username);
                     else
@@ -625,6 +639,7 @@ export default class Tournament extends AbstractView {
                     self.startTournament();
                 }
                 if (data.action === "game_ready") {
+                    console.log("game_ready websocket");
                     self.gameReady(data.player);
                 }
                 if (data.action === "result") {
@@ -731,6 +746,8 @@ export function tournamentDeleted() {
 }
 
 export function tournamentCreated(username) {
+    if (document.getElementById("join-tournament"))
+        document.getElementById("join-tournament").remove();
     document.getElementById("start-tournament").classList.add("d-none");
     const joinTournamentBtn = document.createElement("button");
     joinTournamentBtn.classList.add("btn", "btn-primary", "button-font");

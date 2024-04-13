@@ -141,7 +141,7 @@ export const addNavEventListeners = () => {
     }
 };
 
-const navigate = (path) => {
+export const navigate = (path) => {
     history.pushState({}, "", path);
     loadView(path);
 };
