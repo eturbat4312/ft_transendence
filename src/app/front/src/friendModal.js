@@ -459,13 +459,13 @@ async function fetchGamesPlayedFromId(userId) {
             }
         });
         if (!response.ok) {
-            throw new Error('Failed to fetch friend requests');
+            throw new Error('Failed to fetch games played');
         }
 
         const data = await response.json();
         return data.gamesplayed;
     } catch (error) {
-        console.error('Error fetching friend requests:', error);
+        console.error('Error fetching games played:', error);
         return [];
     }
 }
@@ -496,8 +496,6 @@ async function respondFriendRequest(userId, bool, websocket)
                 console.log(`Friend request accepted for user ${userId}`);
                 const message = JSON.stringify({ action: 'update_friends', toUserId: uid });
                 websocket.send(message);
-            } else {
-                console.log(`Friend request rejected for user ${userId}`);
             }
             updateFriendRequestsModal(websocket);
             getFriends(websocket);
@@ -634,14 +632,14 @@ async function sendMessage(messageInput, friendId, websocket) {
 }
 
 let chatWindow = null;
-let websocket = null;
+let websocketC = null;
 
 function startPrivateChat(friendId, friendName) {
     const username = localStorage.getItem('username');   
     if (chatWindow) {
         document.getElementById('player-bar').removeChild(chatWindow);
         chatWindow = null;
-        websocket.close();
+        websocketC.close();
     }
     chatWindow = document.createElement('div');
     chatWindow.classList.add('prv-chat-window');
@@ -661,37 +659,37 @@ function startPrivateChat(friendId, friendName) {
     getMessageHistory(friendId);
     const serverIP = window.location.hostname;
     const userId = localStorage.getItem('userId');
-    websocket = new WebSocket(`wss://${serverIP}/api/ws/prv/`);
-    websocket.onopen = function(event) {
-        console.log('WebSocket connection opened');
+    websocketC = new WebSocket(`wss://${serverIP}/api/ws/prv/`);
+    websocketC.onopen = function(event) {
+        console.log('WebSocketC connection opened');
         const data = { action: 'join', user_id: userId, other_user_id: friendId,  };
-        websocket.send(JSON.stringify(data));
+        websocketC.send(JSON.stringify(data));
     };
-    websocket.onmessage = function(event) {
+    websocketC.onmessage = function(event) {
         const data = JSON.parse(event.data);
         if (data.action === "chat_message")
             displayMessage(data.message);
     };
-    websocket.onerror = function(error) {
+    websocketC.onerror = function(error) {
         console.error('WebSocket error:', error);
     };
-    websocket.onclose = function(event) {
+    websocketC.onclose = function(event) {
         console.log('WebSocket connection closed');
     };
     const closeBtn = chatWindow.querySelector('.close-btn');
     closeBtn.addEventListener('click', () => {
         chatWindow.parentNode.removeChild(chatWindow);
         chatWindow = null;
-        websocket.close();
+        websocketC.close();
     });
     const sendMessageBtn = chatWindow.querySelector('#prvMessageBtn');
     const messageInput = chatWindow.querySelector('#prvMessageInput');
     sendMessageBtn.addEventListener('click', () => {
-        sendMessage(messageInput, friendId, websocket);
+        sendMessage(messageInput, friendId, websocketC);
     });
     messageInput.addEventListener('keydown', (event) => {
         if (event.key === 'Enter') {
-            sendMessage(messageInput, friendId, websocket);
+            sendMessage(messageInput, friendId, websocketC);
         }
     });
 }
@@ -719,10 +717,16 @@ async function blockRequest(id, playerName, websocket)
         const data = await response.json();
         if (data.status === 'success') {
             alert('User blocked successfully!');
+            if (chatWindow) {
+                document.getElementById('player-bar').removeChild(chatWindow);
+                chatWindow = null;
+                websocketC.close();
+            }
             await removeFriend(id, websocket);
             await respondFriendRequest(id, false, websocket);
             updateBlockedModal(websocket);
             updateConnectedPlayer(playerName, id, true, websocket);
+            websocket.send(JSON.stringify({ action: "update_friends", toUserId: id}));
         } else {
             alert('Error: ' + data.message + ' status: ' + data.status);
             console.log(data);
@@ -779,7 +783,7 @@ export async function updateBlockedModal(websocket) {
             const unblockButton = document.createElement('button');
             unblockButton.classList.add('btn', 'btn-danger', 'btn-sm');
             unblockButton.innerText = "Unblock";
-            unblockButton.addEventListener('click', async () => await removeBlockedUser(blocked.id, blocked.username, websocket));
+            unblockButton.addEventListener('click', async () => removeBlockedUser(blocked.id, blocked.username, websocket));
             li.appendChild(unblockButton);
             ul.appendChild(li);
         });
@@ -787,7 +791,7 @@ export async function updateBlockedModal(websocket) {
     }
 }
 
-async function removeBlockedUser(blockedId, blockedUsername, websocket) {
+async function removeBlockedUser(blockedId, blockedUsername, websocketp) {
     const serverIP = window.location.hostname;
     const token = localStorage.getItem('token');
     if (!token) {
@@ -805,8 +809,9 @@ async function removeBlockedUser(blockedId, blockedUsername, websocket) {
 
         if (response.ok) {
             alert('Blocked user removed successfully');
-            await updateBlockedModal(websocket);
-            websocket.send(JSON.stringify({ action: "ping", to_user: blockedUsername }));
+            await updateBlockedModal(websocketp);
+            await updateFriendRequestsModal(websocketp);
+            websocketp.send(JSON.stringify({ action: "ping", to_user: blockedUsername }));
         } else {
             console.error('Failed to remove blocked user:', response.statusText);
         }
@@ -1039,6 +1044,11 @@ async function removeFriend(friendId, websocket) {
         if (response.ok) {
             const data = await response.json();
             console.log('Friend removed successfully:', data);
+            if (chatWindow) {
+                document.getElementById('player-bar').removeChild(chatWindow);
+                chatWindow = null;
+                websocketC.close();
+            }
             getFriends(websocket);
         } else {
             console.error('Failed to remove friend:', response.statusText);

@@ -155,8 +155,10 @@ class RespondFriendRequestView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request, from_user_id):
-        friend_request = get_object_or_404(FriendRequest, from_user_id=from_user_id, to_user=request.user)
+        friend_request = FriendRequest.objects.filter(from_user_id=from_user_id, to_user=request.user).first()
         from_user = get_object_or_404(UserModel, id=from_user_id)
+        if not friend_request:
+            return Response({'status': 'none'})
         if friend_request.to_user != request.user:
             return Response({'status': 'error', 'message': 'Unauthorized'}, status=status.HTTP_401_UNAUTHORIZED)
         action = request.data.get('action')
