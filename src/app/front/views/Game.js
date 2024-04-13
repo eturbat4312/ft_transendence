@@ -498,6 +498,7 @@ export default class Game extends AbstractView {
         }
         document.getElementById("winner").innerText = message;
         this.gameActive = false;
+        this.sendInGameStatus(false);
         if (!this.isOffline) {
             this.websocket.close();
         }

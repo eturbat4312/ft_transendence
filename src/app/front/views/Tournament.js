@@ -296,7 +296,8 @@ export default class Tournament extends AbstractView {
         }
     }
 
-    sendStartMessage() {
+    sendStartMessage = (event) => {
+        console.log("start_message");
         const message = JSON.stringify({ action: "start_tournament"});
         this.websocketT.send(message);
     }
@@ -438,8 +439,8 @@ export default class Tournament extends AbstractView {
         btnText.textContent = 'Start the tournament';
         if (this.tournamentMaster) {
             button.disabled = false;
-            button.removeEventListener('click', () => { this.sendStartMessage(); });
-            button.addEventListener('click', () => { this.sendStartMessage(); });
+            button.removeEventListener('click', this.sendStartMessage);
+            button.addEventListener('click', this.sendStartMessage);
         }
     }
 
@@ -501,7 +502,7 @@ export default class Tournament extends AbstractView {
 
     finishTournament(winner) {
         if (this.tournamentMaster) {
-            deleteTournament();
+            this.sendDeletedMessage()
             const navLinks = document.querySelectorAll('.nav__link');
             navLinks.forEach(link => {
             link.removeEventListener('click', this.navLinkClickHandler);
@@ -631,7 +632,7 @@ export default class Tournament extends AbstractView {
                     if (self.tournamentMaster && !self.started) {
                         const button = document.getElementById("queue-btn");
                         button.disabled = true;
-                        button.removeEventListener('click', () => { self.sendStartMessage(); });
+                        button.removeEventListener('click', self.sendStartMessage);
                     }
                 }
                 if (data.action === "start_tournament") {
@@ -695,11 +696,10 @@ async function createTournament(websocket) {
 
 export async function eventDelete() {
     const creatorId = await checkTournamentExists();
-    if (creatorId) {
+    if (creatorId)
         tournamentCreated(creatorId);
-    } else {
-        addTournamentEventListeners(getWebsocket())
-    }
+ // vu que le creatorid est deja la au moment ou la fonction se lance, le start button nemarche plus au moment ou le tournoi est fini et qu on est encore sur la page tournoi
+    addTournamentEventListeners(getWebsocket())
  }
 
 async function deleteTournament() {

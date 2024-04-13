@@ -18,7 +18,6 @@ export default class extends AbstractView {
                 <div class="profilePicWrapper">
                   <img id="profilePic" src="" alt="Profile pic" class="img-fluid">
                 </div>
-                <p class="text-muted mb-1">Player</p>
               </div>
             </div>
             <div class="card mb-4 mb-lg-0">
@@ -83,7 +82,7 @@ export default class extends AbstractView {
               </div>
             </div>
             <div class="row">
-              <div class="col-md-5">
+              <div class="col-md-6">
                 <div class="card mb-4 mb-md-0">
                   <div class="card-body">
                     <p class="mb-4">PONG HISTORY</p>
@@ -93,7 +92,7 @@ export default class extends AbstractView {
                   </div>
                 </div>
               </div>
-              <div class="col-md-7">
+              <div class="col-md-6">
                 <div class="card mb-4 mb-md-0">
                   <div class="card-body">
                     <p class="mb-4">TIC-TAC-TOE HISTORY</p>

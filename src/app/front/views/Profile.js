@@ -16,7 +16,6 @@ export default class Profile extends AbstractView {
             <div class="profilePicWrapper">
               <img id="profilePic" src="" alt="Profile pic" class="img-fluid">
             </div>
-            <p class="text-muted mb-1">Player</p>
           </div>
         </div>
         <div class="card mb-4 mb-lg-0">
