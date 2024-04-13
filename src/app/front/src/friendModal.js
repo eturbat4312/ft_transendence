@@ -120,7 +120,6 @@ async function getProfilePic(userId) {
 export function addToPlayersPlaying(id) {
     if (!playersPlaying.includes(id)) {
         playersPlaying.push(id);
-        console.log(playersPlaying);
     }
 }
 
@@ -178,7 +177,6 @@ function updateplayerModal(websocket) {
     listItem.addEventListener('click', async () => {
         const playerName = listItem.dataset.name;
         const userId = listItem.dataset.id;
-        console.log("typeof userID: " + typeof userId);
         const playerInfoContent = `
         <p>Name: ${playerName}</p><button id="addFriendBtn" data-user-id="${userId}" class="btn btn-primary">Add to friends</button>
         <button id="blockBtn" data-user-id="${userId}" class="btn btn-danger">Block player</button>
@@ -194,9 +192,7 @@ function updateplayerModal(websocket) {
         });
         const profileBtn = document.getElementById('profileBtn');
         profileBtn.addEventListener('click', function() {
-            console.log("function");
             setTimeout(() => {
-                console.log(userId)
                 printProfile(userId);
             }, 50);
         });
@@ -248,7 +244,6 @@ export async function updateConnectedPlayer(username, userId, online, websocket)
     const data = await fetchBlockedList();
     const blockedList = data.blocked;
     for (let i = 0; i < blockedList.length; i++) {
-        console.log(blockedList[i]);
         if (username === blockedList[i].username) {
             removeDisconnectedPlayer(username);
             return;
@@ -516,7 +511,6 @@ export async function updateFriendRequestsModal(websocket) {
         const ul = document.createElement('ul');
         for (const request of friendRequests) {
             const username = await fetchUsernameFromId(request.from_user);
-            console.log("updateFriendRequsetModal: " + username);
             let isBlocked = false;
             for (const blockedUser of blockedList) {
                 if (username === blockedUser.username) {

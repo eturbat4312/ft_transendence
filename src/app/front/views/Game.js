@@ -238,6 +238,8 @@ export default class Game extends AbstractView {
     }
 
     startGame = () => {
+        if (this.isMaster)
+            console.log(" START_GAME");
         this.sendInGameStatus(true);
         this.checkIfLeave();
         this.resetBall();
@@ -476,7 +478,6 @@ export default class Game extends AbstractView {
         const username = localStorage.getItem("username");
         const player1Name = document.getElementById("player1-name").dataset.name;
         const player2Name = document.getElementById("player2-name").dataset.name;
-        console.log(username + " --- " + player1Name + " --- " + player2Name);
         if (disconnectedPlayer != player1Name && disconnectedPlayer != player2Name)
             return;
         this.ballSpeedX = 0;
@@ -567,7 +568,7 @@ export default class Game extends AbstractView {
         this.gameActive = false;
         if (!this.isOffline) {
             this.websocket.close();
-            if (!this.playerDisconnected)
+            if (!this.playerDisconnected && !this.tournament)
                 this.postMatchResults();
         }
         this.websocket = null;
@@ -762,13 +763,12 @@ export default class Game extends AbstractView {
             return;
         }
         if (gameMaster) {
-            document.getElementById("ready-player-one").classList.add("d-none");
             this.isMaster = true;
             this.player1 = true;
         } else {
-            document.getElementById("ready-player-two").classList.add("d-none");
             this.player2 = true;
         }
+        console.log(this.isMaster, this.player1, this.player2);
     }
 
     startTournament(playing, gameMaster, gameId, websocketT) {
@@ -1238,5 +1238,7 @@ export function initPrivateGame(userId, opponentUserId) {
 
 export function startTournamentGame(playing, gameMaster, gameId, websocketT) {
     const gameView = new Game();
+    if (gameMaster)
+        console.log("GAMEMASTER");
     gameView.startTournament(playing, gameMaster, gameId, websocketT);
 }
