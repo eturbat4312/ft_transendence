@@ -259,19 +259,31 @@ export async function updateConnectedPlayer(username, userId, online, websocket)
 
 }
 
-export function showGameInvitationNotification(inviterUserId, websocket) {
+let currentInviterUserId = null;
+
+function handlePrvBtnClick() {
+    const prvBtn = document.getElementById('btn-start-private');
     const userId = localStorage.getItem("userId");
-    const message = `Do you want to join ${inviterUserId} for a 1vs1 ?`;
+    initPrivateGame(userId, currentInviterUserId);
+    prvBtn.removeEventListener('click', handlePrvBtnClick);
+}
+
+export async function showGameInvitationNotification(inviterUserId, websocket) {
+    const userId = localStorage.getItem("userId");
+    const inviterName = await fetchUsernameFromId(inviterUserId);
+    console.log(inviterName);
+    const message = `Do you want to join ${inviterName} for a 1vs1 ?`;
     showToastWithButtons(message, 
         'Yes !', 
         function() {
             const yesMessage = JSON.stringify({ action: 'accept_invite', userId: inviterUserId });
             websocket.send(yesMessage);
+            currentInviterUserId = inviterUserId;
             closeToast();
             setTimeout(() => {
                 const prvBtn = document.getElementById('btn-start-private');
                 prvBtn.disabled = false;
-                prvBtn.addEventListener('click', () => { initPrivateGame(userId, inviterUserId) });
+                prvBtn.addEventListener('click', handlePrvBtnClick);
             }, 200);
         },
         'No...',
@@ -961,7 +973,7 @@ export async function getFriends(websocket) {
                     const friendId = friendElement.dataset.id;
                     const friendInfoContent = ` <p>Username: ${friendName}</p>
                                                 <button id="removeFriendBtn" class="btn btn-danger" data-bs-dismiss="modal">Remove from friends</button>
-                                                <button id="inviteGameBtn"  class="btn btn-success" data-bs-dismiss="modal">Invite to play 1v1</button>
+                                                <button id="inviteGameBtn"  class="btn btn-success invite-button" data-bs-dismiss="modal">Invite to play 1v1</button>
                                                 <a href="/profile" id="friendProfileBtn" data-user-id="${friendId}" class="btn btn-info nav__link">Profile</a>`;
                     document.getElementById('friendModalBody').innerHTML = friendInfoContent;
                     const removeFriendBtn = document.getElementById('removeFriendBtn');

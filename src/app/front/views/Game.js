@@ -1,5 +1,7 @@
 import AbstractView from "./AbstractView.js";
 import { getWebsocket } from "../src/index.js";
+import { getUsername } from "../src/utils.js";
+import { fetchUsernameFromId } from "../src/friendModal.js";
 
 export default class Game extends AbstractView {
     constructor(params) {
@@ -34,6 +36,7 @@ export default class Game extends AbstractView {
         this.winner = null;
         this.spectator = false;
         this.tournament = false;
+        this.private = false;
         this.playerDisconnected = false;
         this.keysPressed = {
             ArrowUp: false,
@@ -246,7 +249,7 @@ export default class Game extends AbstractView {
         this.gameLoop();
         this.ball.style.display = "block";
         if (!this.tournament) {
-            if (!this.isOffline)
+            if (!this.isOffline && !this.private)
                 setTimeout(() => { this.websocket.send(JSON.stringify({ action: "send_username" })); }, 100);
             document.getElementById("start-game").style.display = "none";
             document.getElementById("btn-start-private").style.display = "none";
@@ -573,6 +576,8 @@ export default class Game extends AbstractView {
        // saveScore(player1Score, player2Score);
         this.gameActive = false;
         if (!this.isOffline) {
+            document.getElementById("player2-name").classList.add("d-none");
+            document.getElementById("player1-name").classList.add("d-none");
             this.websocket.close();
             if (!this.playerDisconnected && !this.tournament)
                 this.postMatchResults();
@@ -714,14 +719,28 @@ export default class Game extends AbstractView {
         this.startGame();
     }
 
-    startPrivateGame(userId, opponentUserId, gameId, GM) {
+    handleClick = () => {
+        this.websocket.close();
+        const prvBtn = document.getElementById('btn-start-private');
+        if (prvBtn) {
+            prvBtn.disabled = true;
+        }
+        inviteButtons.forEach(btn => {
+            btn.removeEventListener('click', handleClick);
+        });
+    }
+
+    async startPrivateGame(userId, opponentUserId, gameId, GM) {
         const serverIP = window.location.hostname;
+        this.opponent = await fetchUsernameFromId(opponentUserId);
         if (GM){
             this.isMaster = true;
             this.player1 = true;
         } else {
             this.player2 = true;
         }
+        this.private = true;
+        this.printNames();
         if (this.websocket === null || this.websocket.readyState !== WebSocket.OPEN) {
             this.websocket = new WebSocket(`wss://${serverIP}/api/ws/game/`);
             this.websocket.onopen = () => {
@@ -734,6 +753,10 @@ export default class Game extends AbstractView {
                 if (data.action === "start_game")
                     self.startGame();
             }
+            const inviteButtons = document.querySelectorAll('.invite-button');
+            inviteButtons.forEach(btn => {
+                btn.addEventListener('click', this.handleClick);
+            });
             const checkPageChange = () => {
                 if (!document.getElementById("game")) {
                     console.log("change page");

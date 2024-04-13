@@ -2,7 +2,7 @@ import { getNav, getSocial, getChat, handleLogout } from '../views/utils.js';
 import { eventDelete, addTournamentEventListeners, tournamentCreated, checkTournamentExists, tournamentDeleted } from '../views/Tournament.js';
 import { addGameEventListeners, initPrivateGame } from '../views/Game.js';
 import { addChatEventListeners } from './utils.js';
-import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, showGameInvitationNotification, updateFriendRequestsModal, getFriends, updateBlockedModal, addToPlayersPlaying, removeFromPlayersPlaying, checkPlaying } from './friendModal.js';
+import { updateConnectedPlayer, removeDisconnectedPlayer, showToast, showGameInvitationNotification, updateFriendRequestsModal, getFriends, updateBlockedModal, addToPlayersPlaying, removeFromPlayersPlaying, checkPlaying, fetchUsernameFromId } from './friendModal.js';
 import '../theme/base.css'
 import '../theme/game.css'
 import '../theme/index.css'
@@ -162,6 +162,15 @@ function setInGameStatus(friendId) {
     }
 }
 
+let currentInviterUserId = null;
+
+function handlePrvBtnClick() {
+    const prvBtn = document.getElementById('btn-start-private');
+    const userId = localStorage.getItem("userId");
+    initPrivateGame(userId, currentInviterUserId);
+    prvBtn.removeEventListener('click', handlePrvBtnClick);
+}
+
 const checkIfConnected = async () => {
     const auth = await isAuthenticated();
     if (!auth)
@@ -182,7 +191,7 @@ const checkIfConnected = async () => {
     websocket.onclose = function(event) {
         console.log('Connect WebSocket closed');
     }
-    websocket.onmessage = function(event) {
+    websocket.onmessage = async function(event) {
         const data = JSON.parse(event.data);
         if (data.action === 'error') {
             window.location = "/already-connected";
@@ -210,7 +219,8 @@ const checkIfConnected = async () => {
             showGameInvitationNotification(data.user_id, websocket);
         }
         if (data.action === "invite_play" && data.user_id === userId) {
-            showToast(data.to_user_id + " has received your invitation", websocket);
+            const to_username = await fetchUsernameFromId(data.to_user_id);
+            showToast(to_username + " has received your invitation", websocket);
         }
         if (data.action === "ping" && data.to_user === username) {
             websocket.send(JSON.stringify({ action: "pong", to_user: data.username }));
@@ -231,8 +241,8 @@ const checkIfConnected = async () => {
         if (data.action === "accept_invite" && data.user_id === userId) {
             const prvBtn = document.getElementById('btn-start-private');
             prvBtn.disabled = false;
-            console.log("test");
-            prvBtn.addEventListener('click', () => { initPrivateGame(userId, data.inv_user_id) });
+            currentInviterUserId = data.inv_user_id;
+            prvBtn.addEventListener('click', handlePrvBtnClick );
         }
         if (data.action === "refuse_invite" && data.user_id === userId) {
             console.log("refuse");
