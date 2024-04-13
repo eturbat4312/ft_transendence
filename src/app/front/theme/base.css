@@ -122,8 +122,13 @@
 }
 
 .prv-chat-messages {
-   max-height: 200px;
+   max-height: 210px;
+   max-width: 250px;
    overflow-y: auto;
+   overflow-x: auto;
+   word-wrap: break-word;
+   overflow-wrap: break-word;
+   overflow: auto;
 }
 
 .message-input {

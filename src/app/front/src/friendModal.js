@@ -593,8 +593,10 @@ function displayMessage(message) {
 }
 
 async function sendMessage(messageInput, friendId, websocket) {
-    const message = messageInput.value.trim();
+    let message = messageInput.value.trim();
+    const username = localStorage.getItem('username');  
     if (message !== '') {
+        message = `${username}: ${message}`;
         const serverIP = window.location.hostname;
         const token = localStorage.getItem('token');
         if (!token) {
@@ -628,8 +630,8 @@ async function sendMessage(messageInput, friendId, websocket) {
 let chatWindow = null;
 let websocket = null;
 
-function startPrivateChat(friendId, friendName)
-{
+function startPrivateChat(friendId, friendName) {
+    const username = localStorage.getItem('username');   
     if (chatWindow) {
         document.getElementById('player-bar').removeChild(chatWindow);
         chatWindow = null;
@@ -656,7 +658,7 @@ function startPrivateChat(friendId, friendName)
     websocket = new WebSocket(`wss://${serverIP}/api/ws/prv/`);
     websocket.onopen = function(event) {
         console.log('WebSocket connection opened');
-        const data = { action: 'join', user_id: userId, other_user_id: friendId };
+        const data = { action: 'join', user_id: userId, other_user_id: friendId,  };
         websocket.send(JSON.stringify(data));
     };
     websocket.onmessage = function(event) {
