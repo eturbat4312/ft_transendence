@@ -32,7 +32,6 @@ export default class Tournament extends AbstractView {
         <div class="card bg-dark text-light mx-auto" style="max-width: 800px">
             <div class="card-header text-center">
                 <h2>Tournament</h2>
-                <button id="delete-tournament" class="btn btn-danger">DELETE</button>
             </div>
             <div class="card-body">
                 <div class="text-center mb-4">
@@ -623,8 +622,6 @@ export async function eventDelete() {
     } else {
         addTournamentEventListeners(getWebsocket())
     }
-    const deleteBtn = document.getElementById("delete-tournament");
-    deleteBtn.addEventListener('click', () => { deleteTournament(); });
  }
 
 async function deleteTournament() {
@@ -663,8 +660,6 @@ export function addTournamentEventListeners(websocket) {
             tournament.initTournament(false);
         });
     }
-    const deleteBtn = document.getElementById("delete-tournament");
-    deleteBtn.addEventListener('click', () => { deleteTournament(); });
 }
 
 export function tournamentDeleted() {

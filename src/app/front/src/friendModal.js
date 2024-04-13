@@ -31,6 +31,64 @@ async function getTicELO (userId) {
     }
 }
 
+async function getEmail(userId) {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+
+    try {
+        const responseEmail = await fetch(`https://${serverIP}/api/get_email/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Token ' + token
+            }
+        });
+
+        if (responseEmail.ok) {
+            const userData = await responseEmail.json();
+            const email = userData.email;
+            document.getElementById('profile-email').innerText = email;
+        } else {
+            console.log('Failed to get email:', await responseEmail.text());
+        }
+
+    } catch (error) {
+        console.log('Error:', error);
+    }
+}
+
+async function getBio(userId) {
+    const serverIP = window.location.hostname;
+    const token = localStorage.getItem('token');
+    if (!token) {
+        console.log('Token not found');
+        return;
+    }
+
+    try {
+        const responseBio = await fetch(`https://${serverIP}/api/get_bio/${userId}`, {
+            method: 'GET',
+            headers: {
+                'Authorization': 'Token ' + token
+            }
+        });
+
+        if (responseBio.ok) {
+            const userData = await responseBio.json();
+            const bio = userData.bio;
+            document.getElementById('profile-bio').innerText = bio;
+        } else {
+            console.log('Failed to get bio:', await responseBio.text());
+        }
+
+    } catch (error) {
+        console.log('Error:', error);
+    }
+}
+
 async function getProfilePic(userId) {
     const serverIP = window.location.hostname;
     const token = localStorage.getItem('token');
@@ -821,7 +879,8 @@ export async function printProfile(userId)
     const ticElo = document.getElementById("tic-elo");
     const ticHistory = document.getElementById("tic-history");
 
-    console.log(totalMatches, wonMatches, lostMatches, matches);
+    await getBio(userId);
+    await getEmail(userId);
     profileUser.innerText = `${username}`;
     pongGamesPlayed.innerText = totalMatches;
     pongGamesWon.innerText = wonMatches;

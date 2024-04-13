@@ -68,7 +68,7 @@ export default class extends AbstractView {
                     <p class="mb-0">Email</p>
                   </div>
                   <div class="col-sm-9">
-                    <p id="email" class="text-muted mb-0"></p>
+                    <p id="profile-email" class="text-muted mb-0"></p>
                   </div>
                 </div>
                 <hr>
@@ -77,7 +77,7 @@ export default class extends AbstractView {
                     <p class="mb-0">Bio</p>
                   </div>
                   <div class="col-sm-9">
-                    <p id="bio" class="text-muted mb-0"></p>
+                    <p id="profile-bio" class="text-muted mb-0"></p>
                   </div>
                 </div>
               </div>
@@ -113,56 +113,13 @@ export default class extends AbstractView {
 
 
     async initialize() {
-        console.log("2 times or not");
         const serverIP = window.location.hostname;
         const token = localStorage.getItem('token');
+        const userId = localStorage.getItem('userId');
         if (!token) {
             console.log('Token not found');
             return;
         }
-
-    
-
-        try {
-            const responseEmail = await fetch(`https://${serverIP}/api/get_email/`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Token ' + token
-                }
-            });
-
-            if (responseEmail.ok) {
-                const userData = await responseEmail.json();
-                const email = userData.email;
-                document.getElementById('email').innerText = 'Email: ' + email;
-            } else {
-                console.log('Failed to get email:', await responseEmail.text());
-            }
-
-        } catch (error) {
-            console.log('Error:', error);
-        }
-        try {
-            const responseBio = await fetch(`https://${serverIP}/api/get_bio/`, {
-                method: 'GET',
-                headers: {
-                    'Authorization': 'Token ' + token
-                }
-            });
-
-            if (responseBio.ok) {
-                const userData = await responseBio.json();
-                const bio = userData.bio;
-				console.log("bio : ",bio);
-                document.getElementById('bio').innerText = bio;
-            } else {
-                console.log('Failed to get bio:', await responseBio.text());
-            }
-
-        } catch (error) {
-            console.log('Error:', error);
-        }
-        const userId = localStorage.getItem("userId");
         await this.getProfilePic(userId);
         await printProfile(userId);
     }

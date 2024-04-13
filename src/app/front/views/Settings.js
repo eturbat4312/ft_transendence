@@ -95,7 +95,8 @@ export default class Settings extends AbstractView {
             <div class="card-body pb-2">
                 <div class="form-group">
                     <label class="form-label">Bio</label>
-                    <textarea id="newBio" class="form-control" rows="5"></textarea>
+                    <textarea id="newBio" class="form-control" rows="5" maxlength="255"></textarea>
+                    <small id="charCount" class="form-text text-muted text-right">Max 255 chars</small>
                 </div>
             </div> 
             <button id="saveBio" type="button" style="bottom: 0; left: 0;" class="btn btn-primary">Save Bio</button>&nbsp;
@@ -109,6 +110,10 @@ export default class Settings extends AbstractView {
         document.getElementById('savePhoto').addEventListener('click', () => this.updateProfilePic());
         document.getElementById('changePasswordButton').addEventListener('click', () => this.changePassword());
         document.getElementById('saveBio').addEventListener('click', () => this.updateBio());
+        document.getElementById('newBio').addEventListener('input', function () {
+            const remaining = 255 - this.value.length;
+            document.getElementById('charCount').textContent = `Remaining: ${remaining} chars`;
+        });
     }
 
     async updateUsername() {

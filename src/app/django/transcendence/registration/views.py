@@ -71,16 +71,18 @@ class GetEmailView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        email = request.user.email
+    def get(self, request, user_id):
+        user = UserModel.objects.get(id=user_id)
+        email = user.email
         return Response({'email': email})
 
 class GetBioView(APIView):
     authentication_classes = [TokenAuthentication]
     permission_classes = [IsAuthenticated]
 
-    def get(self, request):
-        bio = request.user.bio
+    def get(self, request, user_id):
+        user = UserModel.objects.get(id=user_id)
+        bio = user.bio
         return Response({'bio': bio})
 
 class GetUserIdView(APIView):
