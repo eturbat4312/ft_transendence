@@ -42,15 +42,8 @@ export default class extends AbstractView {
     
     async initialize() {
 
-
-        // Render HTML
-        //document.getElementById("app").innerHTML = await this.getHtml();
-
-        // Get login form
         const form = document.getElementById("login-form");
-        //console.log("initialized!!!");
 
-        // Add submit handler
         form.addEventListener('submit', this.loginUser);
 
     }
@@ -60,22 +53,11 @@ export default class extends AbstractView {
         const serverIP = window.location.hostname;
 
         event.preventDefault();
-      //  console.log(this);
+
 
         const form = event.target;
-        // console.log('Form Element:', form);
 
-        // Log input values
-        //const inputs = form.elements;
-
-        // for (let input of inputs) {
-        //     console.log(input.name, ':', input.value);
-        // }
         const formData = new FormData(form);
-        // console.log(formData.get("username"));
-
-        //const searchParams = new URLSearchParams(formData);
-
 
         try {
             const response = await fetch(`https://${serverIP}/api/login/`, {
@@ -104,8 +86,3 @@ export default class extends AbstractView {
     }
 
 }
-
-// document.addEventListener('DOMContentLoaded', () => {
-//     const loginView = new LoginView();
-//     loginView.initialize();
-// });

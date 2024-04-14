@@ -367,21 +367,11 @@ export default class Tournament extends AbstractView {
             const ready1 = document.getElementById("ready-player-one");
             ready1.disabled = false;
             ready1.classList.remove("d-none");
-            // ready1.addEventListener('click', () => { 
-            //     console.log(" number of click");
-            //     ready1.disabled = true;
-            //     this.sendReadyMessage(1);
-            // });
         } else if (this.demiwinner && (this.players['player3'] || this.players['player4'])) {
             this.playing = true;
             const ready2 = document.getElementById("ready-player-two");
             ready2.disabled = false;
             ready2.classList.remove("d-none");
-            // ready2.addEventListener('click', () => { 
-            //     console.log(" number of click");
-            //     ready2.disabled = true;
-            //     this.sendReadyMessage(2);
-            // });
         }
     }
 
@@ -702,7 +692,6 @@ export async function eventDelete() {
     const creatorId = await checkTournamentExists();
     if (creatorId)
         tournamentCreated(creatorId);
- // vu que le creatorid est deja la au moment ou la fonction se lance, le start button nemarche plus au moment ou le tournoi est fini et qu on est encore sur la page tournoi
     addTournamentEventListeners(getWebsocket())
  }
 
