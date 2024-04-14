@@ -19,6 +19,7 @@ UserModel = get_user_model()
 @api_view(["POST"])
 def register(request):
     serializer = RegisterSerializer(data=request.data)
+    print(request.data)
 
     if serializer.is_valid():
         # print("serialized")

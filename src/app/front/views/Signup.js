@@ -1,6 +1,6 @@
 import AbstractView from "./AbstractView.js";
 
-const INVALID_USERNAME_MSG = "Invalid username or password. Please try again";
+const INVALID_USERNAME_MSG = "Invalid username, email or password. Please try again";
 const DUPLICATE_USERNAME_MSG = "This username is already taken. Please try a different one.";
 
 export default class extends AbstractView {
@@ -93,6 +93,12 @@ export default class extends AbstractView {
 
         const searchParams = new URLSearchParams(formData);
         console.log(searchParams.get("username"));
+        const password = searchParams.get("password");
+        const confirmPassword = searchParams.get("confirmPassword");
+        if (password != confirmPassword){
+            alert("Passwords do not match !");
+            return;
+        }
 
         try {
             const response = await fetch(`https://${serverIP}/api/register/`, {
