@@ -51,7 +51,7 @@ class Match(models.Model):
 class TicMatch(models.Model):
     player = models.ForeignKey(User, related_name='tic_player', on_delete=models.CASCADE)
     opponent = models.ForeignKey(User, related_name='tic_opponent', on_delete=models.CASCADE)
-    match_status = models.CharField(max_length=10)  # 'win', 'loss', or 'draw'
+    match_status = models.CharField(max_length=10)
     played_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):

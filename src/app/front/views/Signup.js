@@ -15,17 +15,10 @@ export default class extends AbstractView {
     }
 
     async initialize() {
-        // Get HTML
-        //const html = await this.getHtml();
-
-        // Render HTML 
-        //document.getElementById("app").innerHTML = html;
 
         const form = document.getElementById("signup-form");
         if (form) {
-            // Add submit listener
             form.addEventListener('submit', this.registerUser);
-            //console.log("initialized!!!");
         } else {
             console.error("Form element not found");
         }
@@ -78,18 +71,8 @@ export default class extends AbstractView {
         const form = event.target;
         console.log('Form Element:', form);
 
-
-        // Log input values  
-        const inputs = form.elements;
-        for (let input of inputs) {
-            console.log(input.name, ':', input.value);
-        }
-
         const formData = new FormData(form);
         event.preventDefault();
-
-        console.log("submitttt");
-
 
         const searchParams = new URLSearchParams(formData);
         console.log(searchParams.get("username"));
@@ -110,19 +93,19 @@ export default class extends AbstractView {
             });
 
             if (!response.ok) {
-                // console.log(response.status);
+
                 if (response.status === 400) {
-                    // Invalid/empty username
+
                     alert(INVALID_USERNAME_MSG);
                 } else if (response.status === 500) {
-                    // Duplicate username
+
                     alert(DUPLICATE_USERNAME_MSG);
                 } else {
-                    console.log('Registration failed!!!');
+                    alert('Registration failed!!!');
                 }
             } else {
-                // Registration successful
-                console.log('Registration successful!');
+
+                alert('Registration successful!');
                 window.location.href = '/login';
             }
 

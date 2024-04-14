@@ -170,19 +170,7 @@ export default class Game extends AbstractView {
     }
 
     gameLoop = () => {
-        let checkIfGamePage = null;
-        // if (location.pathname === "/game")
-        //     checkIfGamePage = document.getElementById("game");
-        // if (location.pathname === "/tournament")
-        //     checkIfGamePage = document.getElementById("tournament-container");
-        // if (!checkIfGamePage) {
-        //     this.gameActive = false;
-        //     if (!this.isOffline) {
-        //         this.websocket.close();
-        //         this.sendInGameStatus(false);
-        //         this.websocket = null;
-        //     }
-        // }
+
         let startTime = new Date().getTime();
         let endTime = new Date().getTime();
         let executionTime = endTime - startTime;
@@ -435,7 +423,7 @@ export default class Game extends AbstractView {
             }
         });
         this.websocket.send(message);
-    //    (this.player1Score === 3 || this.player2Score === 3) ? this.endGame() : this.resetBall();
+
     };
 
     resetBall = () => {
@@ -447,7 +435,7 @@ export default class Game extends AbstractView {
 
 		let counter = 3;
 		const counterInterval = setInterval( () => {
-            if (!document.getElementById("countdown")/* || !(document.getElementById("start-game").style.display === "none")*/) {
+            if (!document.getElementById("countdown")) {
                 clearInterval(counterInterval);
                 return;
             }
@@ -705,7 +693,6 @@ export default class Game extends AbstractView {
             };
         } else {
             console.log("WebSocket connection is already open.");
-        //    this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
         }
     };
 
