@@ -4,7 +4,7 @@ from .models import User, FriendRequest, Message, Match, TicMatch
 
 class RegisterSerializer(serializers.Serializer):
     id = serializers.IntegerField(read_only=True)
-    username = serializers.CharField(max_length=150)
+    username = serializers.CharField(max_length=10)
     email = serializers.EmailField()
     profil_pic = serializers.ImageField(required=False, allow_null=True)
     password = serializers.CharField(write_only=True)
