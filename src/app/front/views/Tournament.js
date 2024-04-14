@@ -415,6 +415,8 @@ export default class Tournament extends AbstractView {
             player2Display.textContent = player2Name;
             player1Display.dataset.name = player1Name;
             player2Display.dataset.name = player2Name;
+            player1Display.classList.remove("d-none");
+            player2Display.classList.remove("d-none");
             this.initSecondGame();
         } else if (this.round === 3) {
             const player1Display = document.getElementById("player1-name");
@@ -425,6 +427,8 @@ export default class Tournament extends AbstractView {
             player2Display.textContent = this.round2winner;
             player1Display.dataset.name = this.round1winner;
             player2Display.dataset.name = this.round2winner;
+            player1Display.classList.remove("d-none");
+            player2Display.classList.remove("d-none");
             this.initFinal();
         }
     }
