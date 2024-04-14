@@ -74,19 +74,19 @@ In order to create a basic functional website, here are a few security concerns 
 11 Minor module
 
 - **Web**
-    - *Major module*: Use a framework as backend :x:
-    - *Minor module*: Use a front-end framework or toolkit :x:
-    - *Minor module*: Use a database for the backend :x:
+    - *Major module*: Use a framework as backend :✅:
+    - *Minor module*: Use a front-end framework or toolkit :✅:
+    - *Minor module*: Use a database for the backend :✅:
     - *Major module*: Store the score of a tournament in the Blockchain :x:
 - **User Management**
-    - *Major module*: Standard user management, authentication, users across tournaments :x:
+    - *Major module*: Standard user management, authentication, users across tournaments :✅:
     - *Major module*: Implementing a remote authentication :x:
 - **Gameplay and User Experience**
-    - *Major module*: Remote players :x:
+    - *Major module*: Remote players :✅:
     - *Major module*: Multiplayer (more than 2) :x:
-    - *Major module*: Add Another Game with User History and Matchmaking :x:
+    - *Major module*: Add Another Game with User History and Matchmaking :✅:
     - *Minor module*: Game customization options :x:
-    - *Major module*: Live chat :x:
+    - *Major module*: Live chat :✅:
 - **AI-Algo**
     - *Major module*: Introduce an AI opponent :x:
     - *Minor module*: User and game stats dashboard :x:
@@ -96,16 +96,25 @@ In order to create a basic functional website, here are a few security concerns 
     - *Major module*: Implement Two-Factor Authentication (2FA) and JWT :x:
 - **Devops**
     - *Major module*: Infrastructure Setup for Log Management :x:
-    - *Minor module*: Monitoring system :x:
+    - *Minor module*: Monitoring system :✅:
     - *Major module*: Designing the Backend as Microservices :x:
 - **Graphics**
     - *Major module*: Use advanced 3D techniques :x:
 - **Accessibility**
     - *Minor module*: Support on all devices :x:
-    - *Minor module*: Expanding browser compatibility :x:
+    - *Minor module*: Expanding browser compatibility :✅:
     - *Minor module*: Multiple language support :x:
     - *Minor module*: Add accessibility for visually impaired users :x:
     - *Minor module*: Server-side rendering (SSR) integration :x:
 - **Object Oriented**
     - *Major module*: Replacing Basic Pong with Server-Side Pong and Implementing an API :x:
     - *Major module*: Enabling Pong Gameplay via CLI against Web Users with API Integration :x:
+
+## Usage
+
+To start the containers
+
+```bash
+make env
+make all
+```
