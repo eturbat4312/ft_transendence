@@ -25,6 +25,7 @@ export default class Tournament extends AbstractView {
             player4: false
         };
         this.disconnected = [];
+        window.addEventListener('popstate', this.handleNavigation);
     }
 
     async getHtml() {
@@ -36,7 +37,7 @@ export default class Tournament extends AbstractView {
             </div>
             <div class="card-body">
                 <div class="text-center mb-4">
-                    <h4 id="tournament-message">Choose Tournament Type</h4>
+                    <h4 id="tournament-message"></h4>
                     <div id="btn-group" class="container" aria-label="Tournament Type">
                         <button id="start-tournament" type="button" class="btn btn-primary btn-4players">Start 4 Players Tournament</button>
                     </div>
@@ -63,7 +64,7 @@ export default class Tournament extends AbstractView {
            <div class="ball"></div>
            <div class="paddle" id="paddle1"></div>
            <div class="paddle" id="paddle2"></div>
-           <div id="countdown" class="countdown-display" style="display: none;"></div>
+           <div id="countdown" class="countdown-display"></div>
            <div id="score">
               <span id="player1-score" class="score">0</span>
               <div id="player1-name" class="d-none"></div>
@@ -78,6 +79,15 @@ export default class Tournament extends AbstractView {
         </div>   
      </div>
         `;
+    }
+
+    handleNavigation = () => {
+        if (this.websocketT) {
+            this.websocketT.close();
+            this.websocketT = null;
+            this.sendDeletedMessage()
+        }
+        window.removeEventListener('popstate', this.handleNavigation);
     }
 
     assignPlayer(i) {

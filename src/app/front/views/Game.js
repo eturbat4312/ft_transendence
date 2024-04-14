@@ -46,6 +46,7 @@ export default class Game extends AbstractView {
         };
         document.addEventListener("keydown", this.handleKeyDown.bind(this));
         document.addEventListener("keyup", this.handleKeyUp.bind(this));
+        window.addEventListener('popstate', this.handleNavigation);
     }
 
     async getHtml() {
@@ -67,7 +68,7 @@ export default class Game extends AbstractView {
                 <div class="ball"></div>
                 <div class="paddle" id="paddle1"></div>
                 <div class="paddle" id="paddle2"></div>
-                <div id="countdown" class="countdown-display" style="display: none;"></div>
+                <div id="countdown" class="countdown-display d-none"></div>
                 <div id="start-game" class="btn-group" role="group">
                     <button class="btn btn-secondary btn-start-offline" style="z-index: 1;">Offline</button>   
                     <button class="btn btn-primary btn-start" style="z-index: 1;">Online</button>
@@ -121,14 +122,28 @@ export default class Game extends AbstractView {
         `;
     }
 
-    navLinkClickHandler = (event) => {
+    handleNavigation = () => {
+        document.getElementById("countdown").classList.add("d-none");
         if (this.gameActive) {
             this.gameActive = false;
-            if (!this.isOffline && this.websocket) {
-                this.websocket.close();
-                this.websocket = null;
-            }
             this.sendInGameStatus(false);
+        }
+        if (this.websocket) {
+            this.websocket.close();
+            this.websocket = null;
+        }
+        window.removeEventListener('popstate', this.handleNavigation);
+    }
+
+    navLinkClickHandler = (event) => {
+        document.getElementById("countdown").classList.add("d-none");
+        if (this.gameActive) {
+            this.gameActive = false;
+            this.sendInGameStatus(false);
+        }
+        if (this.websocket) {
+            this.websocket.close();
+            this.websocket = null;
         }
     }
 
@@ -231,7 +246,7 @@ export default class Game extends AbstractView {
         if (this.isMaster)
             console.log(" START_GAME");
         this.sendInGameStatus(true);
-        this.checkIfLeave();
+        //this.checkIfLeave();
         this.resetBall();
         this.gameActive = true;
         this.gameLoop();
@@ -434,17 +449,21 @@ export default class Game extends AbstractView {
         this.ball.style.display = "block";
 
 		let counter = 3;
+        document.getElementById("countdown").classList.remove("d-none");
 		const counterInterval = setInterval( () => {
-            if (!document.getElementById("countdown")) {
+            if (!document.getElementById("countdown") || document.getElementById("countdown").classList.contains("d-none")) {
+                this.gameActive = false;
                 clearInterval(counterInterval);
                 return;
             }
+            if (counter === 0)
+                counter = "";
 			document.getElementById("countdown").innerText = counter;
-			document.getElementById("countdown").style.display = "block";
-			counter--;
-			if (counter < 0) {
+            if (counter != "")
+			    counter--;
+			if (counter === "") {
 				clearInterval(counterInterval);
-				document.getElementById("countdown").style.display = "none";
+				document.getElementById("countdown").classList.add("d-none");
 				if (Math.random() < 0.5) {
                     this.ballSpeedX = -6;
                 } else {
@@ -606,7 +625,7 @@ export default class Game extends AbstractView {
         this.scoreDisplay1.innerText = "0";
         this.scoreDisplay2.innerText = "0";
         document.getElementById("winner").innerText = "";
-        document.getElementById("countdown").style.display = "none";
+        document.getElementById("countdown").classList.add("none");
         if (!this.tournament) {
             document.getElementById("start-game").style.display = "block";
             document.getElementById("btn-start-private").style.display = "block";
@@ -650,6 +669,7 @@ export default class Game extends AbstractView {
                 this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
             };
             const self = this;
+            this.checkIfLeave();
             this.websocket.onmessage = function(event) {
                 const data = JSON.parse(event.data);
                 if (data.action === "match_found") {
@@ -673,23 +693,21 @@ export default class Game extends AbstractView {
                     }
                 }
             };
-            const checkPageChange = () => {
-                if (!document.getElementById("game")) {
-                    console.log("change page");
-                    this.websocket.close();
-                    this.websocket = null;
-                    clearInterval(intervalId);
-                }
-            }
-            const intervalId = setInterval(checkPageChange, 500);
+            // const checkPageChange = () => {
+            //     if (!document.getElementById("game")) {
+            //         console.log("change page");
+            //         this.websocket.close();
+            //         this.websocket = null;
+            //         clearInterval(intervalId);
+            //     }
+            // }
+            //const intervalId = setInterval(checkPageChange, 500);
 
             this.websocket.onclose = (event) => {
                 console.log("Matchmaking WebSocket connection closed", event);
-                clearInterval(intervalId); 
             };
             this.websocket.onerror = (error) => {
                 console.error("WebSocket error:", error);
-                clearInterval(intervalId);
             };
         } else {
             console.log("WebSocket connection is already open.");
@@ -735,6 +753,7 @@ export default class Game extends AbstractView {
                 this.websocket.send(JSON.stringify({ action: "private", game_id: gameId }));
             }
             const self = this;
+            this.checkIfLeave();
             this.websocket.onmessage = function(event) {
                 const data = JSON.parse(event.data);
                 if (data.action === "start_game")
@@ -744,23 +763,21 @@ export default class Game extends AbstractView {
             inviteButtons.forEach(btn => {
                 btn.addEventListener('click', this.handleClick);
             });
-            const checkPageChange = () => {
-                if (!document.getElementById("game")) {
-                    console.log("change page");
-                    this.websocket.close();
-                    this.websocket = null;
-                    clearInterval(intervalId);
-                }
-            }
-            const intervalId = setInterval(checkPageChange, 1000);
+            // const checkPageChange = () => {
+            //     if (!document.getElementById("game")) {
+            //         console.log("change page");
+            //         this.websocket.close();
+            //         this.websocket = null;
+            //         clearInterval(intervalId);
+            //     }
+            // }
+            // const intervalId = setInterval(checkPageChange, 1000);
 
             this.websocket.onclose = (event) => {
                 console.log("Private WebSocket connection closed", event);
-                clearInterval(intervalId); 
             };
             this.websocket.onerror = (error) => {
                 console.error("WebSocket error:", error);
-                clearInterval(intervalId);
             };
         } else {
             console.log("WebSocket connection is already open.");
@@ -798,23 +815,21 @@ export default class Game extends AbstractView {
             this.websocket.onmessage = function(event) {
                 const data = JSON.parse(event.data);
             }
-            const checkPageChange = () => {
-                if (!document.getElementById("tournament-container")) {
-                    console.log("change page");
-                    this.websocket.close();
-                    this.websocket = null;
-                    clearInterval(intervalId);
-                }
-            }
-            const intervalId = setInterval(checkPageChange, 1000);
+            // const checkPageChange = () => {
+            //     if (!document.getElementById("tournament-container")) {
+            //         console.log("change page");
+            //         this.websocket.close();
+            //         this.websocket = null;
+            //         clearInterval(intervalId);
+            //     }
+            // }
+            //const intervalId = setInterval(checkPageChange, 1000);
 
             this.websocket.onclose = (event) => {
                 console.log("Tournament Game WebSocket connection closed", event);
-                clearInterval(intervalId); 
             };
             this.websocket.onerror = (error) => {
                 console.error("WebSocket error:", error);
-                clearInterval(intervalId);
             };
         } else {
             console.log("WebSocket connection is already open.");
@@ -885,6 +900,7 @@ class Tic extends AbstractView {
                 this.websocket.send(JSON.stringify({ action: "join_matchmaking" }));
             };
             const self = this;
+            this.checkIfLeave();
             this.websocket.onmessage = function(event) {
                 const data = JSON.parse(event.data);
                 if (data.action === "match_found") {
@@ -909,23 +925,21 @@ class Tic extends AbstractView {
                     }
                 }
             };
-            const checkPageChange = () => {
-                if (!document.getElementById("game")) {
-                    console.log("change page");
-                    this.websocket.close();
-                    this.websocket = null;
-                    clearInterval(intervalId);
-                }
-            }
-            const intervalId = setInterval(checkPageChange, 500);
+            // const checkPageChange = () => {
+            //     if (!document.getElementById("game")) {
+            //         console.log("change page");
+            //         this.websocket.close();
+            //         this.websocket = null;
+            //         clearInterval(intervalId);
+            //     }
+            // }
+            // const intervalId = setInterval(checkPageChange, 500);
 
             this.websocket.onclose = (event) => {
                 console.log("Matchmaking WebSocket connection closed", event);
-                clearInterval(intervalId); 
             };
             this.websocket.onerror = (error) => {
                 console.error("WebSocket error:", error);
-                clearInterval(intervalId);
             };
         } else {
             console.log("WebSocket connection is already open.");
@@ -966,13 +980,29 @@ class Tic extends AbstractView {
         document.getElementById("winner-tic").innerText = `${this.opponent} left the game. You can leave the page now.`;
     }
 
-    navLinkClickHandler = (event) => {
+    handleNavigation = () => {
         if (this.gameActive) {
-            if (this.websocket)
-                this.websocket.close();
+            this.gameActive = false;
             this.sendInGameStatus(false);
         }
+        if (this.websocket) {
+            this.websocket.close();
+            this.websocket = null;
+        }
+        window.removeEventListener('popstate', this.handleNavigation);
     }
+
+    navLinkClickHandler = (event) => {
+        if (this.gameActive) {
+            this.gameActive = false;
+            this.sendInGameStatus(false);
+        }
+        if (this.websocket) {
+            this.websocket.close();
+            this.websocket = null;
+        }
+    }
+
 
     checkIfLeave = () => {
         const navLinks = document.querySelectorAll('.nav__link');
@@ -985,7 +1015,7 @@ class Tic extends AbstractView {
     startGame = () => {
         this.gameActive = true;
         this.sendInGameStatus(true);
-        this.checkIfLeave();
+        //this.checkIfLeave();
         document.getElementById("tic-card").classList.add("d-none");
         document.getElementById("tic-tac-toe").classList.remove("d-none");
         setTimeout(() => {
