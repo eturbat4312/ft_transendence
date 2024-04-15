@@ -25,7 +25,7 @@ scrape_configs:
       - targets: ['prometheus:9090']
     basic_auth:
       username: admin
-      password: test12345
+      password: test9999
   
   - job_name: 'postgres-exporter'
     static_configs:

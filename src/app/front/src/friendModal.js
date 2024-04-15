@@ -3,6 +3,7 @@ import { initPrivateGame } from "../views/Game.js";
 
 let connectedPlayers = [];
 let playersPlaying = [];
+let friends = [];
 
 
 
@@ -179,13 +180,19 @@ function updateplayerModal(websocket) {
         const userId = listItem.dataset.id;
         const playerInfoContent = `
         <p>Name: ${playerName}</p><button id="addFriendBtn" data-user-id="${userId}" class="btn btn-primary">Add to friends</button>
-        <button id="blockBtn" data-user-id="${userId}" class="btn btn-danger">Block player</button>
-        <a href="/profile" id="profileBtn" data-user-id="${userId}" class="btn btn-info nav__link">Profile</a>`;
+        <button id="blockBtn" data-user-id="${userId}" data-bs-dismiss="modal" class="btn btn-danger">Block player</button>
+        <a href="/profile" id="profileBtn" data-user-id="${userId}" data-bs-dismiss="modal" class="btn btn-info nav__link">Profile</a>`;
         document.getElementById('playerModalBody').innerHTML = playerInfoContent;
         const addFriendBtn = document.getElementById('addFriendBtn');
         const blockBtn = document.getElementById('blockBtn');
         addFriendBtn.addEventListener('click', async function() {
-            await sendFriendRequest(userId, websocket);
+
+            if (friends.includes(parseInt(userId))) {
+                alert("Already your friend");
+            } else {
+                console.log(friends);
+                await sendFriendRequest(userId, websocket);
+            }
         });
         blockBtn.addEventListener('click', async function() {
             await blockRequest(userId, playerName, websocket);
@@ -947,6 +954,7 @@ export async function getFriends(websocket) {
                 friendElement.classList.add("clickable");
                 friendElement.dataset.id = friend.id;
                 friendElement.dataset.name = friend.username;
+                friends.push(friend.id);
                 const statusIcon = document.createElement("div");
                 statusIcon.setAttribute("id", `friend-${friend.id}`);
                 statusIcon.classList.add("player-status");
@@ -979,7 +987,7 @@ export async function getFriends(websocket) {
                     const friendInfoContent = ` <p>Username: ${friendName}</p>
                                                 <button id="removeFriendBtn" class="btn btn-danger" data-bs-dismiss="modal">Remove from friends</button>
                                                 <button id="inviteGameBtn"  class="btn btn-success invite-button" data-bs-dismiss="modal">Invite to play 1v1</button>
-                                                <a href="/profile" id="friendProfileBtn" data-user-id="${friendId}" class="btn btn-info nav__link">Profile</a>`;
+                                                <a href="/profile" id="friendProfileBtn" data-user-id="${friendId}" data-bs-dismiss="modal" class="btn btn-info nav__link">Profile</a>`;
                     document.getElementById('friendModalBody').innerHTML = friendInfoContent;
                     const removeFriendBtn = document.getElementById('removeFriendBtn');
                     removeFriendBtn.addEventListener('click', async function() {

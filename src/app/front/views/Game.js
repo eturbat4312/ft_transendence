@@ -62,6 +62,10 @@ export default class Game extends AbstractView {
                 </div>
             </div>
         </div>
+            <!-- <button id="paddle1-up" class="paddle-control btn btn-secondary">Paddle 1 Up</button> -->
+            <!-- <button id="paddle1-down" class="paddle-control btn btn-secondary">Paddle 1 Down</button> -->
+            <!-- <button id="paddle2-up" class="paddle-control btn btn-secondary">Paddle 2 Up</button> -->
+            <!-- <button id="paddle2-down" class="paddle-control btn btn-secondary">Paddle 2 Down</button> -->
         <div id="game" class="container-fluid centered d-none">
             <div class="game-container">
                 <div id="center-line"></div>
@@ -243,6 +247,15 @@ export default class Game extends AbstractView {
     }
 
     startGame = () => {
+        // document.getElementById('paddle1-up').addEventListener('touchstart', () => this.handleKeyPress('w', true));
+        // document.getElementById('paddle1-up').addEventListener('touchend', () => this.handleKeyPress('w', false));
+        // document.getElementById('paddle1-down').addEventListener('touchstart', () => this.handleKeyPress('s', true));
+        // document.getElementById('paddle1-down').addEventListener('touchend', () => this.handleKeyPress('s', false));
+
+        // document.getElementById('paddle2-up').addEventListener('touchstart', () => this.handleKeyPress('ArrowUp', true));
+        // document.getElementById('paddle2-up').addEventListener('touchend', () => this.handleKeyPress('ArrowUp', false));
+        // document.getElementById('paddle2-down').addEventListener('touchstart', () => this.handleKeyPress('ArrowDown', true));
+        // document.getElementById('paddle2-down').addEventListener('touchend', () => this.handleKeyPress('ArrowDown', false));
         if (this.isMaster)
             console.log(" START_GAME");
         this.sendInGameStatus(true);
