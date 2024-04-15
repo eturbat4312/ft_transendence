@@ -15,6 +15,7 @@
   DB_PORT=5432
   DB_NAME=postgres
   DB_USER=postgres
+  PROMETHEUS_USERNAME=admin
   DEBUG=False
 
 docker exec postgres apt-get update && apt-get install -y postgresql-13-pg-prometheus  
@@ -48,10 +49,13 @@ docker exec postgres apt-get update && apt-get install -y postgresql-13-pg-prome
   echo -e "\n${GREY}Enter your database password:${NC}"
   read -r POSTGRES_PASSWORD
 
+  echo "Enter your Prometheus password:"
+  read -r PROMETHEUS_PASSWORD
+
 
   # if .env not filled exit
   if [ -z "$SECRET_KEY" ] || [ -z "$DB_HOST" ] || [ -z "$DB_PORT" ]  ||
-   [ -z "$DB_NAME" ] || [ -z "$DB_USER" ] || [ -z "$POSTGRES_PASSWORD" ] || [ -z "$DEBUG" ] ; then
+   [ -z "$DB_NAME" ] || [ -z "$DB_USER" ] || [ -z "$POSTGRES_PASSWORD" ] || [ -z "$PROMETHEUS_PASSWORD" ] || [ -z "$DEBUG" ] ; then
 
     echo -e "\n${RED}Error: .env file not filled${NC}"
     exit 1
@@ -62,8 +66,13 @@ docker exec postgres apt-get update && apt-get install -y postgresql-13-pg-prome
     echo -e "DB_PORT=$DB_PORT" >> $ENV_PATH
     echo -e "DB_NAME=$DB_NAME" >> $ENV_PATH
     echo -e "DB_USER=$DB_USER" >> $ENV_PATH
+    echo -e "PROMETHEUS_USERNAME=$PROMETHEUS_USERNAME" >> $ENV_PATH
     echo -e "DEBUG=$DEBUG" >> $ENV_PATH
     echo -e "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> $ENV_PATH
+    echo -e "PROMETHEUS_PASSWORD=$PROMETHEUS_PASSWORD" >> $ENV_PATH
+    echo -e "DATA_SOURCE_NAME=postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/postgres?sslmode=disable" >> $ENV_PATH
+    export $(grep -v '^#' .env | xargs) 
+    envsubst < prometheus.template.yml > ./src/app/prometheus/prometheus.yml
 
     # Success message
     echo -e "\n${GREEN}Success!${NC} .env file created"

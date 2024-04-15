@@ -31,6 +31,7 @@ services:
         volumes:
             - ./src/app/front/dist:/usr/share/nginx/html
             - ./src/app/nginx:/app/nginx
+            - ./src/app/nginx/htpasswd:/etc/nginx/.htpasswd
             - ./src/app/django/transcendence/media:/var/www/media
         depends_on:
             - django
@@ -70,20 +71,35 @@ services:
         networks:
             - transcendence
 
+    postgres-exporter:
+        image: prometheuscommunity/postgres-exporter
+        ports:
+            - "9187:9187"
+        environment:
+            - DATA_SOURCE_NAME=${DATA_SOURCE_NAME}
+        networks:
+            - transcendence
+
     prometheus:
         image: prom/prometheus
         container_name: prometheus
         restart: always
+        env_file:
+            - .env
         volumes:
             - ./src/app/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
             - ./src/app/prometheus/config/rules.yml:/etc/prometheus/rules.yml
+            - ./src/app/prometheus/config/web.yml:/etc/prometheus/web.yml
 
         ports:
             - "9090:9090"
         command:
             - "--config.file=/etc/prometheus/prometheus.yml"
+            - "--web.config.file=/etc/prometheus/web.yml"
+
         networks:
             - transcendence
+
     grafana:
         image: grafana/grafana
         container_name: grafana
@@ -91,9 +107,10 @@ services:
         ports:
             - "3000:3000"
         volumes:
-            - ./src/app/grafana:/var/lib/grafana
+            - ./src/app/grafana:/var/lib/grafana/
         networks:
             - transcendence
+
     alertmanager:
         image: quay.io/prometheus/alertmanager
         container_name: alertmanager

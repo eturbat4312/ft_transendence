@@ -9,3 +9,4 @@ logs
 db/
 env/
 src/app/django/transcendence/media
+/prometheus.yml
