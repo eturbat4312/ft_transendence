@@ -108,7 +108,7 @@ const getSocial = async () => {
         </div>
     </div>
     <div id="player-bar" class="player-bar bg-dark">
-        <h2>Social</h2>
+        <h2 style="margin-top: 56px;">Social</h2>
         <div id="player-list-container" class="container">
             <p>Friends</p>
             <ul id="friend-list" class="player-list"></ul>
@@ -117,7 +117,7 @@ const getSocial = async () => {
             <ul id="player-list" class="player-list"></ul>
         </div>
         <hr>
-        <div class="d-grid gap-2 col-11 position-absolute">
+        <div class="d-grid gap-2 col-11 position-absolute" style="bottom: 25px;">
             <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#friendRequestsModal">Friends Requests</button>
             <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#blockedModal">Blocked List</button>
         </div>

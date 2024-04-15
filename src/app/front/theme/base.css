@@ -51,18 +51,44 @@
 #player-list-container {
    margin-top: 20px;
    padding: 0;
-   max-height: 600px;
+   flex-grow: 1;
+   margin-bottom: 70px;
    overflow-y: auto;
+}
+
+#paddle1-up {
+   position: absolute;
+   top: 450px;
+   left: 250px;
+}
+
+#paddle1-down {
+   position: absolute;
+   top: 500px;
+   left: 250px;
+}
+
+#paddle2-up {
+   position: absolute;
+   top: 450px;
+   right: 250px;
+}
+
+#paddle2-down {
+   position: absolute;
+   top: 500px;
+   right: 250px;
 }
  
 .player-bar {
-   position: fixed;
+   position: absolute;
    right: 0;
-   top: 56px;
    width: 200px;
    height: 100%;
    color: #fff;
    padding: 10px;
+   display: flex;
+   flex-direction: column;
    z-index: 2;
 }
 
