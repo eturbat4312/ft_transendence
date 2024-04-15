@@ -10,3 +10,4 @@ db/
 env/
 src/app/django/transcendence/media
 /prometheus.yml
+/web.yml

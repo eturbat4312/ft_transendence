@@ -52,10 +52,13 @@ docker exec postgres apt-get update && apt-get install -y postgresql-13-pg-prome
   echo "Enter your Prometheus password:"
   read -r PROMETHEUS_PASSWORD
 
+  PROMETHEUS_HASH=$(htpasswd -nbBC 10 "$PROMETHEUS_USERNAME" "$PROMETHEUS_PASSWORD" | awk -F":" '{print $2}')
+
 
   # if .env not filled exit
   if [ -z "$SECRET_KEY" ] || [ -z "$DB_HOST" ] || [ -z "$DB_PORT" ]  ||
-   [ -z "$DB_NAME" ] || [ -z "$DB_USER" ] || [ -z "$POSTGRES_PASSWORD" ] || [ -z "$PROMETHEUS_PASSWORD" ] || [ -z "$DEBUG" ] ; then
+    [ -z "$DB_NAME" ] || [ -z "$DB_USER" ] || [ -z "$POSTGRES_PASSWORD" ] || [ -z "$PROMETHEUS_PASSWORD" ] ||
+    [ -z "$PROMETHEUS_USERNAME" ]|| [ -z "$PROMETHEUS_HASH" ]|| [ -z "$DEBUG" ] ; then
 
     echo -e "\n${RED}Error: .env file not filled${NC}"
     exit 1
@@ -71,8 +74,10 @@ docker exec postgres apt-get update && apt-get install -y postgresql-13-pg-prome
     echo -e "POSTGRES_PASSWORD=$POSTGRES_PASSWORD" >> $ENV_PATH
     echo -e "PROMETHEUS_PASSWORD=$PROMETHEUS_PASSWORD" >> $ENV_PATH
     echo -e "DATA_SOURCE_NAME=postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/postgres?sslmode=disable" >> $ENV_PATH
+    echo -e "PROMETHEUS_HASH=$PROMETHEUS_HASH" >> $ENV_PATH
     export $(grep -v '^#' .env | xargs) 
     envsubst < prometheus.template.yml > ./src/app/prometheus/prometheus.yml
+    envsubst < web.template.yml > ./src/app/prometheus/config/web.yml
 
     # Success message
     echo -e "\n${GREEN}Success!${NC} .env file created"
