@@ -127,7 +127,8 @@ export default class Game extends AbstractView {
     }
 
     handleNavigation = () => {
-        document.getElementById("countdown").classList.add("d-none");
+        if (document.getElementById("countdown"))
+            document.getElementById("countdown").classList.add("d-none");
         if (this.gameActive) {
             this.gameActive = false;
             this.sendInGameStatus(false);
@@ -140,7 +141,8 @@ export default class Game extends AbstractView {
     }
 
     navLinkClickHandler = (event) => {
-        document.getElementById("countdown").classList.add("d-none");
+        if (document.getElementById("countdown"))
+            document.getElementById("countdown").classList.add("d-none");
         if (this.gameActive) {
             this.gameActive = false;
             this.sendInGameStatus(false);
@@ -259,7 +261,8 @@ export default class Game extends AbstractView {
         if (this.isMaster)
             console.log(" START_GAME");
         this.sendInGameStatus(true);
-        //this.checkIfLeave();
+        if (this.isOffline)
+            this.checkIfLeave();
         this.resetBall();
         this.gameActive = true;
         this.gameLoop();
@@ -1028,7 +1031,6 @@ class Tic extends AbstractView {
     startGame = () => {
         this.gameActive = true;
         this.sendInGameStatus(true);
-        //this.checkIfLeave();
         document.getElementById("tic-card").classList.add("d-none");
         document.getElementById("tic-tac-toe").classList.remove("d-none");
         setTimeout(() => {
@@ -1191,6 +1193,7 @@ class Tic extends AbstractView {
             const [a, b, c] = combination;
             if (this.board[a] !== '' && this.board[a] === this.board[b] && this.board[a] === this.board[c]) {
                 this.winner = this.board[a];
+                this.gameActive = false;
                 this.sendInGameStatus(false);
                 this.winnerDisplay.textContent = `Player ${this.winner} wins!`;
                 this.resetButton.style.display = 'block';
@@ -1206,6 +1209,7 @@ class Tic extends AbstractView {
 
     startOfflineGame = () => {
         this.sendInGameStatus(true);
+        this.checkIfLeave();
         document.getElementById("tic-card").classList.add("d-none");
         document.getElementById("tic-tac-toe").classList.remove("d-none");
         this.cells.forEach(cell => {
@@ -1219,6 +1223,7 @@ class Tic extends AbstractView {
         this.player1 = false;
         this.player2 = false;
         this.isOffline = true;
+        this.gameActive = true;
         this.startOfflineGame();
     }
 }
