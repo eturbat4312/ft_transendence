@@ -85,7 +85,8 @@ export default class Tournament extends AbstractView {
         if (this.websocketT) {
             this.websocketT.close();
             this.websocketT = null;
-            this.sendDeletedMessage()
+            if (this.tournamentMaster)
+                this.sendDeletedMessage();
         }
         window.removeEventListener('popstate', this.handleNavigation);
     }
