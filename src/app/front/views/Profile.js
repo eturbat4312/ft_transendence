@@ -84,7 +84,7 @@ export default class Profile extends AbstractView {
             <div class="card mb-4 mb-md-0">
               <div class="card-body">
                 <p class="mb-4">PONG HISTORY</p>
-                <ul id="pong-history" class="list-group">
+                <ul id="pong-history"   style="overflow-y: auto; max-height: 300px;" class="list-group">
                 
                 </ul>
               </div>
@@ -94,7 +94,7 @@ export default class Profile extends AbstractView {
             <div class="card mb-4 mb-md-0">
               <div class="card-body">
                 <p class="mb-4">TIC-TAC-TOE HISTORY</p>
-                <ul id="tic-history" class="list-group">
+                <ul id="tic-history"  style="overflow-y: auto; max-height: 300px;" class="list-group">
                 
                 </ul>
               </div>

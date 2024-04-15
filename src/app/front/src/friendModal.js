@@ -873,11 +873,25 @@ async function getTicStats(userId) {
 
 export async function printProfile(userId)
 {
-    const username = await fetchUsernameFromId(userId);
-    const data = await getPlayerStats(userId);
-    const tic = await getTicStats(userId);
-    const elo = await getTicELO(userId);
-    await getProfilePic(userId);
+    const [
+        username,
+        data,
+        tic,
+        elo,
+        ,
+        ,
+        ,
+    ] = await Promise.all([
+        fetchUsernameFromId(userId),
+        getPlayerStats(userId),
+        getTicStats(userId),
+        getTicELO(userId),
+        getProfilePic(userId),
+        getBio(userId),
+        getEmail(userId),
+    ]);
+
+    document.getElementById("profile-username").innerText = username;
     const totalMatches = data.total_matches;
     const wonMatches = data.won_matches;
     const lostMatches = data.lost_matches;
@@ -887,7 +901,6 @@ export async function printProfile(userId)
     const drawTic = tic.draw_matches;
     const lostTic = tic.lost_matches;
     const ticMatches = tic.matches;
-    const profileUser = document.getElementById("profile-username");
     const pongGamesPlayed = document.getElementById("pong-gamesPlayed");
     const pongGamesWon = document.getElementById("pong-gamesWon");
     const pongGamesLose = document.getElementById("pong-gamesLost");
@@ -898,10 +911,6 @@ export async function printProfile(userId)
     const ticGamesLose = document.getElementById("tic-gamesLost");
     const ticElo = document.getElementById("tic-elo");
     const ticHistory = document.getElementById("tic-history");
-
-    await getBio(userId);
-    await getEmail(userId);
-    profileUser.innerText = `${username}`;
     pongGamesPlayed.innerText = totalMatches;
     pongGamesWon.innerText = wonMatches;
     pongGamesLose.innerText = lostMatches;
@@ -911,20 +920,23 @@ export async function printProfile(userId)
     ticGamesLose.innerText = lostTic;
     ticElo.innerText = elo;
 
-    for (let i = 0; i < matches.length; i++) {
-        const opponent = await fetchUsernameFromId(matches[i].opponent);
+    const matchPromises = matches.map(async (match) => {
+        const opponent = await fetchUsernameFromId(match.opponent);
         const li = document.createElement('li');
-        li.textContent = `${new Date(matches[i].played_at).toLocaleDateString()}: ${username} ${matches[i].player_score} - ${matches[i].opponent_score} ${opponent}`;
+        li.textContent = `${new Date(match.played_at).toLocaleDateString()}: ${username} ${match.player_score} - ${match.opponent_score} ${opponent}`;
         li.className = 'list-group-item';
         pongHistory.appendChild(li);
-    }
-    for (let i = 0; i < ticMatches.length; i++) {
-        const opponent = await fetchUsernameFromId(ticMatches[i].opponent);
+    });
+
+    const ticMatchPromises = ticMatches.map(async (ticMatch) => {
+        const opponent = await fetchUsernameFromId(ticMatch.opponent);
         const li = document.createElement('li');
-        li.textContent = `${new Date(ticMatches[i].played_at).toLocaleDateString()}: ${username} - ${opponent}: ${ticMatches[i].match_status}`;
+        li.textContent = `${new Date(ticMatch.played_at).toLocaleDateString()}: ${username} - ${opponent}: ${ticMatch.match_status}`;
         li.className = 'list-group-item';
         ticHistory.appendChild(li);
-    }
+    });
+
+    await Promise.all([...matchPromises, ...ticMatchPromises]);
 }
 
 export async function getFriends(websocket) {

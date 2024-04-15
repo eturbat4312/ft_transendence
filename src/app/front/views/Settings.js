@@ -139,7 +139,7 @@ export default class Settings extends AbstractView {
             console.log('data send to backend : ', JSON.stringify({ username: username }));
             if (response.ok) {
                 alert('Username updated');
-    
+                localStorage.setItem('username', username);
             } else {
                 alert( 'Failed to update username');
                 console.log('Failed to update username:', await response.text());

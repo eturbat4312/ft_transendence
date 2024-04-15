@@ -436,6 +436,8 @@ class UpdateEmailView(APIView):
     def post(self, request):
         user = request.user
         new_email = request.data.get('new_email')
+        if UserModel.objects.filter(email=new_email).exists():
+            return Response({'error': 'Email already in use'}, status=400)
         user.email = new_email
         user.save()
         return Response({'message': 'Email updated successfully'})
