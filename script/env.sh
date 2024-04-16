@@ -18,7 +18,7 @@
   PROMETHEUS_USERNAME=admin
   DEBUG=False
 
-docker exec postgres apt-get update && apt-get install -y postgresql-13-pg-prometheus  
+#docker exec postgres apt-get update && apt-get install -y postgresql-13-pg-prometheus  
 
 
   # Catch if ctrl+c is pressed

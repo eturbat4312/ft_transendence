@@ -48,10 +48,12 @@ services:
             - "8000:8000"
         volumes:
             - ./src/app/django:/app/django
+            - ./wait-for-postgres.sh:/app/django/wait-for-postgres.sh
         env_file:
             - .env
         depends_on:
             - db
+        command: ["./wait-for-postgres.sh", "db", "./entrypoint.sh"]
         networks:
             - transcendence
 
