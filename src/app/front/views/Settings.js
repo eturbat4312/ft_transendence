@@ -152,14 +152,18 @@ export default class Settings extends AbstractView {
 
     async updateEmail() {
         const email = document.getElementById('email').value;
-        console.log("email: ", email);
+        if (!this.isValidEmail(email)) {
+            alert('Invalid email address.');
+            return;
+        }
+    
         const serverIP = window.location.hostname;
         const token = localStorage.getItem('token');
         if (!token) {
             console.log('Token not found');
             return;
         }
-
+    
         try {
             const response = await fetch(`https://${serverIP}/api/update_email/`, {
                 method: 'POST',
@@ -169,19 +173,22 @@ export default class Settings extends AbstractView {
                 },
                 body: JSON.stringify({ new_email: email })
             });
-
+    
             if (response.ok) {
-                alert( 'Email updated');
-                console.log('Email updated');
+                alert('Email updated');
             } else {
                 alert('Failed to update email');
-                console.log('Failed to update email:', await response.text());
             }
-
         } catch (error) {
             console.log('Error:', error);
         }
     }
+    
+    isValidEmail(email) {
+        const re = /^[a-zA-Z0-3.]+@[a-zA-Z0-3.-]+\.[a-zA-Z]{2,}$/;
+        return re.test(email);
+    }
+    
 
     async updateProfilePic() {
         const serverIP = window.location.hostname;
