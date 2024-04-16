@@ -62,11 +62,11 @@ export default class Settings extends AbstractView {
                     <input id="Username" type="text" class="form-control mb-1" value="">
                     <button id="saveUsername" type="button"  class="btn btn-primary">Save username</button>&nbsp;
                 </div>
-                <div class="form-group">
+                <form class="form-group">
                     <label class="form-label">E-mail</label>
-                    <input id="email" type="text" class="form-control mb-1" value="">
+                    <input id="email" type="email" class="form-control mb-1" value="">
                     <button id="saveEmail" type="button"  class="btn btn-primary">Save email</button>&nbsp;
-                </div>
+                </form>
             </div>
         </div>
         `;
@@ -152,6 +152,7 @@ export default class Settings extends AbstractView {
 
     async updateEmail() {
         const email = document.getElementById('email').value;
+        console.log("email: ", email);
         const serverIP = window.location.hostname;
         const token = localStorage.getItem('token');
         if (!token) {
