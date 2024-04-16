@@ -8,7 +8,6 @@ logs
 *.log
 db/
 env/
-src/app/django/transcendence/media
 src/app/prometheus/prometheus.yml
 src/app/prometheus/config/web.yml
 
