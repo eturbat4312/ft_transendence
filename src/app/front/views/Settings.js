@@ -152,6 +152,7 @@ export default class Settings extends AbstractView {
 
     async updateEmail() {
         const email = document.getElementById('email').value;
+        console.log("email: ", email);
         const serverIP = window.location.hostname;
         const token = localStorage.getItem('token');
         if (!token) {
