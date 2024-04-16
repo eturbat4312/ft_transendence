@@ -76,8 +76,10 @@ docker exec postgres apt-get update && apt-get install -y postgresql-13-pg-prome
     echo -e "DATA_SOURCE_NAME=postgresql://postgres:${POSTGRES_PASSWORD}@db:5432/postgres?sslmode=disable" >> $ENV_PATH
     echo -e "PROMETHEUS_HASH=$PROMETHEUS_HASH" >> $ENV_PATH
     export $(grep -v '^#' .env | xargs) 
-    envsubst < prometheus.template.yml > ./src/app/prometheus/prometheus.yml
-    envsubst < web.template.yml > ./src/app/prometheus/config/web.yml
+    sed 's/${PROMETHEUS_PASSWORD}/'"$PROMETHEUS_PASSWORD"'/' prometheus.template.yml > prom.yml
+    sed 's#${PROMETHEUS_HASH}#'"$PROMETHEUS_HASH"'#' web.template.yml > web.yml
+    mv prom.yml ./src/app/prometheus/prometheus.yml
+    mv web.yml ./src/app/prometheus/config/web.yml
 
     # Success message
     echo -e "\n${GREEN}Success!${NC} .env file created"
