@@ -171,7 +171,6 @@ function updateplayerModal(websocket) {
     const playerName = document.createElement("p");
     playerName.textContent = player.name;
     playerName.classList.add("player-name");
-    console.log("add to html", player.name);
     listItem.appendChild(playerName);
     playerList.appendChild(listItem);
 

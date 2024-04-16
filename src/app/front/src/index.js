@@ -121,7 +121,6 @@ const loadComponents = async () => {
 };
 
 const navLinkClickHandler = (event) => {
-    console.log("page:", event.currentTarget.getAttribute('href'));
     event.preventDefault();
     const path = event.currentTarget.getAttribute('href');
     navigate(path);

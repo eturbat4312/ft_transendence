@@ -258,8 +258,6 @@ export default class Game extends AbstractView {
         // document.getElementById('paddle2-up').addEventListener('touchend', () => this.handleKeyPress('ArrowUp', false));
         // document.getElementById('paddle2-down').addEventListener('touchstart', () => this.handleKeyPress('ArrowDown', true));
         // document.getElementById('paddle2-down').addEventListener('touchend', () => this.handleKeyPress('ArrowDown', false));
-        if (this.isMaster)
-            console.log(" START_GAME");
         this.sendInGameStatus(true);
         if (this.isOffline)
             this.checkIfLeave();
@@ -813,7 +811,6 @@ export default class Game extends AbstractView {
         } else {
             this.player2 = true;
         }
-        console.log(this.isMaster, this.player1, this.player2);
     }
 
     startTournament(playing, gameMaster, gameId, websocketT) {
@@ -1284,7 +1281,5 @@ export function initPrivateGame(userId, opponentUserId) {
 
 export function startTournamentGame(playing, gameMaster, gameId, websocketT) {
     const gameView = new Game();
-    if (gameMaster)
-        console.log("GAMEMASTER");
     gameView.startTournament(playing, gameMaster, gameId, websocketT);
 }

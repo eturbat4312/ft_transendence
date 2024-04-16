@@ -156,7 +156,6 @@ export default class Tournament extends AbstractView {
             if (this.checkInterval)
                 clearInterval(this.checkInterval);
         }
-        console.log("handleFirstRound");
         let message;
         let winner;
         if (player1 && player2) {
@@ -184,7 +183,6 @@ export default class Tournament extends AbstractView {
             if (this.checkInterval)
                 clearInterval(this.checkInterval);
         }
-        console.log("handleSecoundRound");
         let message;
         let winner;
         if (player1 && player2) {
@@ -308,14 +306,12 @@ export default class Tournament extends AbstractView {
     }
 
     sendStartMessage = (event) => {
-        console.log("start_message");
         const message = JSON.stringify({ action: "start_tournament"});
         this.websocketT.send(message);
     }
 
     sendReadyMessage(player) {
         let message = null;
-        console.log('player: ' + player);
         if (player === 1)
             message = JSON.stringify({ action: "game_ready", player: "1"});
         else if (player === 2)
@@ -459,7 +455,6 @@ export default class Tournament extends AbstractView {
     }
 
     gameReady(playerData) {
-        console.log("game is ready to start");
         if (playerData === "1")
             this.ready1 = true;
         if (playerData === "2")
@@ -645,7 +640,6 @@ export default class Tournament extends AbstractView {
                     self.startTournament();
                 }
                 if (data.action === "game_ready") {
-                    console.log("game_ready websocket");
                     self.gameReady(data.player);
                 }
                 if (data.action === "result") {
@@ -688,7 +682,6 @@ async function createTournament(websocket) {
 
         if (response.ok) {
             const result = await response.json();
-            console.log('Tournament created successfully with ID:', result.tournament_id);
             const message = JSON.stringify({ action: "start_tournament" });
             websocket.send(message);
         } else {
@@ -724,7 +717,6 @@ async function deleteTournament() {
 
         if (response.ok) {
             const result = await response.json();
-            console.log('Tournament deleted successfully');
         } else {
             console.error('no tournament to delete');
         }
