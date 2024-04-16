@@ -1,4 +1,4 @@
-import { navigate } from "../src/index.js";
+import { navigate } from "../src/index.js"; // Importing the navigate function
 import AbstractView from "./AbstractView.js";
 import { getProfilePicUrl } from "./utils.js";
 
@@ -159,6 +159,11 @@ export default class Settings extends AbstractView {
             return;
         }
 
+        if (!isValidEmail(email)) {
+            alert('Email is not in a valid format');
+            return;
+        }
+
         try {
             const response = await fetch(`https://${serverIP}/api/update_email/`, {
                 method: 'POST',
@@ -170,7 +175,7 @@ export default class Settings extends AbstractView {
             });
 
             if (response.ok) {
-                alert( 'Email updated');
+                alert( 'Email updatedd');
                 console.log('Email updated');
             } else {
                 alert('Failed to update email');
@@ -289,4 +294,11 @@ export default class Settings extends AbstractView {
         }
     }
 
+}
+
+// Function to validate email format
+function isValidEmail(email) {
+    // Regular expression to match email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
 }
