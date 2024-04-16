@@ -119,7 +119,7 @@ export default class Game extends AbstractView {
                 </div>
                 <div class="end-game-container">
                     <div id="winner-tic"></div>
-                    <button class="btn btn-primary btn-reset" style="z-index: 1; display: none;">Reset</button>
+                    <button id="resetTic" class="btn btn-primary btn-reset" style="z-index: 1; display: none;">Reset</button>
                 </div>  
             </div>
         </div>
@@ -869,6 +869,7 @@ class Tic extends AbstractView {
         this.gameActive = false;
         this.winnerDisplay = document.getElementById('winner-tic');
         this.myName = localStorage.getItem("username");
+        this.resetButton = document.getElementById("resetTic");
         this.ELO = null;
     }
 
